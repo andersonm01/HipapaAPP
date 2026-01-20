@@ -1,0 +1,44 @@
+/*
+ * Bootstrap via CDN (cargado en el layout)
+ * Estilos personalizados de la aplicación
+ */
+
+body {
+  padding-top: 56px; /* Para el navbar fijo */
+  background-color: #f8f9fa;
+}
+
+.card-header.bg-light {
+  background-color: #e9ecef !important;
+}
+
+.border-success {
+  border-left-width: 4px !important;
+}
+
+/* Estilo para botón naranja similar a la imagen */
+.btn-warning {
+  background-color: #fd7e14;
+  border-color: #fd7e14;
+  color: white;
+}
+
+.btn-warning:hover {
+  background-color: #e66a00;
+  border-color: #e66a00;
+  color: white;
+}
+
+.card-header.bg-warning {
+  background-color: #fd7e14 !important;
+}
+
+/* Ajustes de espaciado para tablas */
+.table th {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.table td {
+  font-size: 0.875rem;
+}
