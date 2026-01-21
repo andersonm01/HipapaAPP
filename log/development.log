@@ -648,3 +648,158 @@ Processing by HomeController#index as HTML
 Completed 200 OK in 11ms (Views: 4.6ms | ActiveRecord: 0.3ms | Allocations: 4972)
 
 
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:38:29 -0500
+  [1m[36mActiveRecord::SchemaMigration Pluck (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.2ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9360'
+  Rendered home/index.html.erb within layouts/application (Duration: 47.6ms | Allocations: 10234)
+  Rendered layout layouts/application.html.erb (Duration: 133.9ms | Allocations: 42456)
+Completed 200 OK in 246ms (Views: 157.9ms | ActiveRecord: 0.7ms | Allocations: 47142)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:39:38 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9488'
+  Rendered home/index.html.erb within layouts/application (Duration: 3.5ms | Allocations: 4847)
+  Rendered layout layouts/application.html.erb (Duration: 6.8ms | Allocations: 6391)
+Completed 200 OK in 16ms (Views: 11.6ms | ActiveRecord: 0.1ms | Allocations: 7178)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:40:46 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9640'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.9ms | Allocations: 4813)
+  Rendered layout layouts/application.html.erb (Duration: 6.2ms | Allocations: 6355)
+Completed 200 OK in 15ms (Views: 11.1ms | ActiveRecord: 0.1ms | Allocations: 7139)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:40:50 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9720'
+  Rendered home/index.html.erb within layouts/application (Duration: 3.3ms | Allocations: 4815)
+  Rendered layout layouts/application.html.erb (Duration: 7.1ms | Allocations: 6366)
+Completed 200 OK in 16ms (Views: 12.0ms | ActiveRecord: 0.1ms | Allocations: 7154)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:41:48 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9792'
+  Rendered home/index.html.erb within layouts/application (Duration: 3.2ms | Allocations: 4804)
+  Rendered layout layouts/application.html.erb (Duration: 110.7ms | Allocations: 8946)
+Completed 200 OK in 121ms (Views: 116.1ms | ActiveRecord: 0.1ms | Allocations: 9724)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:41:58 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9872'
+  Rendered home/index.html.erb within layouts/application (Duration: 3.6ms | Allocations: 4819)
+  Rendered layout layouts/application.html.erb (Duration: 7.0ms | Allocations: 6369)
+Completed 200 OK in 17ms (Views: 12.5ms | ActiveRecord: 0.1ms | Allocations: 7157)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:42:05 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9944'
+  Rendered home/index.html.erb within layouts/application (Duration: 3.0ms | Allocations: 4802)
+  Rendered layout layouts/application.html.erb (Duration: 6.8ms | Allocations: 6343)
+Completed 200 OK in 16ms (Views: 11.6ms | ActiveRecord: 0.1ms | Allocations: 7121)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:42:06 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.2ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_9944'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.8ms | Allocations: 4314)
+  Rendered layout layouts/application.html.erb (Duration: 5.9ms | Allocations: 5655)
+Completed 200 OK in 10ms (Views: 6.2ms | ActiveRecord: 0.2ms | Allocations: 5936)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:42:17 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_10072'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.9ms | Allocations: 4808)
+  Rendered layout layouts/application.html.erb (Duration: 6.0ms | Allocations: 6349)
+Completed 200 OK in 16ms (Views: 11.0ms | ActiveRecord: 0.1ms | Allocations: 7129)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:42:25 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_10072'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.6ms | Allocations: 4317)
+  Rendered layout layouts/application.html.erb (Duration: 15.6ms | Allocations: 7029)
+Completed 200 OK in 20ms (Views: 16.0ms | ActiveRecord: 0.1ms | Allocations: 7309)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:42:30 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_10072'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.6ms | Allocations: 4310)
+  Rendered layout layouts/application.html.erb (Duration: 6.9ms | Allocations: 5697)
+Completed 200 OK in 10ms (Views: 7.1ms | ActiveRecord: 0.1ms | Allocations: 5975)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:43:39 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_10072'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.2ms | Allocations: 4317)
+  Rendered layout layouts/application.html.erb (Duration: 15.9ms | Allocations: 7034)
+Completed 200 OK in 19ms (Views: 16.2ms | ActiveRecord: 0.1ms | Allocations: 7313)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:43:48 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_10072'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.1ms | Allocations: 4308)
+  Rendered layout layouts/application.html.erb (Duration: 15.0ms | Allocations: 6998)
+Completed 200 OK in 18ms (Views: 15.3ms | ActiveRecord: 0.1ms | Allocations: 7276)
+
+
+Started GET "/" for 127.0.0.1 at 2026-01-20 21:43:54 -0500
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mOrder Load (0.1ms)[0m  [1m[34mSELECT "orders".* FROM "orders"[0m
+  ↳ app/views/home/index.html.erb:29:in '_app_views_home_index_html_erb__514560256_10072'
+  Rendered home/index.html.erb within layouts/application (Duration: 2.6ms | Allocations: 4314)
+  Rendered layout layouts/application.html.erb (Duration: 15.5ms | Allocations: 7039)
+Completed 200 OK in 19ms (Views: 15.9ms | ActiveRecord: 0.1ms | Allocations: 7318)
+
+

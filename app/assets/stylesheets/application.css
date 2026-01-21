@@ -5,7 +5,7 @@
 
 body {
   padding-top: 56px; /* Para el navbar fijo */
-  background-color: #f8f9fa;
+  background-color: #e1e2e4;
 }
 
 .card-header.bg-light {
@@ -18,19 +18,19 @@ body {
 
 /* Estilo para botón naranja similar a la imagen */
 .btn-warning {
-  background-color: #fd7e14;
-  border-color: #fd7e14;
+  background-color: #ffbb00;
+  border-color: #ffbb00;
   color: white;
 }
 
 .btn-warning:hover {
-  background-color: #e66a00;
-  border-color: #e66a00;
+  background-color: #ffbb00;
+  border-color: #ffbb00;
   color: white;
 }
 
 .card-header.bg-warning {
-  background-color: #fd7e14 !important;
+  background-color: #ffbb00 !important;
 }
 
 /* Ajustes de espaciado para tablas */
