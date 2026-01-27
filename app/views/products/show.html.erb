@@ -1,0 +1,69 @@
+<!-- Header con título y botón -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0 fw-bold">DETALLE DEL PRODUCTO</h1>
+  <%= link_to "← Volver", products_path, class: "btn btn-secondary" %>
+</div>
+
+<!-- Detalle del producto -->
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">ID #<%= @product.id %></h5>
+        <div>
+          <%= link_to edit_product_path(@product), class: "btn btn-sm btn-light me-2", title: "Editar" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 9.207 2.5 1.207l3.707 3.707L12.793 5.5z"/>
+            </svg>
+          <% end %>
+          <%= link_to product_path(@product), 
+              class: "btn btn-sm btn-light", 
+              title: "Eliminar",
+              data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de eliminar el producto '#{@product.nombre}'?" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+              <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+            </svg>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="mb-3">
+          <div class="mb-2">
+            <strong>Nombre:</strong> <%= @product.nombre %>
+          </div>
+          <div class="mb-2">
+            <strong>Descripción:</strong> 
+            <p class="text-muted mb-0"><%= @product.descripcion.present? ? @product.descripcion : "Sin descripción" %></p>
+          </div>
+          <div class="mb-2">
+            <strong>Precio:</strong> $<%= sprintf("%.2f", @product.precio) %>
+          </div>
+          <div class="mb-2">
+            <strong>Categoría:</strong> <%= @product.categoria %>
+          </div>
+          <div class="mb-2">
+            <strong>Estado:</strong> 
+            <% if @product.activo %>
+              <span class="bg-success text-white fw-bold p-1 rounded">Activo</span>
+            <% else %>
+              <span class="bg-danger text-white fw-bold p-1 rounded">Inactivo</span>
+            <% end %>
+          </div>
+          <div class="mb-2">
+            <strong>Creado:</strong> <%= @product.created_at.strftime("%d/%m/%Y %H:%M:%S") %>
+          </div>
+          <div>
+            <strong>Última actualización:</strong> <%= @product.updated_at.strftime("%d/%m/%Y %H:%M:%S") %>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+          <%= link_to "Volver a la lista", products_path, class: "btn btn-secondary me-md-2" %>
+          <%= link_to "Editar", edit_product_path(@product), class: "btn btn-warning fw-bold" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

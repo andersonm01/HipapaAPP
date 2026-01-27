@@ -1,9 +1,9 @@
 <!-- Header con título y botón -->
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="h3 mb-0 fw-bold">MOSTRADOR</h1>
-  <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#nuevoPedidoOffcanvas">
+  <%= link_to root_path, class: "btn btn-primary" do %>
     + Nuevo Pedido
-  </button>
+  <% end %>
 </div>
 
 <div class="row g-4">
@@ -28,18 +28,12 @@
           <tbody>
             <% if @orders.present? %>
               <% @orders.each do |order| %>
-                <tr>
+                <tr style="cursor: pointer;" data-order-id="<%= order.id %>" class="order-row">
                   <td><%= order.id %></td>
                   <td><%= order.created_at.strftime("%d/%m/%Y %H:%M:%S") %></td>
-                  <td>
-                    <% if order.status == 0 %>
-                      <span class="bg-success text-white fw-bold p-1 rounded">En curso</span>
-                    <% else %>
-                      <span class="bg-danger text-white fw-bold p-1 rounded">Cerrada</span>
-                    <% end %>
-                  </td>
+                  <td><span class="bg-success text-white fw-bold p-1 rounded">En curso</span></td>
                   <td><%= order.cliente %></td>
-                  <td><%= "0" %></td>
+                  <td>$<%= sprintf("%.2f", order.total) %></td>
                 </tr>
               <% end %>
             <% else %>
@@ -71,41 +65,23 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="border-start border-success border-3">
-              <td class="fw-bold">2199</td>
-              <td>18/01/26 22:30:45</td>
-              <td><span class="text-success">Cerrada</span></td>
-              <td></td>
-              <td class="fw-bold">$24.500</td>
-            </tr>
-            <tr class="border-start border-success border-3">
-              <td class="fw-bold">2198</td>
-              <td>18/01/26 22:21:13</td>
-              <td><span class="text-success">Cerrada</span></td>
-              <td></td>
-              <td class="fw-bold">$18.000</td>
-            </tr>
-            <tr class="border-start border-success border-3">
-              <td class="fw-bold">2197</td>
-              <td>18/01/26 22:13:34</td>
-              <td><span class="text-success">Cerrada</span></td>
-              <td></td>
-              <td class="fw-bold">$23.000</td>
-            </tr>
-            <tr class="border-start border-success border-3">
-              <td class="fw-bold">2196</td>
-              <td>18/01/26 22:05:03</td>
-              <td><span class="text-success">Cerrada</span></td>
-              <td></td>
-              <td class="fw-bold">$46.500</td>
-            </tr>
-            <tr class="border-start border-success border-3">
-              <td class="fw-bold">2195</td>
-              <td>18/01/26 21:55:52</td>
-              <td><span class="text-success">Cerrada</span></td>
-              <td></td>
-              <td class="fw-bold">$17.500</td>
-            </tr>
+            <% if @closed_orders.present? %>
+              <% @closed_orders.each do |order| %>
+                <tr class="border-start">
+                  <td class="fw-bold"><%= order.id %></td>
+                  <td><%= order.created_at.strftime("%d/%m/%y %H:%M:%S") %></td>
+                  <td><span class="bg-danger text-white fw-bold p-1 rounded">En curso</span></td>
+                  <td><%= order.cliente %></td>
+                  <td class="fw-bold">$<%= sprintf("%.2f", order.total) %></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                  No hay pedidos cerrados.
+                </td>
+              </tr>
+            <% end %>
           </tbody>
         </table>
       </div>
@@ -135,6 +111,21 @@
       </div>
 
       <div class="card-body">
+        <!-- Mensajes de éxito/error -->
+        <% if notice %>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= notice %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+
+        <% if alert %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= alert %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+
         <!-- Información del pedido -->
         <div class="mb-3">
           <div class="mb-2">
@@ -142,7 +133,7 @@
           </div>
           <div>
             <strong>Seguimiento:</strong> 
-            <a href="#" class="text-decoration-none">
+            <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#orderDetailModal">
               Ver pedido
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
@@ -161,64 +152,97 @@
           </svg>
         </div>
 
-        <!-- Búsqueda de productos -->
-        <div class="mb-3 d-flex align-items-center">
-          <button class="btn btn-warning text-white me-2" type="button" style="width: 40px; height: 40px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-            </svg>
-          </button>
-          <input type="text" class="form-control" placeholder="Buscar producto...">
+        <!-- Mensaje si el pedido está cerrado -->
+        <% if @current_order.status != 0 %>
+          <div class="alert alert-warning mb-3" role="alert">
+            <strong>Pedido cerrado:</strong> No se pueden agregar más productos a este pedido.
+          </div>
+        <% end %>
+
+        <!-- Productos confirmados en la orden -->
+        <% if @order_items.present? && @order_items.any? %>
+          <div class="mb-3">
+            <h6 class="fw-bold mb-2">Productos confirmados:</h6>
+            <div style="max-height: 150px; overflow-y: auto;">
+              <% @order_items.each do |item| %>
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                  <div class="flex-grow-1">
+                    <div class="fw-bold"><%= item.product.nombre %></div>
+                    <small class="text-muted">Cant: <%= item.cantidad %> x $<%= sprintf("%.2f", item.precio_unitario) %></small>
+                    <% if item.comentario.present? %>
+                      <div class="mt-1">
+                        <small class="text-info"><em><%= item.comentario %></em></small>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="fw-bold">$<%= sprintf("%.2f", item.subtotal) %></div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Productos seleccionados (temporales) -->
+        <div id="selectedProductsContainer" class="mb-3" style="display: none;">
+          <h6 class="fw-bold mb-2">Productos seleccionados:</h6>
+          <div id="selectedProductsList" style="max-height: 200px; overflow-y: auto;">
+            <!-- Los productos seleccionados se agregarán aquí dinámicamente -->
+          </div>
         </div>
 
-        <!-- Grid de productos (placeholder) -->
-        <div class="row g-2 mb-3" style="max-height: 300px; overflow-y: auto;">
-          <!-- Estos productos serían dinámicos desde la base de datos -->
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">Agua brisa 1.5</button>
+        <!-- Búsqueda de productos -->
+        <% if @current_order.status == 0 %>
+          <div class="mb-3">
+            <input type="text" id="productSearch" class="form-control" placeholder="Buscar producto...">
           </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">Coca cola 1.5</button>
+
+          <!-- Grid de productos dinámicos -->
+          <div class="row g-2 mb-3" id="productsGrid" style="max-height: 300px; overflow-y: auto;">
+            <% if @products.present? %>
+              <% @products.each do |product| %>
+                <div class="col-6 product-item" data-product-id="<%= product.id %>" data-product-name="<%= product.nombre.downcase %>" data-product-precio="<%= product.precio %>">
+                  <button type="button" class="btn btn-light w-100 text-start add-product-btn" 
+                          data-product-id="<%= product.id %>" 
+                          data-product-name="<%= product.nombre %>"
+                          data-product-precio="<%= product.precio %>">
+                    <%= truncate(product.nombre, length: 20) %>
+                  </button>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="col-12 text-center text-muted py-3">
+                No hay productos disponibles.
+              </div>
+            <% end %>
           </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">Coca cola mini</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">11 Coca Cola Person...</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">2 La Atrevida</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">1 La Humilde</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">5 La Prohibida</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">3 La Toxica</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">4 La Tragona</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">Naranja personal 400</button>
-          </div>
-          <div class="col-6">
-            <button class="btn btn-light w-100 text-start" type="button">6 papas carne</button>
-          </div>
-        </div>
+        <% end %>
       </div>
 
       <!-- Footer con Total y botones -->
       <div class="card-footer bg-dark text-white p-2">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="fw-bold">Total:</span>
-          <span class="fw-bold">$0</span>
+          <span class="fw-bold">Total confirmado:</span>
+          <span class="fw-bold">$<%= sprintf("%.2f", @current_order.total) %></span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-2" id="selectedTotalContainer" style="display: none;">
+          <span class="fw-bold">Total seleccionado:</span>
+          <span class="fw-bold" id="selectedTotal">$0.00</span>
         </div>
         <div class="d-grid gap-2">
-          <button class="btn btn-secondary" type="button" disabled>% Aplicar Descuento</button>
-          <button class="btn btn-dark border" type="button">Cerrar Pedido</button>
+          <% if @current_order.status == 0 %>
+            <%= form_with url: confirm_items_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "confirmProductsForm", class: "d-inline" do |f| %>
+              <button type="submit" id="confirmProductsBtn" class="btn btn-warning fw-bold w-100" disabled>
+                Confirmar Productos
+              </button>
+            <% end %>
+            <button type="button" class="btn btn-dark border w-100" data-bs-toggle="modal" data-bs-target="#closeOrderModal">
+              Cerrar Pedido
+            </button>
+          <% else %>
+            <div class="alert alert-info mb-0" role="alert">
+              <strong>Pedido cerrado</strong> - No se pueden realizar más modificaciones
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -277,3 +301,261 @@
   </div>
 <% end %>
 </div>
+
+<!-- Modal para cerrar pedido -->
+<% if @current_order.present? && @current_order.status == 0 %>
+<div class="modal fade" id="closeOrderModal" tabindex="-1" aria-labelledby="closeOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title fw-bold" id="closeOrderModalLabel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cash-coin me-2" viewBox="0 0 16 16">
+            <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.11a.5.5 0 0 1 .494.379l1.7 6.8A.5.5 0 0 0 8.5 17h5a.5.5 0 0 0 .494-.379l1.7-6.8A.5.5 0 0 1 15.39 10H16a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zM0 1v8h4.11l1.7 6.8A.5.5 0 0 0 6.5 16h5a.5.5 0 0 0 .494-.379L13.39 9H16V1z"/>
+          </svg>
+          Cerrar Pedido #<%= @current_order.id %>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <%= form_with url: close_order_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "closeOrderForm" do |f| %>
+        <div class="modal-body">
+          <!-- Total del pedido -->
+          <div class="card bg-light mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold fs-5">Total a pagar:</span>
+                <span class="fw-bold fs-4 text-warning" id="orderTotal">$<%= sprintf("%.2f", @current_order.total) %></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tipo de pago -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Tipo de pago</label>
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="tipo_pago" id="tipo_efectivo" value="efectivo" checked>
+              <label class="btn btn-outline-warning" for="tipo_efectivo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cash me-1" viewBox="0 0 16 16">
+                  <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                  <path d="M0 4a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                  <path d="M0 10.5a1.5 1.5 0 0 0 1.5 1.5h13a1.5 1.5 0 0 0 1.5-1.5v-3a1.5 1.5 0 0 0-1.5-1.5h-13a1.5 1.5 0 0 0-1.5 1.5z"/>
+                </svg>
+                Efectivo
+              </label>
+              <input type="radio" class="btn-check" name="tipo_pago" id="tipo_transferencia" value="transferencia">
+              <label class="btn btn-outline-warning" for="tipo_transferencia">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bank me-1" viewBox="0 0 16 16">
+                  <path d="m8 0 6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.5.5 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89zM3.777 3h8.447L8 1zM2 6v7h1V6zm2 0v7h2.5V6zm3.5 0v7h1V6zm2 0v7H12V6zm3 0v7h1V6zM1 4v1h14V4z"/>
+                </svg>
+                Transferencia
+              </label>
+            </div>
+          </div>
+
+          <!-- Monto pagado -->
+          <div class="mb-3">
+            <label for="monto_pagado" class="form-label fw-bold">Monto recibido</label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text bg-warning text-white fw-bold">$</span>
+              <input type="number" 
+                     class="form-control" 
+                     id="monto_pagado" 
+                     name="monto_pagado" 
+                     step="0.01" 
+                     min="0" 
+                     required
+                     value="<%= sprintf("%.2f", @current_order.total) %>">
+            </div>
+            <small class="text-muted">Ingrese el monto con el que le pagaron</small>
+          </div>
+
+          <!-- Vuelto (calculado automáticamente) -->
+          <div class="mb-3" id="vueltoContainer" style="display: none;">
+            <div class="card border-success" id="vueltoCard">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold" id="vueltoLabel">Vuelto a devolver:</span>
+                  <span class="fw-bold fs-4" id="vueltoAmount">$0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <input type="hidden" id="vuelto" name="vuelto" value="0">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning fw-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-1" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+              <path d="m10.97 4.97-.02.022a.75.75 0 1 1-1.08 1.04L6.477 9.417 4.384 7.323a.75.75 0 0 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+            </svg>
+            Cerrar Pedido
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<!-- Modal para ver detalle del pedido -->
+<% if @current_order.present? %>
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title fw-bold" id="orderDetailModalLabel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-receipt me-2" viewBox="0 0 16 16">
+            <path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.509z"/>
+            <path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5"/>
+          </svg>
+          Detalle del Pedido #<%= @current_order.id %>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Información del pedido -->
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <strong>Cliente:</strong> <%= @current_order.cliente || 'Sin cliente' %>
+              </div>
+              <div class="col-md-6 mb-2">
+                <strong>Mesero:</strong> <%= @current_order.mesero || 'Sin mesero' %>
+              </div>
+              <div class="col-md-6 mb-2">
+                <strong>Fecha de creación:</strong> <%= @current_order.created_at.strftime("%d/%m/%Y %H:%M:%S") %>
+              </div>
+              <div class="col-md-6 mb-2">
+                <strong>Estado:</strong> 
+                <% if @current_order.status == 0 %>
+                  <span class="bg-success text-white fw-bold p-1 rounded">En curso</span>
+                <% else %>
+                  <span class="bg-danger text-white fw-bold p-1 rounded">Cerrada</span>
+                <% end %>
+              </div>
+              <% if @current_order.comentario.present? %>
+                <div class="col-12 mt-2">
+                  <strong>Comentario del pedido:</strong>
+                  <p class="mb-0 text-muted"><%= @current_order.comentario %></p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos del pedido -->
+        <div class="mb-3">
+          <h6 class="fw-bold mb-3">Productos:</h6>
+          <% if @order_items.present? && @order_items.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Producto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-end">Precio Unit.</th>
+                    <th class="text-end">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @order_items.each do |item| %>
+                    <tr>
+                      <td>
+                        <div class="fw-bold"><%= item.product.nombre %></div>
+                        <% if item.comentario.present? %>
+                          <small class="text-muted"><em><%= item.comentario %></em></small>
+                        <% end %>
+                      </td>
+                      <td class="text-center"><%= item.cantidad %></td>
+                      <td class="text-end">$<%= sprintf("%.2f", item.precio_unitario) %></td>
+                      <td class="text-end fw-bold">$<%= sprintf("%.2f", item.subtotal) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="alert alert-info mb-0">
+              No hay productos en este pedido.
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Información de pago (solo si está cerrado) -->
+        <% if @current_order.status == 1 && @current_order.monto_pagado.present? %>
+          <div class="card border-warning mb-3">
+            <div class="card-header bg-warning text-white">
+              <h6 class="mb-0 fw-bold">Información de Pago</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-2">
+                  <strong>Tipo de pago:</strong>
+                  <div>
+                    <% if @current_order.tipo_pago == 'efectivo' %>
+                      <span class="badge bg-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-cash" viewBox="0 0 16 16">
+                          <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                          <path d="M0 4a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                          <path d="M0 10.5a1.5 1.5 0 0 0 1.5 1.5h13a1.5 1.5 0 0 0 1.5-1.5v-3a1.5 1.5 0 0 0-1.5-1.5h-13a1.5 1.5 0 0 0-1.5 1.5z"/>
+                        </svg>
+                        Efectivo
+                      </span>
+                    <% else %>
+                      <span class="badge bg-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-bank" viewBox="0 0 16 16">
+                          <path d="m8 0 6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.5.5 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89zM3.777 3h8.447L8 1zM2 6v7h1V6zm2 0v7h2.5V6zm3.5 0v7h1V6zm2 0v7H12V6zm3 0v7h1V6zM1 4v1h14V4z"/>
+                        </svg>
+                        Transferencia
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Monto pagado:</strong>
+                  <div class="fw-bold text-success">$<%= sprintf("%.2f", @current_order.monto_pagado) %></div>
+                </div>
+                <% if @current_order.tipo_pago == 'efectivo' && @current_order.vuelto.present? %>
+                  <div class="col-md-4 mb-2">
+                    <strong>Vuelto:</strong>
+                    <div class="fw-bold text-info">$<%= sprintf("%.2f", @current_order.vuelto) %></div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Total -->
+        <div class="card bg-dark text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-bold fs-5">Total del pedido:</span>
+              <span class="fw-bold fs-4">$<%= sprintf("%.2f", @current_order.total) %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<!-- Data para JavaScript -->
+<script type="application/json" id="order-data">
+<%= {
+  orderId: @current_order&.id,
+  orderStatus: @current_order&.status || 0,
+  orderTotal: @current_order&.total || 0
+}.to_json.html_safe %>
+</script>
+
+<script type="module">
+  import "home";
+</script>
+ 

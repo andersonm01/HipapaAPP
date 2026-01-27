@@ -1,0 +1,77 @@
+<!-- Header con título y botón -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0 fw-bold">PRODUCTOS</h1>
+  <%= link_to "+ Nuevo Producto", new_product_path, class: "btn btn-primary" %>
+</div>
+
+<!-- Mensajes de éxito/error -->
+<% if notice %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= notice %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% end %>
+
+<% if alert %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= alert %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% end %>
+
+<!-- Tabla de productos -->
+<div class="card">
+  <div class="card-header bg-light">
+    <h5 class="mb-0 fw-bold">LISTA DE PRODUCTOS</h5>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @products.present? %>
+          <% @products.each do |product| %>
+            <tr>
+              <td><%= product.id %></td>
+              <td><%= product.nombre %></td>
+              <td><%= truncate(product.descripcion, length: 50) if product.descripcion.present? %></td>
+              <td>$<%= sprintf("%.2f", product.precio) %></td>
+              <td><%= product.categoria %></td>
+              <td>
+                <% if product.activo %>
+                  <span class="bg-success text-white fw-bold p-1 rounded">Activo</span>
+                <% else %>
+                  <span class="bg-danger text-white fw-bold p-1 rounded">Inactivo</span>
+                <% end %>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <%= link_to "Ver", product_path(product), class: "btn btn-sm btn-info text-white" %>
+                  <%= link_to "Editar", edit_product_path(product), class: "btn btn-sm btn-warning text-white" %>
+                  <%= link_to "Eliminar", product_path(product), 
+                      class: "btn btn-sm btn-danger text-white",
+                      data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de eliminar el producto '#{product.nombre}'?" } %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              No hay productos registrados.
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+<!-- Header con título y botón -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0 fw-bold">EDITAR PRODUCTO</h1>
+  <%= link_to "← Volver", products_path, class: "btn btn-secondary" %>
+</div>
+
+<!-- Mensajes de error -->
+<% if alert %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= alert %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% end %>
+
+<!-- Formulario -->
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-warning text-white">
+        <h5 class="mb-0 fw-bold">INFORMACIÓN DEL PRODUCTO</h5>
+      </div>
+      <div class="card-body">
+        <%= form_with model: @product, local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |f| %>
+          <div class="mb-3">
+            <%= f.label :nombre, "Nombre", class: "form-label fw-bold" %>
+            <%= f.text_field :nombre, class: "form-control", placeholder: "Nombre del producto", required: true %>
+            <% if @product.errors[:nombre].any? %>
+              <div class="text-danger small mt-1">
+                <%= @product.errors[:nombre].join(", ") %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :descripcion, "Descripción", class: "form-label fw-bold" %>
+            <%= f.text_area :descripcion, class: "form-control", rows: 4, placeholder: "Descripción del producto..." %>
+            <% if @product.errors[:descripcion].any? %>
+              <div class="text-danger small mt-1">
+                <%= @product.errors[:descripcion].join(", ") %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <%= f.label :precio, "Precio", class: "form-label fw-bold" %>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <%= f.number_field :precio, class: "form-control", placeholder: "0.00", step: "0.01", min: "0", required: true %>
+              </div>
+              <% if @product.errors[:precio].any? %>
+                <div class="text-danger small mt-1">
+                  <%= @product.errors[:precio].join(", ") %>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <%= f.label :categoria, "Categoría", class: "form-label fw-bold" %>
+              <%= f.text_field :categoria, class: "form-control", placeholder: "Categoría del producto", required: true %>
+              <% if @product.errors[:categoria].any? %>
+                <div class="text-danger small mt-1">
+                  <%= @product.errors[:categoria].join(", ") %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <%= f.check_box :activo, class: "form-check-input" %>
+              <%= f.label :activo, "Producto activo", class: "form-check-label fw-bold" %>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= link_to "Cancelar", products_path, class: "btn btn-secondary me-md-2" %>
+            <%= f.submit "Actualizar Producto", class: "btn btn-warning fw-bold" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
