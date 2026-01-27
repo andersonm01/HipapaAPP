@@ -292,4 +292,43 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   }
+
+  // ActionCable - Suscripción para actualizaciones en tiempo real
+  if (typeof App !== 'undefined' && App.cable) {
+    const ordersChannel = App.cable.subscriptions.create("OrdersChannel", {
+      connected() {
+        console.log("Conectado al canal de órdenes");
+      },
+      
+      disconnected() {
+        console.log("Desconectado del canal de órdenes");
+      },
+      
+      received(data) {
+        console.log("Datos recibidos:", data);
+        
+        if (data.type === "order_created") {
+          // Nueva orden creada - recargar la página para mostrar la nueva orden
+          location.reload();
+        } else if (data.type === "order_updated") {
+          // Orden actualizada - actualizar si es la orden actual
+          if (orderId && data.order.id === orderId) {
+            // Actualizar el total si estamos viendo esta orden
+            const totalElement = document.querySelector('.card-footer .fw-bold:last-child');
+            if (totalElement && data.order.total) {
+              totalElement.textContent = '$' + parseFloat(data.order.total).toFixed(2);
+            }
+            // Recargar para mostrar productos actualizados
+            location.reload();
+          } else {
+            // Si no es la orden actual, recargar para actualizar las tablas
+            location.reload();
+          }
+        } else if (data.type === "order_closed") {
+          // Orden cerrada - recargar para actualizar las tablas
+          location.reload();
+        }
+      }
+    });
+  }
 });

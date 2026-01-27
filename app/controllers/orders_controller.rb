@@ -6,6 +6,17 @@ class OrdersController < ApplicationController
     
     if @order.save
       Rails.logger.debug "Order guardado exitosamente"
+      # Transmitir actualización en tiempo real
+      ActionCable.server.broadcast("orders_channel", {
+        type: "order_created",
+        order: {
+          id: @order.id,
+          cliente: @order.cliente,
+          total: @order.total,
+          status: @order.status,
+          created_at: @order.created_at.strftime("%d/%m/%Y %H:%M:%S")
+        }
+      })
       redirect_to root_path(order_id: @order.id), notice: 'Pedido creado exitosamente.'
     else
       Rails.logger.debug "Errores: #{@order.errors.full_messages}"
@@ -59,6 +70,16 @@ class OrdersController < ApplicationController
         end
       end
       
+      # Transmitir actualización en tiempo real
+      ActionCable.server.broadcast("orders_channel", {
+        type: "order_updated",
+        order: {
+          id: @order.id,
+          total: @order.total,
+          status: @order.status
+        }
+      })
+      
       redirect_to root_path(order_id: @order.id), notice: 'Productos confirmados exitosamente.'
     else
       redirect_to root_path(order_id: @order.id), alert: 'No hay productos para confirmar.'
@@ -81,6 +102,15 @@ class OrdersController < ApplicationController
       tipo_pago: tipo_pago,
       vuelto: vuelto
     )
+      # Transmitir actualización en tiempo real
+      ActionCable.server.broadcast("orders_channel", {
+        type: "order_closed",
+        order: {
+          id: @order.id,
+          status: @order.status,
+          total: @order.total
+        }
+      })
       redirect_to root_path, notice: 'Pedido cerrado exitosamente.'
     else
       redirect_to root_path, alert: "Error al cerrar el pedido: #{@order.errors.full_messages.join(', ')}"

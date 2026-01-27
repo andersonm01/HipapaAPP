@@ -7,8 +7,220 @@
 </div>
 
 <div class="row g-4">
-  <!-- Columna Izquierda: Tablas de Pedidos -->
-  <div class="col-lg-8">
+  <!-- Columna Derecha: Formulario NUEVO PEDIDO o Detalle de Pedido (primero en móvil) -->
+  <% if @new_order_id.present? && @current_order.present? %>
+    <div class="col-lg-4 order-1 order-lg-2">
+      <div class="card border-0 shadow-sm">
+        <!-- Header con ID y botones -->
+        <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">ID #<%= @current_order.id %></h5>
+          <div>
+            <button class="btn btn-sm btn-light me-2" type="button" title="Confirmar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
+                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+              </svg>
+            </button>
+            <button class="btn btn-sm btn-light" type="button" title="Editar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 9.207 2.5 1.207l3.707 3.707L12.793 5.5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Mensajes de éxito/error -->
+          <% if notice %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <%= notice %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% end %>
+
+          <% if alert %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <%= alert %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% end %>
+
+          <!-- Información del pedido -->
+          <div class="mb-3">
+            <div class="mb-2">
+              <strong>Hora Inicio:</strong> <%= @current_order.created_at.strftime("%d/%m/%y %H:%M:%S") %>
+            </div>
+            <div>
+              <strong>Seguimiento:</strong> 
+              <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#orderDetailModal">
+                Ver pedido
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
+                  <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Sección ADICIONAR -->
+          <div class="bg-secondary text-white p-2 mb-3 d-flex justify-content-between align-items-center">
+            <span class="fw-bold">ADICIONAR</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.292-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.292c.415.764-.42 1.6-1.185 1.184l-.292-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.292A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+            </svg>
+          </div>
+
+          <!-- Mensaje si el pedido está cerrado -->
+          <% if @current_order.status != 0 %>
+            <div class="alert alert-warning mb-3" role="alert">
+              <strong>Pedido cerrado:</strong> No se pueden agregar más productos a este pedido.
+            </div>
+          <% end %>
+
+          <!-- Productos confirmados en la orden -->
+          <% if @order_items.present? && @order_items.any? %>
+            <div class="mb-3">
+              <h6 class="fw-bold mb-2">Productos confirmados:</h6>
+              <div style="max-height: 150px; overflow-y: auto;">
+                <% @order_items.each do |item| %>
+                  <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                    <div class="flex-grow-1">
+                      <div class="fw-bold"><%= item.product.nombre %></div>
+                      <small class="text-muted">Cant: <%= item.cantidad %> x $<%= sprintf("%.2f", item.precio_unitario) %></small>
+                      <% if item.comentario.present? %>
+                        <div class="mt-1">
+                          <small class="text-info"><em><%= item.comentario %></em></small>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="fw-bold">$<%= sprintf("%.2f", item.subtotal) %></div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Productos seleccionados (temporales) -->
+          <div id="selectedProductsContainer" class="mb-3" style="display: none;">
+            <h6 class="fw-bold mb-2">Productos seleccionados:</h6>
+            <div id="selectedProductsList" style="max-height: 200px; overflow-y: auto;">
+              <!-- Los productos seleccionados se agregarán aquí dinámicamente -->
+            </div>
+          </div>
+
+          <!-- Búsqueda de productos -->
+          <% if @current_order.status == 0 %>
+            <div class="mb-3">
+              <input type="text" id="productSearch" class="form-control" placeholder="Buscar producto...">
+            </div>
+
+            <!-- Grid de productos dinámicos -->
+            <div class="row g-2 mb-3" id="productsGrid" style="max-height: 300px; overflow-y: auto;">
+              <% if @products.present? %>
+                <% @products.each do |product| %>
+                  <div class="col-6 product-item" data-product-id="<%= product.id %>" data-product-name="<%= product.nombre.downcase %>" data-product-precio="<%= product.precio %>">
+                    <button type="button" class="btn btn-light w-100 text-start add-product-btn" 
+                            data-product-id="<%= product.id %>" 
+                            data-product-name="<%= product.nombre %>"
+                            data-product-precio="<%= product.precio %>">
+                      <%= truncate(product.nombre, length: 20) %>
+                    </button>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="col-12 text-center text-muted py-3">
+                  No hay productos disponibles.
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Footer con Total y botones -->
+        <div class="card-footer bg-dark text-white p-2">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold">Total confirmado:</span>
+            <span class="fw-bold">$<%= sprintf("%.2f", @current_order.total) %></span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2" id="selectedTotalContainer" style="display: none;">
+            <span class="fw-bold">Total seleccionado:</span>
+            <span class="fw-bold" id="selectedTotal">$0.00</span>
+          </div>
+          <div class="d-grid gap-2">
+            <% if @current_order.status == 0 %>
+              <%= form_with url: confirm_items_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "confirmProductsForm", class: "d-inline" do |f| %>
+                <button type="submit" id="confirmProductsBtn" class="btn btn-warning fw-bold w-100" disabled>
+                  Confirmar Productos
+                </button>
+              <% end %>
+              <button type="button" class="btn btn-dark border w-100" data-bs-toggle="modal" data-bs-target="#closeOrderModal">
+                Cerrar Pedido
+              </button>
+            <% else %>
+              <div class="alert alert-info mb-0" role="alert">
+                <strong>Pedido cerrado</strong> - No se pueden realizar más modificaciones
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="col-lg-4 order-1 order-lg-2">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-warning">
+          <h5 class="mb-0 fw-bold">NUEVO PEDIDO</h5>
+        </div>
+        <div class="card-body">
+          <% if notice %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <%= notice %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% end %>
+          <% if alert %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <%= alert %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% end %>
+          
+          <%= form_with url: orders_path, method: :post, local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |f| %>
+            <div class="mb-3">
+              <%= f.label :cliente, "Cliente", class: "form-label" %>
+              <%= f.text_field :cliente, class: "form-control", placeholder: "Nombre del cliente", required: true %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :mesero, "Mesero", class: "form-label" %>
+              <%= f.select :mesero, 
+                  options_for_select([
+                    ["Seleccionar mesero...", ""],
+                    ["Mesero 1", "mesero1"],
+                    ["Mesero 2", "mesero2"],
+                    ["Mesero 3", "mesero3"]
+                  ]), 
+                  {}, 
+                  { class: "form-select", required: true } %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :comentario, "Comentario", class: "form-label" %>
+              <%= f.text_area :comentario, class: "form-control", rows: 4, placeholder: "Comentarios adicionales..." %>
+            </div>
+
+            <div class="d-grid">
+              <%= f.submit "Crear", class: "btn btn-warning fw-bold" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Columna Izquierda: Tablas de Pedidos (segundo en móvil) -->
+  <div class="col-lg-8 order-2 order-lg-1">
     <!-- Tabla EN CURSO -->
     <div class="card mb-4">
       <div class="card-header bg-light">
@@ -70,7 +282,7 @@
                 <tr class="border-start">
                   <td class="fw-bold"><%= order.id %></td>
                   <td><%= order.created_at.strftime("%d/%m/%y %H:%M:%S") %></td>
-                  <td><span class="bg-danger text-white fw-bold p-1 rounded">En curso</span></td>
+                  <td><span class="bg-danger text-white fw-bold p-1 rounded">Cerrada</span></td>
                   <td><%= order.cliente %></td>
                   <td class="fw-bold">$<%= sprintf("%.2f", order.total) %></td>
                 </tr>
@@ -87,219 +299,6 @@
       </div>
     </div>
   </div>
-
-<!-- Columna Derecha: Formulario NUEVO PEDIDO o Detalle de Pedido -->
-<% if @new_order_id.present? && @current_order.present? %>
-  <div class="col-lg-4">
-    <div class="card border-0 shadow-sm">
-      <!-- Header con ID y botones -->
-      <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">ID #<%= @current_order.id %></h5>
-        <div>
-          <button class="btn btn-sm btn-light me-2" type="button" title="Confirmar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-              <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-              <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
-            </svg>
-          </button>
-          <button class="btn btn-sm btn-light" type="button" title="Editar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 9.207 2.5 1.207l3.707 3.707L12.793 5.5z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="card-body">
-        <!-- Mensajes de éxito/error -->
-        <% if notice %>
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <%= notice %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        <% end %>
-
-        <% if alert %>
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <%= alert %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        <% end %>
-
-        <!-- Información del pedido -->
-        <div class="mb-3">
-          <div class="mb-2">
-            <strong>Hora Inicio:</strong> <%= @current_order.created_at.strftime("%d/%m/%y %H:%M:%S") %>
-          </div>
-          <div>
-            <strong>Seguimiento:</strong> 
-            <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#orderDetailModal">
-              Ver pedido
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
-                <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <!-- Sección ADICIONAR -->
-        <div class="bg-secondary text-white p-2 mb-3 d-flex justify-content-between align-items-center">
-          <span class="fw-bold">ADICIONAR</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.292-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.292c.415.764-.42 1.6-1.185 1.184l-.292-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.292A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-          </svg>
-        </div>
-
-        <!-- Mensaje si el pedido está cerrado -->
-        <% if @current_order.status != 0 %>
-          <div class="alert alert-warning mb-3" role="alert">
-            <strong>Pedido cerrado:</strong> No se pueden agregar más productos a este pedido.
-          </div>
-        <% end %>
-
-        <!-- Productos confirmados en la orden -->
-        <% if @order_items.present? && @order_items.any? %>
-          <div class="mb-3">
-            <h6 class="fw-bold mb-2">Productos confirmados:</h6>
-            <div style="max-height: 150px; overflow-y: auto;">
-              <% @order_items.each do |item| %>
-                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
-                  <div class="flex-grow-1">
-                    <div class="fw-bold"><%= item.product.nombre %></div>
-                    <small class="text-muted">Cant: <%= item.cantidad %> x $<%= sprintf("%.2f", item.precio_unitario) %></small>
-                    <% if item.comentario.present? %>
-                      <div class="mt-1">
-                        <small class="text-info"><em><%= item.comentario %></em></small>
-                      </div>
-                    <% end %>
-                  </div>
-                  <div class="fw-bold">$<%= sprintf("%.2f", item.subtotal) %></div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Productos seleccionados (temporales) -->
-        <div id="selectedProductsContainer" class="mb-3" style="display: none;">
-          <h6 class="fw-bold mb-2">Productos seleccionados:</h6>
-          <div id="selectedProductsList" style="max-height: 200px; overflow-y: auto;">
-            <!-- Los productos seleccionados se agregarán aquí dinámicamente -->
-          </div>
-        </div>
-
-        <!-- Búsqueda de productos -->
-        <% if @current_order.status == 0 %>
-          <div class="mb-3">
-            <input type="text" id="productSearch" class="form-control" placeholder="Buscar producto...">
-          </div>
-
-          <!-- Grid de productos dinámicos -->
-          <div class="row g-2 mb-3" id="productsGrid" style="max-height: 300px; overflow-y: auto;">
-            <% if @products.present? %>
-              <% @products.each do |product| %>
-                <div class="col-6 product-item" data-product-id="<%= product.id %>" data-product-name="<%= product.nombre.downcase %>" data-product-precio="<%= product.precio %>">
-                  <button type="button" class="btn btn-light w-100 text-start add-product-btn" 
-                          data-product-id="<%= product.id %>" 
-                          data-product-name="<%= product.nombre %>"
-                          data-product-precio="<%= product.precio %>">
-                    <%= truncate(product.nombre, length: 20) %>
-                  </button>
-                </div>
-              <% end %>
-            <% else %>
-              <div class="col-12 text-center text-muted py-3">
-                No hay productos disponibles.
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Footer con Total y botones -->
-      <div class="card-footer bg-dark text-white p-2">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="fw-bold">Total confirmado:</span>
-          <span class="fw-bold">$<%= sprintf("%.2f", @current_order.total) %></span>
-        </div>
-        <div class="d-flex justify-content-between align-items-center mb-2" id="selectedTotalContainer" style="display: none;">
-          <span class="fw-bold">Total seleccionado:</span>
-          <span class="fw-bold" id="selectedTotal">$0.00</span>
-        </div>
-        <div class="d-grid gap-2">
-          <% if @current_order.status == 0 %>
-            <%= form_with url: confirm_items_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "confirmProductsForm", class: "d-inline" do |f| %>
-              <button type="submit" id="confirmProductsBtn" class="btn btn-warning fw-bold w-100" disabled>
-                Confirmar Productos
-              </button>
-            <% end %>
-            <button type="button" class="btn btn-dark border w-100" data-bs-toggle="modal" data-bs-target="#closeOrderModal">
-              Cerrar Pedido
-            </button>
-          <% else %>
-            <div class="alert alert-info mb-0" role="alert">
-              <strong>Pedido cerrado</strong> - No se pueden realizar más modificaciones
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
-<% else %>
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-warning">
-          <h5 class="mb-0 fw-bold">NUEVO PEDIDO</h5>
-        </div>
-        <div class="card-body">
-          <% if notice %>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <%= notice %>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% end %>
-          <% if alert %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <%= alert %>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% end %>
-          
-          <%= form_with url: orders_path, method: :post, local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |f| %>
-            <div class="mb-3">
-              <%= f.label :cliente, "Cliente", class: "form-label" %>
-              <%= f.text_field :cliente, class: "form-control", placeholder: "Nombre del cliente", required: true %>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :mesero, "Mesero", class: "form-label" %>
-              <%= f.select :mesero, 
-                  options_for_select([
-                    ["Seleccionar mesero...", ""],
-                    ["Mesero 1", "mesero1"],
-                    ["Mesero 2", "mesero2"],
-                    ["Mesero 3", "mesero3"]
-                  ]), 
-                  {}, 
-                  { class: "form-select", required: true } %>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :comentario, "Comentario", class: "form-label" %>
-              <%= f.text_area :comentario, class: "form-control", rows: 4, placeholder: "Comentarios adicionales..." %>
-            </div>
-
-            <div class="d-grid">
-              <%= f.submit "Crear", class: "btn btn-warning fw-bold" %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>
 </div>
 
 <!-- Modal para cerrar pedido -->

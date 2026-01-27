@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   root 'home#index'
   get 'home/index'
   
+  # ActionCable mount
+  mount ActionCable.server => '/cable'
+  
   resources :orders, only: [:create] do
     member do
       post :confirm_items
