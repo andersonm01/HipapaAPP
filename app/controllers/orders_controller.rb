@@ -17,7 +17,16 @@ class OrdersController < ApplicationController
           created_at: @order.created_at.strftime("%d/%m/%Y %H:%M:%S")
         }
       })
-      redirect_to root_path(order_id: @order.id), notice: 'Pedido creado exitosamente.'
+      # Redirigir por JavaScript para que la URL ?order_id= no se pierda (Turbo/navegador)
+      flash[:notice] = 'Pedido creado exitosamente.'
+      render html: <<~HTML.html_safe, layout: false, content_type: 'text/html'
+        <!DOCTYPE html>
+        <html><head><meta charset="utf-8"><title>Redirigiendo...</title></head>
+        <body>
+        <script>window.location.replace("/?order_id=#{@order.id}");</script>
+        <p>Redirigiendo...</p>
+        </body></html>
+      HTML
     else
       Rails.logger.debug "Errores: #{@order.errors.full_messages}"
       flash[:alert] = "Error al crear el pedido: #{@order.errors.full_messages.join(', ')}"
@@ -30,7 +39,7 @@ class OrdersController < ApplicationController
     
     # Verificar que el pedido no esté cerrado
     if @order.status != 0
-      redirect_to root_path(order_id: @order.id), alert: 'No se pueden agregar productos a un pedido cerrado.'
+      redirect_to pedido_path(@order.id), alert: 'No se pueden agregar productos a un pedido cerrado.'
       return
     end
     
@@ -80,9 +89,9 @@ class OrdersController < ApplicationController
         }
       })
       
-      redirect_to root_path(order_id: @order.id), notice: 'Productos confirmados exitosamente.'
+      redirect_to pedido_path(@order.id), notice: 'Productos confirmados exitosamente.'
     else
-      redirect_to root_path(order_id: @order.id), alert: 'No hay productos para confirmar.'
+      redirect_to pedido_path(@order.id), alert: 'No hay productos para confirmar.'
     end
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "Error en confirm_items: #{e.message}"
@@ -120,10 +129,30 @@ class OrdersController < ApplicationController
     redirect_to root_path, alert: 'Error: No se encontró la orden.'
   end
 
+  def update_servicio
+    @order = Order.find(params[:id])
+    if @order.status != 0
+      redirect_to pedido_path(@order.id), alert: 'No se puede cambiar el tipo de servicio en un pedido cerrado.'
+      return
+    end
+    tipo = params[:tipo_servicio].to_s
+    unless %w[mesa llevar domicilio].include?(tipo)
+      redirect_to pedido_path(@order.id), alert: 'Tipo de servicio no válido.'
+      return
+    end
+    if @order.update(tipo_servicio: tipo)
+      redirect_to pedido_path(@order.id), notice: 'Tipo de servicio actualizado.'
+    else
+      redirect_to pedido_path(@order.id), alert: 'Error al actualizar.'
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path, alert: 'No se encontró el pedido.'
+  end
+
   private
 
   def order_params
     # form_with con url: envía los parámetros directamente, no anidados
-    params.permit(:cliente, :mesero, :comentario)
+    params.permit(:cliente, :mesero, :comentario, :tipo_servicio)
   end
 end

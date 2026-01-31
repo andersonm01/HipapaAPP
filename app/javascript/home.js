@@ -20,12 +20,20 @@ document.addEventListener('DOMContentLoaded', function() {
     row.addEventListener('click', function() {
       const orderId = this.getAttribute('data-order-id');
       if (orderId) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('order_id', orderId);
-        window.location.href = url.toString();
+        window.location.href = '/pedido/' + orderId;
       }
     });
   });
+
+  // Tipo de servicio: enviar formulario al cambiar selección
+  const tipoServicioForm = document.getElementById('tipoServicioForm');
+  if (tipoServicioForm) {
+    tipoServicioForm.querySelectorAll('input[name="tipo_servicio"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        tipoServicioForm.submit();
+      });
+    });
+  }
 
   // Búsqueda de productos (solo si el pedido no está cerrado)
   const productSearch = document.getElementById('productSearch');
@@ -183,40 +191,113 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Etiqueta de tipo de servicio para comanda
+  function etiquetaTipoServicio(val) {
+    if (val === 'llevar') return 'Para llevar';
+    if (val === 'domicilio') return 'Domicilio';
+    return 'En mesa';
+  }
+
+  // Imprimir comanda en impresora POS 80mm
+  function printComanda(items, onAfterPrint) {
+    const orderId = orderData.orderId || '-';
+    const cliente = orderData.cliente || '-';
+    const mesero = orderData.mesero || '-';
+    const tipoServicio = etiquetaTipoServicio(orderData.tipoServicio || 'mesa');
+    const fecha = orderData.createdAt || new Date().toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const lineas = items.map(function(p) {
+      const comentario = (p.comentario && p.comentario.trim()) ? p.comentario.trim() : '';
+      let bloque = '<div class="item">' +
+        '<span class="producto">' + p.cantidad + ' x ' + p.product_name + '</span>';
+      if (comentario) {
+        bloque += '<div class="comentario"><span class="comentario-label">Nota:</span> ' + comentario + '</div>';
+      }
+      bloque += '</div>';
+      return bloque;
+    });
+
+    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Comanda #' + orderId + '</title><style>' +
+      '@media print { body { width: 80mm; max-width: 80mm; margin: 0; padding: 8px; font-family: "Courier New", monospace; font-size: 17px; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }' +
+      'body { width: 80mm; max-width: 80mm; margin: 0; padding: 8px; font-family: "Courier New", monospace; font-size: 17px; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }' +
+      '.center { text-align: center; } .bold { font-weight: bold; } .line { border-bottom: 1px dashed #000; margin: 8px 0; }' +
+      '.item { margin-bottom: 12px; } .producto { font-size: 18px; font-weight: bold; }' +
+      '.comentario { margin-top: 6px; margin-left: 8px; padding: 6px 8px; background: #f5f5f5; border-left: 3px solid #333; font-size: 16px; } .comentario-label { font-weight: bold; }' +
+      '</style></head><body>' +
+      '<div class="center bold" style="font-size: 22px;">COMANDA</div>' +
+      '<div class="center" style="font-size: 19px;">Pedido #' + orderId + '</div>' +
+      '<div class="line"></div>' +
+      '<span style="font-size: 18px;">Cliente: ' + (cliente || '-') + '</span><br>' +
+      '<span style="font-size: 18px;">Mesero:  ' + (mesero || '-') + '</span><br>' +
+      '<span style="font-size: 18px;">Servicio: ' + tipoServicio + '</span><br>' +
+      '<span style="font-size: 18px;">Fecha:   ' + fecha + '</span><br>' +
+      '<div class="line"></div>' +
+      lineas.join('') +
+      '<div class="line"></div>' +
+      '<div class="center" style="font-size: 16px;">Gracias</div>' +
+      '</body></html>';
+
+    const ventana = window.open('', '_blank', 'width=320,height=500');
+    if (!ventana) {
+      if (onAfterPrint) onAfterPrint();
+      return;
+    }
+    ventana.document.write(html);
+    ventana.document.close();
+    ventana.focus();
+
+    var submitted = false;
+    function doSubmit() {
+      if (submitted) return;
+      submitted = true;
+      try { ventana.close(); } catch (e) {}
+      if (onAfterPrint) onAfterPrint();
+    }
+
+    ventana.onload = function() {
+      setTimeout(function() { ventana.print(); }, 150);
+    };
+    ventana.onafterprint = function() { doSubmit(); };
+    ventana.onbeforeunload = function() {
+      setTimeout(doSubmit, 200);
+    };
+  }
+
   // Formulario de confirmación
   const confirmForm = document.getElementById('confirmProductsForm');
   if (confirmForm) {
     confirmForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
       if (selectedProducts.length === 0) {
         alert('No hay productos para confirmar.');
         return;
       }
-      
+
       // Crear campos hidden para cada producto
       selectedProducts.forEach(function(product, index) {
         const productIdInput = document.createElement('input');
         productIdInput.type = 'hidden';
-        productIdInput.name = `order_items[${index}][product_id]`;
+        productIdInput.name = 'order_items[' + index + '][product_id]';
         productIdInput.value = product.product_id;
         confirmForm.appendChild(productIdInput);
-        
+
         const cantidadInput = document.createElement('input');
         cantidadInput.type = 'hidden';
-        cantidadInput.name = `order_items[${index}][cantidad]`;
+        cantidadInput.name = 'order_items[' + index + '][cantidad]';
         cantidadInput.value = product.cantidad;
         confirmForm.appendChild(cantidadInput);
-        
+
         const comentarioInput = document.createElement('input');
         comentarioInput.type = 'hidden';
-        comentarioInput.name = `order_items[${index}][comentario]`;
+        comentarioInput.name = 'order_items[' + index + '][comentario]';
         comentarioInput.value = product.comentario || '';
         confirmForm.appendChild(comentarioInput);
       });
-      
-      // Enviar formulario
-      confirmForm.submit();
+
+      // Imprimir comanda y luego enviar formulario
+      printComanda(selectedProducts, function() {
+        confirmForm.submit();
+      });
     });
   }
 
@@ -308,8 +389,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Datos recibidos:", data);
         
         if (data.type === "order_created") {
-          // Nueva orden creada - recargar la página para mostrar la nueva orden
-          location.reload();
+          // No recargar si ya estamos viendo ese pedido (evita perder ?order_id= en la URL)
+          const currentPath = window.location.pathname;
+          const urlParams = new URLSearchParams(window.location.search);
+          const orderIdInUrl = urlParams.get('order_id');
+          const isOnThisPedido = currentPath.startsWith('/pedido/') && data.order && String(data.order.id) === currentPath.replace(/^\/pedido\//, '');
+          const isOnRootWithOrderId = (currentPath === '/' || currentPath === '') && orderIdInUrl && data.order && String(data.order.id) === orderIdInUrl;
+          if (!isOnThisPedido && !isOnRootWithOrderId) location.reload();
         } else if (data.type === "order_updated") {
           // Orden actualizada - actualizar si es la orden actual
           if (orderId && data.order.id === orderId) {
