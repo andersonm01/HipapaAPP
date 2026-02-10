@@ -62,6 +62,13 @@ Rails.application.configure do
   # Deshabilitar caché de assets en desarrollo para evitar problemas de permisos en Windows
   config.assets.cache_store = :null_store
 
+  
+  # Permitir dominios de Codespaces
+  config.hosts << /.*\.app\.github\.dev/
+
+  # Desactivar verificación de Origin en desarrollo
+  config.action_controller.forgery_protection_origin_check = false
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
