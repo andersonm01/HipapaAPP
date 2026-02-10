@@ -205,7 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
     return div.innerHTML;
   }
 
-  const PRINT_URL = 'http://127.0.0.1:8000';
+  //const PRINT_URL = 'http://127.0.0.1:8000';
+  const PRINT_URL = 'https://verbose-space-dollop-xjpjxvq69xjf97qr-3000.app.github.dev/';
   const IMPRESORA = document.body.getAttribute('data-impresora-termica') || localStorage.getItem('hipapa_impresora') || 'POS-80';
   // Tamaño de fuente en altura (dots): 24=normal, 48=2x, 72=3x. Se mapea a escala ESC/POS 1-8.
   const TAMANO_FUENTE_PIXELS = 2;
