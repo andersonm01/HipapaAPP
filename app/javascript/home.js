@@ -205,84 +205,71 @@ document.addEventListener('DOMContentLoaded', function() {
     return div.innerHTML;
   }
 
-  // Imprimir comanda en impresora POS 80mm (diseño aplicado: cabecera naranja, ítems con borde, notas destacadas)
+  const PRINT_URL = 'http://127.0.0.1:8000';
+  const IMPRESORA = document.body.getAttribute('data-impresora-termica') || localStorage.getItem('hipapa_impresora') || 'POS-80';
+  // Tamaño de fuente en altura (dots): 24=normal, 48=2x, 72=3x. Se mapea a escala ESC/POS 1-8.
+  const TAMANO_FUENTE_PIXELS = 2;
+  const tamanoFuente = 2;
+
+  // Imprimir comanda: solo impresión directa (Rails + Windows).
   function printComanda(items, onAfterPrint) {
     const orderId = orderData.orderId || '-';
-    const cliente = escaparHtml(orderData.cliente) || '-';
-    const mesero = escaparHtml(orderData.mesero) || '-';
+    const cliente = (orderData.cliente || '-').toString();
+    const mesero = (orderData.mesero || '-').toString();
     const tipoServicio = etiquetaTipoServicio(orderData.tipoServicio || 'mesa');
     const fecha = orderData.createdAt || new Date().toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-    const lineas = items.map(function(p) {
-      const comentario = (p.comentario && p.comentario.trim()) ? escaparHtml(p.comentario.trim()) : '';
-      const productName = escaparHtml(p.product_name);
-      let bloque = '<div class="comanda-item">' +
-        '<div class="comanda-producto">' + p.cantidad + ' x ' + productName + '</div>';
-      if (comentario) {
-        bloque += '<div class="comanda-comentario">Nota: ' + comentario + '</div>';
-      }
-      bloque += '</div>';
-      return bloque;
+
+    var operaciones = [
+      { nombre: 'Iniciar', argumentos: [] },
+      { nombre: 'EstablecerAlineacion', argumentos: [0] },
+      { nombre: 'EstablecerTamañoFuente', argumentos: [tamanoFuente, tamanoFuente] },
+      { nombre: 'EstablecerEnfatizado', argumentos: [true] },
+      { nombre: 'EstablecerEnfatizado', argumentos: [false] },
+      { nombre: 'EstablecerTamañoFuente', argumentos: [tamanoFuente, tamanoFuente] },
+      { nombre: 'EscribirTexto', argumentos: ['Pedido #' + orderId + '\n'] },
+      { nombre: 'Feed', argumentos: [1] },
+      { nombre: 'EstablecerAlineacion', argumentos: [0] },
+      { nombre: 'EstablecerTamañoFuente', argumentos: [1, 1] },
+      { nombre: 'EscribirTexto', argumentos: ['Cliente: ' + cliente + '\n'] },
+      { nombre: 'EscribirTexto', argumentos: ['Servicio: ' + tipoServicio + '\n'] },
+      { nombre: 'EscribirTexto', argumentos: ['Fecha:   ' + fecha + '\n'] },
+      { nombre: 'EstablecerTamañoFuente', argumentos: [tamanoFuente, tamanoFuente] },
+      { nombre: 'Feed', argumentos: [1] }
+    ];
+    items.forEach(function(p) {
+      operaciones.push({ nombre: 'EscribirTexto', argumentos: [p.cantidad + ' x ' + p.product_name + '\n'] });
+      var c = (p.comentario && p.comentario.trim()) ? p.comentario.trim() : '';
+      if (c) operaciones.push({ nombre: 'EscribirTexto', argumentos: ['  Salsas: ' + c + '\n'] });
     });
+    operaciones.push(
+      { nombre: 'Feed', argumentos: [1] },
+      { nombre: 'EstablecerAlineacion', argumentos: [1] },
+      { nombre: 'Feed', argumentos: [4] },
+      { nombre: 'Corte', argumentos: [0] }
+    );
 
-    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Comanda #' + orderId + '</title><style>' +
-      '* { box-sizing: border-box; }' +
-      'html, body { height: auto; min-height: 0; margin: 0; padding: 0; }' +
-      '@media print { @page { size: 80mm auto; margin: 4mm; } html, body { width: 80mm; max-width: 80mm; height: auto; min-height: 0; margin: 0; padding: 0; overflow: visible; } .comanda { box-shadow: none; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }' +
-      'body { width: 80mm; max-width: 80mm; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; font-size: 13px; line-height: 1.45; color: #334155; background: #fafafa; }' +
-      '.comanda { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); width: 80mm; max-width: 80mm; }' +
-      '.comanda-header { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #fff; padding: 14px 12px; text-align: center; }' +
-      '.comanda-titulo { font-size: 18px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }' +
-      '.comanda-pedido { font-size: 13px; font-weight: 600; opacity: 0.95; }' +
-      '.comanda-body { padding: 14px 12px; display: flex; flex-direction: column; gap: 12px; }' +
-      '.comanda-line { height: 2px; background: linear-gradient(90deg, transparent, #e2e8f0, transparent); margin: 2px 0; border: 0; border-radius: 1px; }' +
-      '.comanda-info { display: grid; gap: 6px; font-size: 12px; color: #475569; }' +
-      '.comanda-info span { display: flex; align-items: center; gap: 6px; }' +
-      '.comanda-info .label { color: #94a3b8; font-weight: 600; min-width: 62px; }' +
-      '.comanda-items { display: flex; flex-direction: column; gap: 14px; }' +
-      '.comanda-item { padding: 10px 10px 10px 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #ea580c; }' +
-      '.comanda-producto { font-size: 15px; font-weight: 700; color: #0f172a; }' +
-      '.comanda-comentario { margin-top: 8px; padding: 8px 10px; background: #fff7ed; border-radius: 6px; font-size: 12px; color: #9a3412; border: 1px solid #ffedd5; }' +
-      '.comanda-footer { text-align: center; padding: 14px 12px; background: #f1f5f9; }' +
-      '.comanda-gracias { font-size: 14px; font-weight: 600; color: #64748b; letter-spacing: 0.05em; }' +
-      '</style></head><body><div class="comanda">' +
-      '<div class="comanda-header"><div class="comanda-titulo">Comanda</div><div class="comanda-pedido">Pedido #' + orderId + '</div></div>' +
-      '<div class="comanda-body">' +
-      '<div class="comanda-info">' +
-      '<span><span class="label">Cliente</span>' + (cliente || '-') + '</span>' +
-      '<span><span class="label">Mesero</span>' + (mesero || '-') + '</span>' +
-      '<span><span class="label">Servicio</span>' + tipoServicio + '</span>' +
-      '<span><span class="label">Fecha</span>' + fecha + '</span>' +
-      '</div>' +
-      '<hr class="comanda-line">' +
-      '<div class="comanda-items">' + lineas.join('') + '</div>' +
-      '<hr class="comanda-line">' +
-      '<div class="comanda-footer"><div class="comanda-gracias">Gracias</div></div>' +
-      '</div></div></body></html>';
+    var payload = { serial: '', nombreImpresora: IMPRESORA, operaciones: operaciones };
 
-    const ventana = window.open('', '_blank', 'width=320,height=500');
-    if (!ventana) {
-      if (onAfterPrint) onAfterPrint();
-      return;
-    }
-    ventana.document.write(html);
-    ventana.document.close();
-    ventana.focus();
-
-    var submitted = false;
-    function doSubmit() {
-      if (submitted) return;
-      submitted = true;
-      try { ventana.close(); } catch (e) {}
-      if (onAfterPrint) onAfterPrint();
-    }
-
-    ventana.onload = function() {
-      setTimeout(function() { ventana.print(); }, 150);
-    };
-    ventana.onafterprint = function() { doSubmit(); };
-    ventana.onbeforeunload = function() {
-      setTimeout(doSubmit, 200);
-    };
+    // Solo impresión directa (Rails + Windows). Sin plugin, sin páginas extra.
+    fetch('/printer/imprimir_raw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
+      body: JSON.stringify(payload)
+    })
+      .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+      .then(function(res) {
+        if (res.ok && res.data && res.data.ok) {
+          if (onAfterPrint) onAfterPrint();
+          return;
+        }
+        var msg = (res.data && res.data.message) ? res.data.message : 'Error al imprimir. Revisa que la impresora esté instalada y el nombre en Impresora sea correcto.';
+        alert(msg);
+        if (onAfterPrint) onAfterPrint();
+      })
+      .catch(function(err) {
+        alert('No se pudo enviar a la impresora. ¿El servidor está en este mismo PC con Windows? Revisa la configuración en Impresora.');
+        if (onAfterPrint) onAfterPrint();
+      });
   }
 
   // Formulario de confirmación
