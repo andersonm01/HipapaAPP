@@ -7,6 +7,11 @@ class HomeController < ApplicationController
   end
 
   def index
+    valor = 0 
+    Order.where("id >= 62").each do |order|
+      valor += order.order_items.sum(:precio_unitario)
+    end
+    puts "Total de valor de los productos: #{valor}"
     @orders = Order.where(status: 0).order(created_at: :desc)
     @closed_orders = Order.where(status: 1).order(created_at: :desc).limit(10)
     @new_order_id = params[:order_id].presence || params[:id].presence

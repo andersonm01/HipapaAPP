@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   # ActionCable mount
   mount ActionCable.server => '/cable'
 
-  resources :orders, only: [:create] do
+  resources :orders, only: [:create, :destroy] do
     member do
       post :confirm_items
       post :close_order

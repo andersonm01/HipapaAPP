@@ -2,11 +2,72 @@
   <h1 class="h3 mb-0 fw-bold">REPORTES</h1>
 </div>
 
-<div class="card">
-  <div class="card-header bg-light">
-    <h5 class="mb-0 fw-bold">Reportes disponibles</h5>
+<!-- Reporte: Productos vendidos -->
+<div class="card mb-4">
+  <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h5 class="mb-0 fw-bold">Productos vendidos</h5>
   </div>
   <div class="card-body">
-    <p class="text-muted mb-0">Selecciona o configura los reportes que necesites. Aquí podrás agregar ventas por período, pedidos cerrados, productos más vendidos, etc.</p>
+    <%= form_with url: reportes_path, method: :get, class: "row g-3 align-items-end mb-4" do |f| %>
+      <div class="col-auto">
+        <label class="form-label fw-semibold">Período</label>
+        <select name="periodo" class="form-select" style="min-width: 120px;">
+          <option value="dia" <%= @periodo == "dia" ? "selected" : "" %>>Día</option>
+          <option value="semana" <%= @periodo == "semana" ? "selected" : "" %>>Semana</option>
+          <option value="mes" <%= @periodo == "mes" ? "selected" : "" %>>Mes</option>
+          <option value="año" <%= @periodo == "año" ? "selected" : "" %>>Año</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label fw-semibold">Fecha</label>
+        <input type="date" name="fecha" value="<%= @fecha %>" class="form-control">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Ver reporte</button>
+      </div>
+    <% end %>
+
+    <% meses = %w[Enero Febrero Marzo Abril Mayo Junio Julio Agosto Septiembre Octubre Noviembre Diciembre]
+       rango_txt = case @periodo
+         when "dia" then @fecha.strftime("%d/%m/%Y")
+         when "semana" then "#{@fecha.beginning_of_week.strftime("%d/%m")} - #{@fecha.end_of_week.strftime("%d/%m/%Y")}"
+         when "mes" then "#{meses[@fecha.mon - 1]} #{@fecha.year}"
+         when "año" then @fecha.year.to_s
+         else @fecha.strftime("%d/%m/%Y")
+         end %>
+
+    <p class="text-muted small mb-3">Período: <strong><%= rango_txt %></strong></p>
+
+    <% if @productos_vendidos.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th class="text-end">Cantidad</th>
+              <th class="text-end">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @productos_vendidos.each do |pv| %>
+              <tr>
+                <td><%= pv.nombre %></td>
+                <td class="text-end"><%= number_with_delimiter(pv.cantidad_total) %></td>
+                <td class="text-end fw-semibold"><%= number_to_currency(pv.monto_total, unit: "$", separator: ",", delimiter: ".") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td>TOTAL GENERAL</td>
+              <td class="text-end"><%= number_with_delimiter(@productos_vendidos.sum { |p| p.cantidad_total.to_i }) %></td>
+              <td class="text-end"><%= number_to_currency(@total_general, unit: "$", separator: ",", delimiter: ".") %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-muted mb-0">No hay ventas registradas para el período seleccionado.</p>
+    <% end %>
   </div>
 </div>

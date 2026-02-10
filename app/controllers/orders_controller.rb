@@ -129,6 +129,14 @@ class OrdersController < ApplicationController
     redirect_to root_path, alert: 'Error: No se encontró la orden.'
   end
 
+  def destroy
+    @order = Order.find(params[:id])
+    @order.destroy
+    redirect_to root_path, notice: 'Pedido eliminado.'
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path, alert: 'No se encontró el pedido.'
+  end
+
   def update_servicio
     @order = Order.find(params[:id])
     if @order.status != 0

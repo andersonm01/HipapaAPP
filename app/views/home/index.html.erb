@@ -281,7 +281,7 @@
               <% @orders.each do |order| %>
                 <tr style="cursor: pointer;" data-order-id="<%= order.id %>" class="order-row">
                   <td><%= order.id %></td>
-                  <td><%= order.created_at.strftime("%d/%m/%Y %H:%M:%S") %></td>
+                  <td><%= order.created_at.strftime("%d/%m/%Y %I:%M %p") %></td>
                   <td><span class="bg-success text-white fw-bold p-1 rounded">En curso</span></td>
                   <td><%= order.cliente %></td>
                   <td>$<%= sprintf("%.2f", order.total) %></td>
@@ -332,7 +332,7 @@
               <% @closed_orders.each do |order| %>
                 <tr class="border-start">
                   <td class="fw-bold"><%= order.id %></td>
-                  <td><%= order.created_at.strftime("%d/%m/%y %H:%M:%S") %></td>
+                  <td><%= order.created_at.strftime("%d/%m/%y %I:%M %p") %></td>
                   <td><span class="bg-danger text-white fw-bold p-1 rounded">Cerrada</span></td>
                   <td><%= order.cliente %></td>
                   <td class="fw-bold">$<%= sprintf("%.2f", order.total) %></td>
@@ -340,7 +340,7 @@
               <% end %>
             <% else %>
               <tr>
-                <td colspan="5" class="text-center text-muted py-4">
+                <td colspan="6" class="text-center text-muted py-4">
                   No hay pedidos cerrados.
                 </td>
               </tr>
