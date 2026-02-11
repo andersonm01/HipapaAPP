@@ -3,8 +3,8 @@
 require "open3"
 require "tempfile"
 
-# Convierte operaciones (estilo plugin Parzibyte) a bytes ESC/POS y envía a impresora en Windows.
-# Sin plugin, sin páginas extra. Solo Windows.
+# Convierte operaciones (estilo plugin Parzibyte) a bytes ESC/POS y envía a impresora.
+# Windows: Win32 API (winspool). Linux: CUPS (lp -o raw).
 class EscposRawPrinter
   ESC = "\x1B"
   GS = "\x1D"
@@ -46,6 +46,46 @@ class EscposRawPrinter
 
   def self.windows?
     RbConfig::CONFIG["host_os"] =~ /mswin|mingw|cygwin/i
+  end
+
+  def self.linux?
+    RbConfig::CONFIG["host_os"] =~ /linux/i
+  end
+
+  def self.raw_print(printer_name, raw_bytes)
+    if windows?
+      raw_print_to_windows(printer_name, raw_bytes)
+    elsif linux?
+      raw_print_to_linux(printer_name, raw_bytes)
+    else
+      { ok: false, message: "Sistema no soportado (solo Windows y Linux)" }
+    end
+  end
+
+  def self.raw_print_to_linux(printer_name, raw_bytes)
+    return { ok: false, message: "Solo Linux" } unless linux?
+    return { ok: false, message: "Impresora en blanco" } if printer_name.to_s.strip.empty?
+
+    tmp = Tempfile.new(["escpos", ".bin"])
+    tmp.binmode
+    tmp.write(raw_bytes)
+    tmp.close
+    path = tmp.path
+
+    out, err, status = Open3.capture3("lp", "-d", printer_name.to_s.strip, "-o", "raw", path)
+    tmp.unlink
+
+    if status.success?
+      { ok: true }
+    else
+      { ok: false, message: "lp falló: #{err.presence || out}".strip }
+    end
+  rescue Errno::ENOENT
+    tmp&.unlink
+    { ok: false, message: "Comando 'lp' no encontrado (instala CUPS)" }
+  rescue StandardError => e
+    tmp&.unlink
+    { ok: false, message: e.message }
   end
 
   def self.raw_print_to_windows(printer_name, raw_bytes)

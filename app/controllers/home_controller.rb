@@ -64,7 +64,7 @@ class HomeController < ApplicationController
     end
 
     raw_bytes = EscposRawPrinter.operaciones_to_escpos(operaciones)
-    result = EscposRawPrinter.raw_print_to_windows(nombre_impresora, raw_bytes)
+    result = EscposRawPrinter.raw_print(nombre_impresora, raw_bytes)
 
     if result[:ok]
       render json: { ok: true }
