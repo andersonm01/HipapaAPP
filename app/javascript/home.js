@@ -1,6 +1,17 @@
 // Home page JavaScript functionality
 
-document.addEventListener('DOMContentLoaded', function() {
+function initHome() {
+  // Click en filas de orden
+  const orderRows = document.querySelectorAll('.order-row');
+  orderRows.forEach(function(row) {
+    row.addEventListener('click', function() {
+      const orderId = this.getAttribute('data-order-id');
+      if (orderId) {
+        window.location.href = '/pedido/' + orderId;
+      }
+    });
+  });
+
   // Obtener datos desde data attributes
   const orderDataElement = document.getElementById('order-data');
   if (!orderDataElement) return;
@@ -13,18 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Lista temporal de productos seleccionados
   let selectedProducts = [];
-
-  // Click en filas de orden
-  const orderRows = document.querySelectorAll('.order-row');
-  orderRows.forEach(function(row) {
-    row.addEventListener('click', function() {
-      const orderId = this.getAttribute('data-order-id');
-      if (orderId) {
-        window.location.href = '/pedido/' + orderId;
-      }
-    });
-  });
-
   // Tipo de servicio: enviar formulario al cambiar selección
   const tipoServicioForm = document.getElementById('tipoServicioForm');
   if (tipoServicioForm) {
@@ -38,18 +37,25 @@ document.addEventListener('DOMContentLoaded', function() {
   // Búsqueda de productos (solo si el pedido no está cerrado)
   const productSearch = document.getElementById('productSearch');
   if (productSearch && !isOrderClosed) {
-    productSearch.addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase();
+    function filterProducts(searchTerm) {
+      const term = (searchTerm || '').toLowerCase();
       const productItems = document.querySelectorAll('.product-item');
-      
       productItems.forEach(function(item) {
-        const productName = item.getAttribute('data-product-name');
-        if (productName.includes(searchTerm)) {
-          item.style.display = '';
+        const productName = (item.getAttribute('data-product-name') || '').toLowerCase();
+        const productCategory = (item.getAttribute('data-product-category') || '').toLowerCase();
+        if (term === '') {
+          // Sin búsqueda: solo mostrar categoría "papas"
+          item.style.display = (productCategory === 'papas') ? '' : 'none';
         } else {
-          item.style.display = 'none';
+          // Con búsqueda: buscar en todos por nombre
+          item.style.display = productName.includes(term) ? '' : 'none';
         }
       });
+    }
+    // Estado inicial: sin texto, solo Papas
+    filterProducts('');
+    productSearch.addEventListener('input', function() {
+      filterProducts(this.value);
     });
   }
 
@@ -409,4 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-});
+};
+
+document.addEventListener('turbo:load', initHome);

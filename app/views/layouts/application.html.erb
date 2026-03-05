@@ -31,7 +31,6 @@
           <%= link_to "Productos", products_path,      class: "nav-link-item" %>
           <% if current_user&.admin? || current_user&.supervisor? %>
             <%= link_to "Reportes",  reportes_path,      class: "nav-link-item" %>
-            <%= link_to "Impresora", printer_config_path, class: "nav-link-item" %>
           <% end %>
           <% if current_user&.admin? %>
             <%= link_to "Usuarios", admin_users_path, class: "nav-link-item" %>

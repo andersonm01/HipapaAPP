@@ -8,12 +8,12 @@
   <% end %>
 </div>
 
-<div class="flex flex-col lg:flex-row gap-4">
+<div class="flex flex-col lg:flex-row gap-4 w-full">
 
   <!-- ========================================
        PANEL DERECHO: Formulario / Detalle
        ======================================== -->
-  <div class="w-100 lg:w-80 xl:w-96 shrink-0 order-first lg:order-last">
+  <div class="lg:order-last flex-1">
 
     <% if @new_order_id.present? && @current_order.present? %>
       <!-- ---- Detalle del pedido actual ---- -->
@@ -118,10 +118,10 @@
               <input type="text" id="productSearch" class="form-input" placeholder="Buscar producto...">
             </div>
 
-            <div id="productsGrid" class="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-1">
+            <div id="productsGrid" class="grid grid-cols-3 gap-1.5 max-h-52 overflow-y-auto pr-1">
               <% if @products.present? %>
                 <% @products.each do |product| %>
-                  <div class="product-item" data-product-id="<%= product.id %>" data-product-name="<%= product.nombre.downcase %>" data-product-precio="<%= product.precio %>">
+                  <div class="product-item" data-product-id="<%= product.id %>" data-product-name="<%= product.nombre.downcase %>" data-product-precio="<%= product.precio %>" data-product-category="<%= product.categoria.to_s.downcase %>">
                     <button type="button" class="product-btn add-product-btn w-full text-left text-xs"
                             data-product-id="<%= product.id %>"
                             data-product-name="<%= product.nombre %>"
@@ -152,20 +152,22 @@
 
           <div class="p-3 bg-slate-50 border-t border-slate-200 space-y-2">
             <% if @current_order.status == 0 %>
-              <%= form_with url: confirm_items_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "confirmProductsForm" do |f| %>
-                <button type="submit" id="confirmProductsBtn" class="btn-primary w-full" disabled>
+              <div class="flex justify-center gap-2">
+                <%= form_with url: confirm_items_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "confirmProductsForm" do |f| %>
+                  <button type="submit" id="confirmProductsBtn" class="btn-primary col-6" disabled>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Confirmar Productos
+                  </button>
+                <% end %>
+                <button type="button" class="btn-dark col-6" data-bs-toggle="modal" data-bs-target="#closeOrderModal">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                   </svg>
-                  Confirmar Productos
+                  Cerrar Pedido
                 </button>
-              <% end %>
-              <button type="button" class="btn-dark w-full" data-bs-toggle="modal" data-bs-target="#closeOrderModal">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                </svg>
-                Cerrar Pedido
-              </button>
+              </div>
             <% else %>
               <div class="alert-info text-xs">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -219,7 +221,7 @@
                       ["Mesero 2", "mesero2"],
                       ["Mesero 3", "mesero3"]
                     ]),
-                    class: "form-select", required: true %>
+                    class: "form-select" %>
               </div>
 
               <div>
