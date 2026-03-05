@@ -1,69 +1,73 @@
-<!-- Header con título y botón -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="h3 mb-0 fw-bold">DETALLE DEL PRODUCTO</h1>
-  <%= link_to "← Volver", products_path, class: "btn btn-secondary" %>
+<div class="page-header">
+  <h1 class="page-title">Detalle del Producto</h1>
+  <%= link_to products_path, class: "btn-secondary btn-sm" do %>
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Volver
+  <% end %>
 </div>
 
-<!-- Detalle del producto -->
-<div class="row">
-  <div class="col-lg-8">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">ID #<%= @product.id %></h5>
+<div class="max-w-2xl">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="font-bold text-slate-800 text-lg"><%= @product.nombre %></h2>
+        <span class="text-xs text-slate-400 font-mono">ID #<%= @product.id %></span>
+      </div>
+      <% if current_user&.admin? || current_user&.supervisor? %>
+        <div class="flex gap-2">
+          <%= link_to edit_product_path(@product), class: "btn-secondary btn-sm" do %>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Editar
+          <% end %>
+          <%= link_to product_path(@product),
+              class: "btn-outline-danger btn-sm",
+              data: { turbo_method: :delete, turbo_confirm: "¿Eliminar '#{@product.nombre}'?" } do %>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Eliminar
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="card-body">
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4">
+        <div class="col-span-2">
+          <dt class="form-label">Descripción</dt>
+          <dd class="text-slate-700 text-sm"><%= @product.descripcion.present? ? @product.descripcion : "—" %></dd>
+        </div>
         <div>
-          <%= link_to edit_product_path(@product), class: "btn btn-sm btn-light me-2", title: "Editar" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 9.207 2.5 1.207l3.707 3.707L12.793 5.5z"/>
-            </svg>
-          <% end %>
-          <%= link_to product_path(@product), 
-              class: "btn btn-sm btn-light", 
-              title: "Eliminar",
-              data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de eliminar el producto '#{@product.nombre}'?" } do %>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-              <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-            </svg>
-          <% end %>
+          <dt class="form-label">Precio</dt>
+          <dd class="text-2xl font-bold text-slate-800">$<%= sprintf("%.2f", @product.precio) %></dd>
         </div>
-      </div>
-
-      <div class="card-body">
-        <div class="mb-3">
-          <div class="mb-2">
-            <strong>Nombre:</strong> <%= @product.nombre %>
-          </div>
-          <div class="mb-2">
-            <strong>Descripción:</strong> 
-            <p class="text-muted mb-0"><%= @product.descripcion.present? ? @product.descripcion : "Sin descripción" %></p>
-          </div>
-          <div class="mb-2">
-            <strong>Precio:</strong> $<%= sprintf("%.2f", @product.precio) %>
-          </div>
-          <div class="mb-2">
-            <strong>Categoría:</strong> <%= @product.categoria %>
-          </div>
-          <div class="mb-2">
-            <strong>Estado:</strong> 
+        <div>
+          <dt class="form-label">Categoría</dt>
+          <dd><span class="badge-gray"><%= @product.categoria %></span></dd>
+        </div>
+        <div>
+          <dt class="form-label">Estado</dt>
+          <dd>
             <% if @product.activo %>
-              <span class="bg-success text-white fw-bold p-1 rounded">Activo</span>
+              <span class="badge-success">Activo</span>
             <% else %>
-              <span class="bg-danger text-white fw-bold p-1 rounded">Inactivo</span>
+              <span class="badge-danger">Inactivo</span>
             <% end %>
-          </div>
-          <div class="mb-2">
-            <strong>Creado:</strong> <%= @product.created_at.strftime("%d/%m/%Y %H:%M:%S") %>
-          </div>
-          <div>
-            <strong>Última actualización:</strong> <%= @product.updated_at.strftime("%d/%m/%Y %H:%M:%S") %>
-          </div>
+          </dd>
         </div>
-
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-          <%= link_to "Volver a la lista", products_path, class: "btn btn-secondary me-md-2" %>
-          <%= link_to "Editar", edit_product_path(@product), class: "btn btn-warning fw-bold" %>
+        <div>
+          <dt class="form-label">Creado</dt>
+          <dd class="text-sm text-slate-600"><%= @product.created_at.strftime("%d/%m/%Y %H:%M") %></dd>
         </div>
-      </div>
+        <div>
+          <dt class="form-label">Actualizado</dt>
+          <dd class="text-sm text-slate-600"><%= @product.updated_at.strftime("%d/%m/%Y %H:%M") %></dd>
+        </div>
+      </dl>
     </div>
   </div>
 </div>

@@ -1,4 +1,5 @@
 class ReportsController < ApplicationController
+  before_action :require_admin_or_supervisor
   VALID_PERIODS = %w[today yesterday week last_week month last_month year custom].freeze
 
   PERIOD_LABELS = {

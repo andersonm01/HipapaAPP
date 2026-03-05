@@ -1,0 +1,68 @@
+<% if user.errors.any? %>
+  <div class="alert-danger rounded-lg mb-5">
+    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    <div>
+      <p class="font-semibold mb-1">Corrige los errores:</p>
+      <ul class="list-disc list-inside space-y-0.5">
+        <% user.errors.full_messages.each do |msg| %>
+          <li class="text-sm"><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
+<%= form_with model: [:admin, user], local: true do |f| %>
+  <div class="space-y-4">
+    <div>
+      <%= f.label :name, "Nombre completo", class: "form-label" %>
+      <%= f.text_field :name, class: "form-input #{'border-red-400' if user.errors[:name].any?}", required: true, placeholder: "Ej: Juan García" %>
+    </div>
+
+    <div>
+      <%= f.label :email, "Email", class: "form-label" %>
+      <%= f.email_field :email, class: "form-input #{'border-red-400' if user.errors[:email].any?}", required: true, placeholder: "usuario@ejemplo.com" %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :password, user.new_record? ? "Contraseña" : "Nueva contraseña", class: "form-label" %>
+        <%= f.password_field :password, class: "form-input", autocomplete: "new-password",
+            placeholder: user.new_record? ? "Mínimo 6 caracteres" : "Dejar vacío para no cambiar" %>
+        <% unless user.new_record? %>
+          <p class="form-hint">Dejar vacío para mantener la contraseña actual</p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, "Confirmar contraseña", class: "form-label" %>
+        <%= f.password_field :password_confirmation, class: "form-input", autocomplete: "new-password", placeholder: "••••••••" %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :role, "Rol", class: "form-label" %>
+        <%= f.select :role, User::ROLES.map { |r| [r.capitalize, r] },
+            {}, class: "form-select #{'border-red-400' if user.errors[:role].any?}" %>
+      </div>
+
+      <div class="flex flex-col justify-end pb-0.5">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :active, class: "w-4 h-4 rounded border-slate-300 text-brand-500 focus:ring-brand-500" %>
+          <div>
+            <span class="text-sm font-semibold text-slate-700">Cuenta activa</span>
+            <p class="text-xs text-slate-500">Los usuarios inactivos no pueden iniciar sesión</p>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-end gap-3 mt-6 pt-5 border-t border-slate-200">
+    <%= link_to "Cancelar", admin_users_path, class: "btn-secondary" %>
+    <%= f.submit user.new_record? ? "Crear Usuario" : "Guardar Cambios", class: "btn-primary cursor-pointer" %>
+  </div>
+<% end %>

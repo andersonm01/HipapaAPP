@@ -1,0 +1,31 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Editar Usuario</h1>
+    <p class="text-sm text-slate-500 mt-0.5"><%= @user.email %></p>
+  </div>
+  <%= link_to admin_users_path, class: "btn-secondary btn-sm" do %>
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Volver
+  <% end %>
+</div>
+
+<div class="max-w-2xl">
+  <div class="card">
+    <div class="card-header">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
+          <%= @user.name.first.upcase %>
+        </div>
+        <div>
+          <h2 class="font-semibold text-slate-800"><%= @user.name %></h2>
+          <span class="nav-role-badge role-<%= @user.role %>"><%= @user.role %></span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <%= render 'form', user: @user %>
+    </div>
+  </div>
+</div>

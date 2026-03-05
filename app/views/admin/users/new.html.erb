@@ -1,0 +1,20 @@
+<div class="page-header">
+  <h1 class="page-title">Nuevo Usuario</h1>
+  <%= link_to admin_users_path, class: "btn-secondary btn-sm" do %>
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Volver
+  <% end %>
+</div>
+
+<div class="max-w-2xl">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="font-semibold text-slate-800">Datos del Usuario</h2>
+    </div>
+    <div class="card-body">
+      <%= render 'form', user: @user %>
+    </div>
+  </div>
+</div>

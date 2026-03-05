@@ -118,35 +118,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     selectedProducts.forEach(function(product, index) {
       const itemDiv = document.createElement('div');
-      itemDiv.className = 'mb-3 p-2 bg-light rounded';
+      itemDiv.className = 'sel-item';
       itemDiv.innerHTML = `
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div class="flex-grow-1">
-            <div class="fw-bold">${product.product_name}</div>
-            <small class="text-muted">Cant: ${product.cantidad} x $${product.precio.toFixed(2)}</small>
-          </div>
+        <div class="sel-item-header">
           <div>
-            <button type="button" class="btn btn-sm btn-danger remove-product-btn" data-index="${index}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-              </svg>
-            </button>
+            <div class="sel-item-name">${product.product_name}</div>
+            <div class="sel-item-qty-text">${product.cantidad} × $${product.precio.toFixed(2)}</div>
           </div>
+          <button type="button" class="btn-remove remove-product-btn" data-index="${index}" title="Quitar">×</button>
         </div>
-        <div class="mb-2">
-          <label class="form-label small fw-bold">Comentario:</label>
-          <input type="text" class="form-control form-control-sm product-comment" 
-                 data-index="${index}" 
-                 placeholder="Agregar comentario..." 
-                 value="${product.comentario}">
-        </div>
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <button type="button" class="btn btn-sm btn-outline-secondary quantity-btn" data-index="${index}" data-action="decrease">-</button>
-            <span class="mx-2 fw-bold">${product.cantidad}</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary quantity-btn" data-index="${index}" data-action="increase">+</button>
+        <input type="text" class="sel-comment-input product-comment"
+               data-index="${index}"
+               placeholder="Comentario (ej: sin cebolla)..."
+               value="${product.comentario}">
+        <div class="sel-item-controls">
+          <div class="sel-item-qty">
+            <button type="button" class="btn-qty quantity-btn" data-index="${index}" data-action="decrease">−</button>
+            <span style="font-weight:700;font-size:0.875rem;min-width:1.25rem;text-align:center;">${product.cantidad}</span>
+            <button type="button" class="btn-qty quantity-btn" data-index="${index}" data-action="increase">+</button>
           </div>
-          <div class="fw-bold">$${(product.cantidad * product.precio).toFixed(2)}</div>
+          <span class="sel-item-total">$${(product.cantidad * product.precio).toFixed(2)}</span>
         </div>
       `;
       if (list) list.appendChild(itemDiv);
@@ -317,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const vueltoAmount = document.getElementById('vueltoAmount');
   const vueltoInput = document.getElementById('vuelto');
   const vueltoContainer = document.getElementById('vueltoContainer');
-  const vueltoCard = document.getElementById('vueltoCard');
+  const vueltoCard = document.getElementById('vueltoCard'); // may be null — handled safely
   const vueltoLabel = document.getElementById('vueltoLabel');
   const tipoPagoInputs = document.querySelectorAll('input[name="tipo_pago"]');
 
@@ -325,52 +316,42 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateVuelto() {
       const montoPagado = parseFloat(montoPagadoInput.value) || 0;
       const tipoPago = document.querySelector('input[name="tipo_pago"]:checked')?.value;
-      
+
       if (tipoPago === 'transferencia') {
-        // Transferencia: no hay vuelto, ocultar contenedor
         vueltoInput.value = '0';
         vueltoContainer.style.display = 'none';
       } else {
-        // Efectivo: calcular vuelto
         vueltoContainer.style.display = 'block';
-        
+
         if (montoPagado >= orderTotal) {
           const vuelto = montoPagado - orderTotal;
           vueltoAmount.textContent = '$' + vuelto.toFixed(2);
           vueltoInput.value = vuelto.toFixed(2);
-          vueltoAmount.classList.remove('text-danger');
-          vueltoAmount.classList.add('text-success');
-          vueltoLabel.textContent = 'Vuelto a devolver:';
-          vueltoLabel.classList.remove('text-danger');
-          vueltoLabel.classList.add('text-success');
-          vueltoCard.classList.remove('border-danger');
-          vueltoCard.classList.add('border-success');
+          vueltoAmount.style.color = '#15803d';
+          if (vueltoLabel) { vueltoLabel.textContent = 'Vuelto a devolver:'; vueltoLabel.style.color = '#15803d'; }
+          if (vueltoCard)  { vueltoCard.style.background = '#f0fdf4'; vueltoCard.style.borderColor = '#bbf7d0'; }
         } else {
           const falta = orderTotal - montoPagado;
           vueltoAmount.textContent = '$' + falta.toFixed(2);
           vueltoInput.value = '0';
-          vueltoAmount.classList.remove('text-success');
-          vueltoAmount.classList.add('text-danger');
-          vueltoLabel.textContent = 'Falta por pagar:';
-          vueltoLabel.classList.remove('text-success');
-          vueltoLabel.classList.add('text-danger');
-          vueltoCard.classList.remove('border-success');
-          vueltoCard.classList.add('border-danger');
+          vueltoAmount.style.color = '#b91c1c';
+          if (vueltoLabel) { vueltoLabel.textContent = 'Falta por pagar:'; vueltoLabel.style.color = '#b91c1c'; }
+          if (vueltoCard)  { vueltoCard.style.background = '#fef2f2'; vueltoCard.style.borderColor = '#fecaca'; }
         }
       }
     }
 
     montoPagadoInput.addEventListener('input', calculateVuelto);
-    
+
     tipoPagoInputs.forEach(function(input) {
       input.addEventListener('change', function() {
         if (this.value === 'transferencia') {
           montoPagadoInput.value = orderTotal.toFixed(2);
           montoPagadoInput.readOnly = true;
-          montoPagadoInput.classList.add('bg-light');
+          montoPagadoInput.style.background = '#f8fafc';
         } else {
           montoPagadoInput.readOnly = false;
-          montoPagadoInput.classList.remove('bg-light');
+          montoPagadoInput.style.background = '';
         }
         calculateVuelto();
       });

@@ -2,6 +2,8 @@
 require Rails.root.join("app/services/escpos_raw_printer.rb").to_s
 
 class HomeController < ApplicationController
+  before_action :require_admin_or_supervisor, only: [:printer_config, :printer_ping, :printer_impresoras, :printer_imprimir, :printer_imprimir_raw]
+
   def self.plugin_url
     ENV.fetch("PRINTER_PLUGIN_URL", "http://127.0.0.1:8000")
   end

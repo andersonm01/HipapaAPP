@@ -1,77 +1,95 @@
-<!-- Header con título y botón -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="h3 mb-0 fw-bold">PRODUCTOS</h1>
-  <%= link_to "+ Nuevo Producto", new_product_path, class: "btn btn-primary" %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Productos</h1>
+    <p class="text-sm text-slate-500 mt-0.5"><%= @products.count %> producto(s) registrado(s)</p>
+  </div>
+  <% if current_user&.admin? || current_user&.supervisor? %>
+    <%= link_to new_product_path, class: "btn-primary" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nuevo Producto
+    <% end %>
+  <% end %>
 </div>
 
-<!-- Mensajes de éxito/error -->
-<% if notice %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= notice %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% end %>
-
-<% if alert %>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <%= alert %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% end %>
-
-<!-- Tabla de productos -->
 <div class="card">
-  <div class="card-header bg-light">
-    <h5 class="mb-0 fw-bold">LISTA DE PRODUCTOS</h5>
-  </div>
-  <div class="card-body p-0">
-    <table class="table table-hover mb-0">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Precio</th>
-          <th>Categoría</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if @products.present? %>
+  <% if @products.present? %>
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <% if current_user&.admin? || current_user&.supervisor? %>
+              <th class="text-right">Acciones</th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
           <% @products.each do |product| %>
             <tr>
-              <td><%= product.id %></td>
-              <td><%= product.nombre %></td>
-              <td><%= truncate(product.descripcion, length: 50) if product.descripcion.present? %></td>
-              <td>$<%= sprintf("%.2f", product.precio) %></td>
-              <td><%= product.categoria %></td>
+              <td class="text-slate-400 text-xs font-mono"><%= product.id %></td>
+              <td class="font-semibold text-slate-800"><%= product.nombre %></td>
+              <td class="text-slate-500 max-w-xs">
+                <%= truncate(product.descripcion, length: 60) if product.descripcion.present? %>
+              </td>
+              <td class="font-semibold text-slate-800">$<%= sprintf("%.2f", product.precio) %></td>
+              <td>
+                <span class="badge-gray"><%= product.categoria %></span>
+              </td>
               <td>
                 <% if product.activo %>
-                  <span class="bg-success text-white fw-bold p-1 rounded">Activo</span>
+                  <span class="badge-success">Activo</span>
                 <% else %>
-                  <span class="bg-danger text-white fw-bold p-1 rounded">Inactivo</span>
+                  <span class="badge-danger">Inactivo</span>
                 <% end %>
               </td>
-              <td>
-                <div class="btn-group" role="group">
-                  <%= link_to "Ver", product_path(product), class: "btn btn-sm btn-info text-white" %>
-                  <%= link_to "Editar", edit_product_path(product), class: "btn btn-sm btn-warning text-white" %>
-                  <%= link_to "Eliminar", product_path(product), 
-                      class: "btn btn-sm btn-danger text-white",
-                      data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de eliminar el producto '#{product.nombre}'?" } %>
-                </div>
-              </td>
+              <% if current_user&.admin? || current_user&.supervisor? %>
+                <td class="text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <%= link_to product_path(product), class: "btn-ghost btn-sm" do %>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      Ver
+                    <% end %>
+                    <%= link_to edit_product_path(product), class: "btn-secondary btn-sm" do %>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                      Editar
+                    <% end %>
+                    <%= link_to product_path(product),
+                        class: "btn-outline-danger btn-sm",
+                        data: { turbo_method: :delete, turbo_confirm: "¿Eliminar '#{product.nombre}'?" } do %>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                      Eliminar
+                    <% end %>
+                  </div>
+                </td>
+              <% end %>
             </tr>
           <% end %>
-        <% else %>
-          <tr>
-            <td colspan="7" class="text-center text-muted py-4">
-              No hay productos registrados.
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      </svg>
+      <p class="font-medium text-slate-500">No hay productos registrados</p>
+      <% if current_user&.admin? || current_user&.supervisor? %>
+        <%= link_to "Crear primer producto", new_product_path, class: "btn-primary btn-sm mt-3" %>
+      <% end %>
+    </div>
+  <% end %>
 </div>

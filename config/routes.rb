@@ -1,4 +1,18 @@
 Rails.application.routes.draw do
+  # Auth
+  get  '/login',  to: 'sessions#new',     as: :login
+  post '/login',  to: 'sessions#create'
+  delete '/logout', to: 'sessions#destroy', as: :logout
+  get  '/auth/:provider/callback', to: 'sessions#omniauth'
+  get  '/auth/failure',            to: 'sessions#omniauth_failure'
+
+  # Admin
+  namespace :admin do
+    resources :users do
+      member { patch :toggle_active }
+    end
+  end
+
   root 'home#index'
   get 'home/index'
   get 'pedido/:id', to: 'home#index', as: :pedido, constraints: { id: /\d+/ }
