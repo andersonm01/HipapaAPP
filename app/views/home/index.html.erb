@@ -265,6 +265,7 @@
                 <th>Hora</th>
                 <th>Cliente</th>
                 <th>Servicio</th>
+                <th>Estado cocina</th>
                 <th>Total</th>
                 <th class="text-center w-14">Cerrar</th>
               </tr>
@@ -283,6 +284,7 @@
                           else 'Mesa' end %>
                     </span>
                   </td>
+                  <td class="font-semibold text-slate-800"><%= order.kitchen_status %></td>
                   <td class="font-bold text-slate-800">$<%= sprintf("%.2f", order.total) %></td>
                   <td class="text-center" onclick="event.stopPropagation()">
                     <%= form_with url: close_order_order_path(order), method: :post, local: true, data: { turbo: false }, class: "inline" do |f| %>

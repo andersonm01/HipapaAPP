@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_05_000001) do
+ActiveRecord::Schema[7.0].define(version: 2026_03_07_000003) do
   create_table "order_items", force: :cascade do |t|
     t.integer "order_id", null: false
     t.integer "product_id", null: false
@@ -23,8 +23,19 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_05_000001) do
     t.index ["product_id"], name: "index_order_items_on_product_id"
   end
 
-# Could not dump table "orders" because of following StandardError
-#   Unknown type 'bit' for column 'status'
+  create_table "orders", force: :cascade do |t|
+    t.string "cliente"
+    t.string "mesero"
+    t.text "comentario"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
+    t.decimal "monto_pagado", precision: 10, scale: 2
+    t.string "tipo_pago"
+    t.decimal "vuelto", precision: 10, scale: 2
+    t.string "tipo_servicio", default: "mesa"
+    t.string "kitchen_status", default: "preparing", null: false
+  end
 
   create_table "products", force: :cascade do |t|
     t.string "nombre", null: false

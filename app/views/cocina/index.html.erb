@@ -1,0 +1,49 @@
+<div id="cocina-monitor">
+
+  <%# ── Header ── %>
+  <div class="page-header mb-4">
+    <div>
+      <h1 class="page-title">Monitor de Cocina</h1>
+      <p class="text-xs text-gray-500 mt-0.5">Actualizacion automatica en tiempo real</p>
+    </div>
+    <div class="flex items-center gap-5">
+      <div class="text-right mr-4">
+        <div class="section-label mb-0.5">Ordenes activas</div>
+        <div class="text-2xl font-bold text-slate-800"><%= @orders.count %></div>
+      </div>
+      <div class="text-right">
+        <div class="section-label mb-0.5">Hora</div>
+        <div id="cocina-reloj" class="text-base font-mono font-semibold text-slate-700">--:--:--</div>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Leyenda de estados ── %>
+  <div class="flex flex-wrap items-center gap-2 mb-5">
+    <span class="section-label mr-1">Estados:</span>
+    <span class="badge badge-gray">⏳ Pendiente</span>
+    <span class="badge badge-dark">🔥 En preparacion</span>
+    <span class="badge badge-success">✅ Lista</span>
+    <span class="ml-3 badge badge-warning">⚠️ +10 min</span>
+    <span class="badge badge-danger">🔴 +15 min</span>
+  </div>
+
+  <%# ── Estado vacío ── %>
+  <% if @orders.empty? %>
+    <div class="empty-state">
+      <div class="text-5xl mb-3">✅</div>
+      <p class="font-semibold text-gray-500">Todo al dia — sin ordenes pendientes</p>
+    </div>
+
+  <% else %>
+    <%# ── Tarjetas pequeñas con flex (diseño Pencil) ── %>
+    <div class="flex flex-wrap gap-4">
+      <% @orders.each do |order| %>
+        <%= render 'cocina/order_card', order: order %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
+<script type="module">import "cocina"</script>

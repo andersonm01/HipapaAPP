@@ -79,6 +79,9 @@ class OrdersController < ApplicationController
         end
       end
       
+      # Si la orden ya estaba entregada, vuelve a aparecer en cocina con nuevos productos
+      @order.update(kitchen_status: 'preparing') if @order.kitchen_status == 'delivered'
+
       # Transmitir actualización en tiempo real
       ActionCable.server.broadcast("orders_channel", {
         type: "order_updated",
@@ -88,7 +91,12 @@ class OrdersController < ApplicationController
           status: @order.status
         }
       })
-      
+      ActionCable.server.broadcast("cocina_channel", {
+        type: "kitchen_status_updated",
+        order_id: @order.id,
+        kitchen_status: @order.kitchen_status
+      })
+
       redirect_to pedido_path(@order.id), notice: 'Productos confirmados exitosamente.'
     else
       redirect_to pedido_path(@order.id), alert: 'No hay productos para confirmar.'
@@ -135,6 +143,27 @@ class OrdersController < ApplicationController
     redirect_to root_path, notice: 'Pedido eliminado.'
   rescue ActiveRecord::RecordNotFound
     redirect_to root_path, alert: 'No se encontró el pedido.'
+  end
+
+  def update_kitchen_status
+    @order = Order.find(params[:id])
+    new_status = params[:kitchen_status].to_s
+    unless Order::KITCHEN_STATUSES.include?(new_status)
+      redirect_to cocina_path, alert: 'Estado de cocina invalido.'
+      return
+    end
+    if @order.update(kitchen_status: new_status)
+      ActionCable.server.broadcast("cocina_channel", {
+        type: "kitchen_status_updated",
+        order_id: @order.id,
+        kitchen_status: new_status
+      })
+      redirect_to cocina_path
+    else
+      redirect_to cocina_path, alert: 'Error al actualizar el estado de cocina.'
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to cocina_path, alert: 'No se encontro la orden.'
   end
 
   def update_servicio

@@ -1,0 +1,121 @@
+<%
+  ks           = order.kitchen_status.presence || 'preparing'
+  elapsed_min  = ((Time.current - order.created_at) / 60).floor
+  status_badge = case ks
+                 when 'preparing' then 'badge-dark'
+                 when 'ready'     then 'badge-success'
+                 else                  'badge-gray'
+                 end
+  status_label = case ks
+                 when 'preparing' then '🔥 En prep.'
+                 when 'ready'     then '✅ Lista'
+                 else                  '⏳ Pendiente'
+                 end
+  servicio_badge = case order.tipo_servicio
+                   when 'domicilio' then 'badge-info'
+                   when 'llevar'    then 'badge-warning'
+                   else                  'badge-gray'
+                   end
+%>
+<div class="kitchen-card w-[200px] shrink-0 flex flex-col m-2 p-3 rounded-xl"
+     data-order-id="<%= order.id %>"
+     data-created-at="<%= order.created_at.iso8601 %>">
+
+  <%# Barra de alerta de tiempo — JS la activa según urgencia %>
+  <div class="kitchen-alert-bar" data-alert-bar></div>
+
+  <%# ── Header: número, tipo, estado ── %>
+  <div class="card-header py-2 px-3">
+    <div class="flex items-center gap-1.5">
+      <span class="text-lg font-black text-navy-900 leading-none">#<%= order.id %></span>
+      <span class="badge <%= servicio_badge %> text-xs">
+        <%= (order.tipo_servicio || 'mesa').upcase %>
+      </span>
+    </div>
+    <span class="badge <%= status_badge %> text-xs"><%= status_label %></span>
+  </div>
+
+  <%# ── Cuerpo: cliente, tiempo, productos ── %>
+  <div class="card-body flex-1 min-h-0 overflow-y-auto py-2 px-3">
+
+    <%# Cliente + timer %>
+    <div class="flex items-baseline justify-between gap-2 mb-1">
+      <span class="font-semibold text-slate-800 text-sm truncate">
+        <%= order.cliente.presence || 'Sin nombre' %>
+      </span>
+      <span class="kitchen-timer" data-timer>
+        <%= elapsed_min < 1 ? 'Hace menos de 1 min' : "Hace #{elapsed_min} min" %>
+      </span>
+    </div>
+
+    <% if order.mesero.present? %>
+      <div class="text-xs text-gray-400 mb-1">Mesero: <%= order.mesero %></div>
+    <% end %>
+
+    <%# Hora exacta de ingreso %>
+    <div class="text-xs text-gray-400 mb-2">Ingresó: <%= order.created_at.strftime("%H:%M") %></div>
+
+    <%# Lista de productos %>
+    <% if order.order_items.any? %>
+      <ul class="space-y-1 pt-2 border-t border-gray-100">
+        <% order.order_items.each do |item| %>
+          <li>
+            <div class="flex items-baseline gap-1.5 text-sm">
+              <span class="font-bold text-brand-600 shrink-0 leading-none"><%= item.cantidad %>×</span>
+              <span class="text-slate-800 font-medium leading-snug"><%= item.product.nombre %></span>
+            </div>
+            <% if item.comentario.present? %>
+              <div class="ml-5 mt-0.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
+                📝 <%= item.comentario %>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-xs text-gray-400 italic pt-2 border-t border-gray-100">Sin productos confirmados</p>
+    <% end %>
+
+    <%# Nota general de la orden %>
+    <% if order.comentario.present? %>
+      <div class="mt-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+        💬 <%= order.comentario %>
+      </div>
+    <% end %>
+    <br>
+
+    <%# ── Footer: botones de acción ── %>
+    <div class="flex gap-1 py-2 px-3">
+      <%# En preparación %>
+      <%= form_tag update_kitchen_status_order_path(order), method: :patch,
+          data: { turbo: false }, style: "flex:1" do %>
+        <input type="hidden" name="kitchen_status" value="preparing">
+        <button type="submit"
+          class="btn btn-sm w-full <%= ks == 'preparing' ? 'btn-dark' : 'btn-secondary' %>">
+          🔥 Prep.
+        </button>
+      <% end %>
+
+      <%# Lista %>
+      <%= form_tag update_kitchen_status_order_path(order), method: :patch,
+          data: { turbo: false }, style: "flex:1" do %>
+        <input type="hidden" name="kitchen_status" value="ready">
+        <button type="submit"
+          class="btn btn-sm w-full <%= ks == 'ready' ? 'btn-success' : 'btn-secondary' %>">
+          ✅ Lista
+        </button>
+      <% end %>
+
+      <%# Entregada %>
+      <%= form_tag update_kitchen_status_order_path(order), method: :patch,
+          data: { turbo: false }, style: "flex:1" do %>
+        <input type="hidden" name="kitchen_status" value="delivered">
+        <button type="submit" class="btn btn-sm w-full btn-secondary">
+          🏁 Entregada
+        </button>
+      <% end %>
+
+    </div>
+  </div>
+
+</div>
