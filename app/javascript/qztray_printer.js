@@ -19,21 +19,11 @@ async function connect() {
   if (qz.websocket.isActive()) return;
   if (_connectPromise) return _connectPromise;
 
-  // Firma RSA-SHA512: QZ Tray preguntará "¿Confías en Hipapa POS?" solo la
-  // primera vez. Después de "Allow always" nunca vuelve a preguntar.
-  qz.security.setCertificatePromise((resolve, reject) => {
-    fetch('/printer/qz_cert', { credentials: 'same-origin' })
-      .then(r => { if (r.ok) return r.text(); throw new Error('cert no encontrado'); })
-      .then(resolve)
-      .catch(reject);
-  });
+  // Sin firma de código: QZ Tray muestra popup "¿Permitir esta conexión?"
+  // la primera vez. El usuario elige "Allow always" y no vuelve a aparecer.
+  qz.security.setCertificatePromise((resolve) => resolve());
   qz.security.setSignatureAlgorithm('SHA512');
-  qz.security.setSignaturePromise((toSign) => (resolve, reject) => {
-    fetch(`/printer/qz_sign?toSign=${encodeURIComponent(toSign)}`, { credentials: 'same-origin' })
-      .then(r => { if (r.ok) return r.text(); throw new Error('firma fallida'); })
-      .then(resolve)
-      .catch(reject);
-  });
+  qz.security.setSignaturePromise(() => (resolve) => resolve());
 
   _connectPromise = qz.websocket
     .connect({ retries: 3, delay: 0.5 })
