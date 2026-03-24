@@ -19,11 +19,20 @@ async function connect() {
   if (qz.websocket.isActive()) return;
   if (_connectPromise) return _connectPromise;
 
-  // Sin firma de código: QZ Tray muestra popup "¿Permitir esta conexión?"
-  // la primera vez. El usuario elige "Allow always" y no vuelve a aparecer.
-  qz.security.setCertificatePromise((resolve) => resolve());
+  // Certificado RSA — permite que QZ Tray guarde "Allow always" permanentemente.
+  qz.security.setCertificatePromise((resolve, reject) => {
+    fetch('/printer/qz_cert')
+      .then(r => r.ok ? r.text() : Promise.reject('cert no disponible'))
+      .then(resolve)
+      .catch(reject);
+  });
   qz.security.setSignatureAlgorithm('SHA512');
-  qz.security.setSignaturePromise(() => (resolve) => resolve());
+  qz.security.setSignaturePromise((toSign) => (resolve, reject) => {
+    fetch('/printer/qz_sign?toSign=' + encodeURIComponent(toSign))
+      .then(r => r.ok ? r.text() : Promise.reject('firma fallida'))
+      .then(resolve)
+      .catch(reject);
+  });
 
   _connectPromise = qz.websocket
     .connect({ retries: 3, delay: 0.5 })

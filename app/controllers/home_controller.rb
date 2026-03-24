@@ -71,11 +71,10 @@ class HomeController < ApplicationController
     to_sign  = params[:toSign].to_s
     key_path = Rails.root.join('config', 'qztray', 'private_key.pem')
 
-    unless key_path.exist?
-      render plain: '', status: :not_found and return
-    end
+    pem = ENV['QZTRAY_PRIVATE_KEY'].presence || (key_path.exist? ? key_path.read : nil)
+    return render plain: '', status: :not_found unless pem
 
-    key       = OpenSSL::PKey::RSA.new(key_path.read)
+    key       = OpenSSL::PKey::RSA.new(pem)
     signature = key.sign(OpenSSL::Digest::SHA512.new, to_sign)
     render plain: Base64.strict_encode64(signature)
   rescue StandardError => e
