@@ -202,14 +202,10 @@ function initHome() {
     return div.innerHTML;
   }
 
-  //const PRINT_URL = 'http://127.0.0.1:8000';
-  const PRINT_URL = 'https://verbose-space-dollop-xjpjxvq69xjf97qr-3000.app.github.dev/';
   const IMPRESORA = document.body.getAttribute('data-impresora-termica') || localStorage.getItem('hipapa_impresora') || 'POS-80';
-  // Tamaño de fuente en altura (dots): 24=normal, 48=2x, 72=3x. Se mapea a escala ESC/POS 1-8.
-  const TAMANO_FUENTE_PIXELS = 2;
   const tamanoFuente = 2;
 
-  // Imprimir comanda: solo impresión directa (Rails + Windows).
+  // Imprimir comanda: QZ Tray (producción) con fallback a Rails backend (Windows local).
   function printComanda(items, onAfterPrint) {
     const orderId = orderData.orderId || '-';
     const cliente = (orderData.cliente || '-').toString();
@@ -246,28 +242,53 @@ function initHome() {
       { nombre: 'Corte', argumentos: [0] }
     );
 
-    var payload = { serial: '', nombreImpresora: IMPRESORA, operaciones: operaciones };
+    // Usar QZ Tray si está disponible (producción en Render y desarrollo en PC con QZ instalado).
+    // Fallback: Rails backend vía /printer/imprimir_raw (solo funciona en Windows local).
+    var useQZ = (typeof qz !== 'undefined') && (localStorage.getItem('hipapa_print_mode') !== 'rails');
 
-    // Solo impresión directa (Rails + Windows). Sin plugin, sin páginas extra.
-    fetch('/printer/imprimir_raw', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
-      body: JSON.stringify(payload)
-    })
-      .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
-      .then(function(res) {
-        if (res.ok && res.data && res.data.ok) {
-          if (onAfterPrint) onAfterPrint();
-          return;
-        }
-        var msg = (res.data && res.data.message) ? res.data.message : 'Error al imprimir. Revisa que la impresora esté instalada y el nombre en Impresora sea correcto.';
-        alert(msg);
-        if (onAfterPrint) onAfterPrint();
-      })
-      .catch(function(err) {
-        alert('No se pudo enviar a la impresora. ¿El servidor está en este mismo PC con Windows? Revisa la configuración en Impresora.');
+    if (useQZ) {
+      import('qztray_printer').then(function(qzPrinter) {
+        var impresora = qzPrinter.getSavedPrinter() || IMPRESORA;
+        qzPrinter.printRaw(impresora, operaciones)
+          .then(function() {
+            if (onAfterPrint) onAfterPrint();
+          })
+          .catch(function(err) {
+            var msg = err && err.message ? err.message : 'Error al imprimir con QZ Tray';
+            alert(
+              '⚠️ No se pudo imprimir.\n\n' + msg +
+              '\n\n¿QZ Tray está ejecutándose? Busca el ícono en la bandeja del sistema.\n' +
+              'Si no lo tienes instalado, ve a Impresora → Configurar.'
+            );
+            if (onAfterPrint) onAfterPrint();
+          });
+      }).catch(function() {
+        alert('Error al cargar el módulo de impresión.');
         if (onAfterPrint) onAfterPrint();
       });
+    } else {
+      // Fallback Rails backend (Windows local, sin QZ Tray)
+      var payload = { serial: '', nombreImpresora: IMPRESORA, operaciones: operaciones };
+      fetch('/printer/imprimir_raw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+        .then(function(res) {
+          if (res.ok && res.data && res.data.ok) { if (onAfterPrint) onAfterPrint(); return; }
+          var msg = (res.data && res.data.message) ? res.data.message : 'Error al imprimir. Revisa la configuración.';
+          alert(msg);
+          if (onAfterPrint) onAfterPrint();
+        })
+        .catch(function() {
+          alert('No se pudo enviar a la impresora. Verifica la configuración en Impresora.');
+          if (onAfterPrint) onAfterPrint();
+        });
+    }
   }
 
   // Formulario de confirmación
