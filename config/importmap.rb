@@ -10,4 +10,5 @@ pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.8/lib/inde
 pin "@rails/actioncable", to: "actioncable.esm.js"
 pin "home",            to: "home.js"
 pin "cocina",          to: "cocina.js"
-pin "qztray_printer",  to: "qztray_printer.js"
+pin "qztray_printer",    to: "qztray_printer.js"
+pin "webserial_printer", to: "webserial_printer.js"

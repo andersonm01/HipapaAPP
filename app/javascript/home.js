@@ -242,11 +242,27 @@ function initHome() {
       { nombre: 'Corte', argumentos: [0] }
     );
 
-    // Usar QZ Tray si está disponible (producción en Render y desarrollo en PC con QZ instalado).
-    // Fallback: Rails backend vía /printer/imprimir_raw (solo funciona en Windows local).
-    var useQZ = (typeof qz !== 'undefined') && (localStorage.getItem('hipapa_print_mode') !== 'rails');
+    var printMode = localStorage.getItem('hipapa_print_mode') || 'qztray';
 
-    if (useQZ) {
+    if (printMode === 'webserial') {
+      // ── Web Serial: directo al puerto COM, sin software adicional
+      import('webserial_printer').then(function(ws) {
+        ws.printRaw(operaciones)
+          .then(function() {
+            if (onAfterPrint) onAfterPrint();
+          })
+          .catch(function(err) {
+            var msg = err && err.message ? err.message : 'Error al imprimir';
+            alert('⚠️ No se pudo imprimir.\n\n' + msg + '\n\nVe a Impresora → Configurar para revisar el puerto serial.');
+            if (onAfterPrint) onAfterPrint();
+          });
+      }).catch(function() {
+        alert('Error al cargar el módulo de impresión serial.');
+        if (onAfterPrint) onAfterPrint();
+      });
+
+    } else if (printMode !== 'rails' && typeof qz !== 'undefined') {
+      // ── QZ Tray
       import('qztray_printer').then(function(qzPrinter) {
         var impresora = qzPrinter.getSavedPrinter() || IMPRESORA;
         qzPrinter.printRaw(impresora, operaciones)
@@ -266,8 +282,9 @@ function initHome() {
         alert('Error al cargar el módulo de impresión.');
         if (onAfterPrint) onAfterPrint();
       });
+
     } else {
-      // Fallback Rails backend (Windows local, sin QZ Tray)
+      // ── Rails backend (solo Windows local)
       var payload = { serial: '', nombreImpresora: IMPRESORA, operaciones: operaciones };
       fetch('/printer/imprimir_raw', {
         method: 'POST',
