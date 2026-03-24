@@ -56,6 +56,33 @@ class HomeController < ApplicationController
     render json: { ok: false, message: e.message }, status: :service_unavailable
   end
 
+  # QZ Tray: sirve el certificado público para que el browser lo pase a QZ Tray
+  def printer_qz_cert
+    cert_path = Rails.root.join('config', 'qztray', 'certificate.pem')
+    if cert_path.exist?
+      render plain: cert_path.read, content_type: 'text/plain'
+    else
+      render plain: '', status: :not_found
+    end
+  end
+
+  # QZ Tray: firma el challenge con la llave privada (SHA-512 RSA, base64)
+  def printer_qz_sign
+    to_sign  = params[:toSign].to_s
+    key_path = Rails.root.join('config', 'qztray', 'private_key.pem')
+
+    unless key_path.exist?
+      render plain: '', status: :not_found and return
+    end
+
+    key       = OpenSSL::PKey::RSA.new(key_path.read)
+    signature = key.sign(OpenSSL::Digest::SHA512.new, to_sign)
+    render plain: Base64.strict_encode64(signature)
+  rescue StandardError => e
+    Rails.logger.error("QZ Tray sign error: #{e.message}")
+    render plain: '', status: :internal_server_error
+  end
+
   # Impresión directa ESC/POS en Windows (sin plugin, sin páginas extra)
   def printer_imprimir_raw
     payload = JSON.parse(request.raw_post)

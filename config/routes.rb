@@ -40,6 +40,8 @@ Rails.application.routes.draw do
   get "printer/impresoras", to: "home#printer_impresoras"
   post "printer/imprimir", to: "home#printer_imprimir"
   post "printer/imprimir_raw", to: "home#printer_imprimir_raw"
+  get "printer/qz_cert", to: "home#printer_qz_cert"
+  get "printer/qz_sign", to: "home#printer_qz_sign"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
