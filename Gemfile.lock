@@ -158,6 +158,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.0-x64-mingw-ucrt)
       racc (~> 1.4)
+    nokogiri (1.19.0-x86_64-linux-gnu)
+      racc (~> 1.4)
     oauth2 (2.0.18)
       faraday (>= 0.17.3, < 4.0)
       jwt (>= 1.0, < 4.0)
@@ -252,6 +254,7 @@ GEM
       tailwindcss-ruby (~> 4.0)
     tailwindcss-ruby (4.2.0)
     tailwindcss-ruby (4.2.0-x64-mingw-ucrt)
+    tailwindcss-ruby (4.2.0-x86_64-linux-gnu)
     thor (1.5.0)
     timeout (0.6.0)
     turbo-rails (2.0.12)
@@ -280,6 +283,7 @@ GEM
 PLATFORMS
   x64-mingw-ucrt
   x86-mingw32
+  x86_64-linux
 
 DEPENDENCIES
   bcrypt (~> 3.1.7)
