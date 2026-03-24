@@ -6,6 +6,7 @@
 
 const STORAGE_KEY = 'hipapa_webserial_port';
 const DEFAULT_BAUD = 9600;
+const DEFAULT_FLOW = 'none'; // 'none' | 'hardware'
 
 // ─── Soporte ─────────────────────────────────────────────────────────────────
 
@@ -29,13 +30,20 @@ function savePortInfo(port, baudRate) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     usbVendorId:  info.usbVendorId  ?? null,
     usbProductId: info.usbProductId ?? null,
-    baudRate:     baudRate || existing.baudRate || DEFAULT_BAUD
+    baudRate:     baudRate || existing.baudRate || DEFAULT_BAUD,
+    flowControl:  existing.flowControl || DEFAULT_FLOW
   }));
 }
 
 export function saveBaudRate(baud) {
   const info = getSavedPortInfo() || {};
   info.baudRate = parseInt(baud) || DEFAULT_BAUD;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(info));
+}
+
+export function saveFlowControl(flow) {
+  const info = getSavedPortInfo() || {};
+  info.flowControl = (flow === 'hardware') ? 'hardware' : 'none';
   localStorage.setItem(STORAGE_KEY, JSON.stringify(info));
 }
 
@@ -153,10 +161,17 @@ export async function printRaw(operaciones) {
   // Si el puerto ya está abierto (error previo sin cerrar), intentar cerrar primero
   try { await port.close(); } catch { /* ya estaba cerrado */ }
 
-  await port.open({ baudRate });
+  const flowControl = (saved?.flowControl === 'hardware') ? 'hardware' : 'none';
+  await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none', flowControl });
+
   try {
     const writer = port.writable.getWriter();
     await writer.write(bytes);
+    // Esperar a que el SO vacíe el buffer serial antes de cerrar el puerto.
+    // writer.write() completa cuando los bytes entran al buffer del navegador,
+    // no cuando salen físicamente por el cable. Sin este delay el puerto
+    // se cierra antes de que terminen de enviarse.
+    await new Promise(r => setTimeout(r, 600));
     writer.releaseLock();
   } finally {
     await port.close();
