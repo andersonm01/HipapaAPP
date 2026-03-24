@@ -27,11 +27,11 @@ async function connect() {
       .catch(() => resolve(''));
   });
   qz.security.setSignatureAlgorithm('SHA512');
-  qz.security.setSignaturePromise((toSign) => (resolve) => {
-    fetch('/printer/qz_sign?toSign=' + encodeURIComponent(toSign))
-      .then(r => r.ok ? r.text() : '')
-      .then(resolve)
-      .catch(() => resolve(''));
+  qz.security.setSignaturePromise(function(toSign) {
+    return fetch("/qz/sign", {
+        method: "POST",
+        body: toSign
+    }).then(res => res.text());
   });
 
   _connectPromise = qz.websocket
