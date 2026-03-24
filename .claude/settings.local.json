@@ -8,7 +8,9 @@
       "Bash(bin/rails db:seed:*)",
       "Bash(bin/rails runner:*)",
       "Bash(bin/rails tailwindcss:install:*)",
-      "Bash(bin/rails tailwindcss:build:*)"
+      "Bash(bin/rails tailwindcss:build:*)",
+      "Bash(openssl genrsa:*)",
+      "Bash(openssl req:*)"
     ]
   }
 }

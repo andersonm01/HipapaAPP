@@ -20,18 +20,18 @@ async function connect() {
   if (_connectPromise) return _connectPromise;
 
   // Certificado RSA — permite que QZ Tray guarde "Allow always" permanentemente.
-  qz.security.setCertificatePromise((resolve, reject) => {
+  qz.security.setCertificatePromise((resolve) => {
     fetch('/printer/qz_cert')
-      .then(r => r.ok ? r.text() : Promise.reject('cert no disponible'))
+      .then(r => r.ok ? r.text() : '')
       .then(resolve)
-      .catch(reject);
+      .catch(() => resolve(''));
   });
   qz.security.setSignatureAlgorithm('SHA512');
-  qz.security.setSignaturePromise((toSign) => (resolve, reject) => {
+  qz.security.setSignaturePromise((toSign) => (resolve) => {
     fetch('/printer/qz_sign?toSign=' + encodeURIComponent(toSign))
-      .then(r => r.ok ? r.text() : Promise.reject('firma fallida'))
+      .then(r => r.ok ? r.text() : '')
       .then(resolve)
-      .catch(reject);
+      .catch(() => resolve(''));
   });
 
   _connectPromise = qz.websocket
