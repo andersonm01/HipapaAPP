@@ -184,6 +184,9 @@ GEM
     omniauth-rails_csrf_protection (2.0.1)
       actionpack (>= 4.2)
       omniauth (~> 2.0)
+    pg (1.6.3)
+    pg (1.6.3-x64-mingw-ucrt)
+    pg (1.6.3-x86_64-linux)
     prism (1.8.0)
     public_suffix (7.0.2)
     puma (5.6.9)
@@ -294,12 +297,13 @@ DEPENDENCIES
   jbuilder
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
+  pg
   puma (~> 5.0)
   rails (~> 7.0.8)
   redis (~> 4.0)
   selenium-webdriver
   sprockets-rails
-  sqlite3 (~> 1.4)
+  sqlite3
   stimulus-rails
   tailwindcss-rails
   turbo-rails
