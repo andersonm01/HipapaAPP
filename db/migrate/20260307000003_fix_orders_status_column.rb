@@ -1,7 +1,12 @@
 class FixOrdersStatusColumn < ActiveRecord::Migration[7.0]
+  # Desactiva la transacción para PostgreSQL
   disable_ddl_transaction!
 
-  def change
-    change_column :orders, :status, :integer, default: 0, null: false
+  def up
+    change_column :orders, :status, :integer, null: false, default: 0
+  end
+
+  def down
+    change_column :orders, :status, :boolean, null: false, default: false
   end
 end
