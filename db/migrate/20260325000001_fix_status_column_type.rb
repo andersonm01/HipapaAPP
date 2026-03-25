@@ -5,8 +5,9 @@ class FixStatusColumnType < ActiveRecord::Migration[7.0]
     return if col.type == :integer
 
     if connection.adapter_name == 'PostgreSQL'
-      # PostgreSQL no permite cast directo de boolean/bit a integer sin USING.
-      # Convertimos: true/'1' → 1, false/'0'/null → 0
+      # Primero eliminamos el default (puede ser boolean false) para que no
+      # haya conflicto al cambiar el tipo. Luego convertimos con USING.
+      execute "ALTER TABLE orders ALTER COLUMN status DROP DEFAULT"
       execute <<~SQL
         ALTER TABLE orders
           ALTER COLUMN status TYPE integer
