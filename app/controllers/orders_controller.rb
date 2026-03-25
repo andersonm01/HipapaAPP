@@ -37,9 +37,9 @@ class OrdersController < ApplicationController
   def confirm_items
     @order = Order.find(params[:id])
     
-    # Verificar que el pedido no esté cerrado
-    if @order.status != 0
-      redirect_to pedido_path(@order.id), alert: 'No se pueden agregar productos a un pedido cerrado.'
+    # Verificar que el pedido esté abierto
+    unless @order.open?
+      redirect_to pedido_path(@order.id), alert: 'No se pueden agregar productos a un pedido cerrado o cancelado.'
       return
     end
     
@@ -137,6 +137,43 @@ class OrdersController < ApplicationController
     redirect_to root_path, alert: 'Error: No se encontró la orden.'
   end
 
+  def cancel_order
+    @order = Order.find(params[:id])
+    unless @order.open?
+      redirect_to pedido_path(@order.id), alert: 'Solo se pueden cancelar pedidos abiertos.'
+      return
+    end
+    motivo = params[:cancel_reason].to_s.strip
+    if @order.update(status: Order::STATUS_CANCELLED, cancel_reason: motivo, cancelled_at: Time.current)
+      ActionCable.server.broadcast("orders_channel", {
+        type: "order_cancelled",
+        order: { id: @order.id }
+      })
+      redirect_to root_path, notice: "Pedido ##{@order.id} cancelado."
+    else
+      redirect_to pedido_path(@order.id), alert: "Error al cancelar el pedido."
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path, alert: 'No se encontró el pedido.'
+  end
+
+  def destroy_item
+    @order = Order.find(params[:id])
+    unless @order.open?
+      redirect_to pedido_path(@order.id), alert: 'No se pueden eliminar productos de un pedido cerrado o cancelado.'
+      return
+    end
+    item = @order.order_items.find(params[:item_id])
+    item.destroy
+    ActionCable.server.broadcast("orders_channel", {
+      type: "order_updated",
+      order: { id: @order.id, total: @order.reload.total, status: @order.status }
+    })
+    redirect_to pedido_path(@order.id), notice: 'Producto eliminado del pedido.'
+  rescue ActiveRecord::RecordNotFound
+    redirect_to pedido_path(@order.id), alert: 'No se encontró el producto en este pedido.'
+  end
+
   def destroy
     @order = Order.find(params[:id])
     @order.destroy
@@ -168,8 +205,8 @@ class OrdersController < ApplicationController
 
   def update_servicio
     @order = Order.find(params[:id])
-    if @order.status != 0
-      redirect_to pedido_path(@order.id), alert: 'No se puede cambiar el tipo de servicio en un pedido cerrado.'
+    unless @order.open?
+      redirect_to pedido_path(@order.id), alert: 'No se puede cambiar el tipo de servicio en un pedido cerrado o cancelado.'
       return
     end
     tipo = params[:tipo_servicio].to_s

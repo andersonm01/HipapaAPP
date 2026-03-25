@@ -24,8 +24,10 @@ Rails.application.routes.draw do
     member do
       post :confirm_items
       post :close_order
+      post :cancel_order
       patch :update_servicio
       patch :update_kitchen_status
+      delete 'items/:item_id', to: 'orders#destroy_item', as: :destroy_item
     end
   end
   resources :products

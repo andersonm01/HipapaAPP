@@ -4,19 +4,36 @@ class Order < ApplicationRecord
 
   KITCHEN_STATUSES = %w[pending preparing ready delivered].freeze
 
-  # Órdenes abiertas que no hayan sido marcadas como entregadas.
-  # Si se agregan nuevos productos a una orden entregada, el controlador
-  # resetea kitchen_status a 'pending' y la orden vuelve a aparecer aquí.
+  # status: 0 = abierta, 1 = cerrada, 2 = cancelada
+  STATUS_OPEN      = 0
+  STATUS_CLOSED    = 1
+  STATUS_CANCELLED = 2
+
+  scope :open,      -> { where(status: STATUS_OPEN) }
+  scope :closed,    -> { where(status: STATUS_CLOSED) }
+  scope :cancelled, -> { where(status: STATUS_CANCELLED) }
+
   scope :for_kitchen, -> {
-    where(status: 0)
+    where(status: STATUS_OPEN)
       .where.not(kitchen_status: 'delivered')
       .includes(order_items: :product)
       .order(created_at: :asc)
   }
 
-  # Retorna true si la orden debe mostrarse en el monitor de cocina.
+  def open?
+    status == STATUS_OPEN
+  end
+
+  def closed?
+    status == STATUS_CLOSED
+  end
+
+  def cancelled?
+    status == STATUS_CANCELLED
+  end
+
   def visible_en_cocina?
-    status == 0 && kitchen_status != 'delivered'
+    open? && kitchen_status != 'delivered'
   end
 
   def total

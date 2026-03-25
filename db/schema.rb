@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_07_000003) do
+ActiveRecord::Schema[7.0].define(version: 2026_03_25_000002) do
   create_table "order_items", force: :cascade do |t|
     t.integer "order_id", null: false
     t.integer "product_id", null: false
@@ -35,6 +35,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_07_000003) do
     t.decimal "vuelto", precision: 10, scale: 2
     t.string "tipo_servicio", default: "mesa"
     t.string "kitchen_status", default: "preparing", null: false
+    t.string "cancel_reason"
+    t.datetime "cancelled_at"
   end
 
   create_table "products", force: :cascade do |t|

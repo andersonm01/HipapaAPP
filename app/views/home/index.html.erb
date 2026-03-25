@@ -75,13 +75,20 @@
             <% end %>
           </div>
 
-          <!-- Pedido cerrado aviso -->
-          <% if @current_order.status != 0 %>
+          <!-- Estado del pedido -->
+          <% if @current_order.closed? %>
             <div class="alert-warning text-xs">
               <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
               </svg>
               Pedido cerrado — sin modificaciones
+            </div>
+          <% elsif @current_order.cancelled? %>
+            <div class="alert-warning text-xs" style="background:#fef2f2;border-color:#fecaca;color:#b91c1c;">
+              <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              Pedido cancelado<%= @current_order.cancel_reason.present? ? " — #{@current_order.cancel_reason}" : "" %>
             </div>
           <% end %>
 
@@ -99,7 +106,20 @@
                         <p class="text-xs text-amber-600 italic mt-0.5"><%= item.comentario %></p>
                       <% end %>
                     </div>
-                    <span class="text-sm font-bold text-slate-700 shrink-0">$<%= sprintf("%.2f", item.subtotal) %></span>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <span class="text-sm font-bold text-slate-700">$<%= sprintf("%.2f", item.subtotal) %></span>
+                      <% if @current_order.open? %>
+                        <%= form_with url: destroy_item_order_path(@current_order, item_id: item.id), method: :delete, local: true, data: { turbo: false }, class: "inline" do %>
+                          <button type="submit" class="btn-icon-sm text-slate-400 hover:text-red-500"
+                                  title="Eliminar producto"
+                                  onclick="return confirm('¿Eliminar <%= j(item.product.nombre) %> del pedido?')">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                          </button>
+                        <% end %>
+                      <% end %>
+                    </div>
                   </div>
                 <% end %>
               </div>
@@ -113,7 +133,7 @@
           </div>
 
           <!-- Búsqueda + grid de productos -->
-          <% if @current_order.status == 0 %>
+          <% if @current_order.open? %>
             <div>
               <input type="text" id="productSearch" class="form-input" placeholder="Buscar producto...">
             </div>
@@ -151,7 +171,7 @@
           </div>
 
           <div class="p-3 bg-slate-50 border-t border-slate-200 space-y-2">
-            <% if @current_order.status == 0 %>
+            <% if @current_order.open? %>
               <div class="flex justify-center gap-2">
                 <%= form_with url: confirm_items_order_path(@current_order), method: :post, local: true, data: { turbo: false }, id: "confirmProductsForm" do |f| %>
                   <button type="submit" id="confirmProductsBtn" class="btn-primary col-6" disabled>
@@ -168,12 +188,27 @@
                   Cerrar Pedido
                 </button>
               </div>
-            <% else %>
+              <div class="flex justify-center">
+                <button type="button" class="btn-outline-danger btn-xs w-full" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Cancelar Pedido
+                </button>
+              </div>
+            <% elsif @current_order.closed? %>
               <div class="alert-info text-xs">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                 </svg>
                 Pedido cerrado — sin modificaciones
+              </div>
+            <% elsif @current_order.cancelled? %>
+              <div class="text-xs" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;background:#fef2f2;border:1px solid #fecaca;border-radius:0.5rem;color:#b91c1c;">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                Pedido cancelado
               </div>
             <% end %>
           </div>
@@ -360,13 +395,49 @@
         </div>
       <% end %>
     </div>
+
+    <!-- Tabla CANCELADAS -->
+    <% if @cancelled_orders.present? %>
+    <div class="card mt-4">
+      <div class="card-header">
+        <div class="flex items-center gap-2">
+          <h2 class="font-semibold text-slate-800">Cancelados Recientes</h2>
+          <span class="badge-gray"><%= @cancelled_orders.count %></span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Motivo</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @cancelled_orders.each do |order| %>
+              <tr style="opacity:0.65;">
+                <td class="font-mono text-xs text-slate-400"><%= order.id %></td>
+                <td class="text-xs text-slate-500"><%= order.cancelled_at&.strftime("%d/%m %H:%M") || order.created_at.strftime("%d/%m %H:%M") %></td>
+                <td class="text-slate-700"><%= order.cliente %></td>
+                <td class="text-xs text-slate-500 italic"><%= order.cancel_reason.presence || "—" %></td>
+                <td class="font-bold text-slate-400">$<%= sprintf("%.2f", order.total) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <% end %>
   </div>
 </div>
 
 <!-- =============================================
      MODAL: Cerrar Pedido
      ============================================= -->
-<% if @current_order.present? && @current_order.status == 0 %>
+<% if @current_order.present? && @current_order.open? %>
 <div class="modal fade" id="closeOrderModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -427,6 +498,41 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             Confirmar Cierre
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<!-- =============================================
+     MODAL: Cancelar Pedido
+     ============================================= -->
+<% if @current_order.present? && @current_order.open? %>
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#dc2626;">
+        <h5 class="modal-title text-white">Cancelar Pedido #<%= @current_order.id %></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <%= form_with url: cancel_order_order_path(@current_order), method: :post, local: true, data: { turbo: false } do |f| %>
+        <div class="modal-body space-y-4">
+          <div class="text-sm text-slate-600">
+            Esta acción cancelará el pedido de <strong><%= @current_order.cliente %></strong>
+            con un total de <strong>$<%= sprintf("%.2f", @current_order.total) %></strong>.
+            Esta acción no se puede deshacer.
+          </div>
+          <div>
+            <label for="cancel_reason" class="form-label">Motivo de cancelación <span class="text-slate-400 font-normal">(opcional)</span></label>
+            <%= text_area_tag :cancel_reason, nil, class: "form-textarea", rows: 2, placeholder: "Ej: Cliente desistió, error en el pedido..." %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-bs-dismiss="modal">Volver</button>
+          <button type="submit" class="btn-danger" style="background:#dc2626;color:white;border:none;padding:0.5rem 1rem;border-radius:0.5rem;font-size:0.875rem;font-weight:600;">
+            Sí, cancelar pedido
           </button>
         </div>
       <% end %>
