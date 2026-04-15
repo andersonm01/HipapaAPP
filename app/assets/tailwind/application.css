@@ -59,9 +59,9 @@
     cursor: not-allowed;
   }
 
-  .btn-primary   { @apply bg-brand-500 text-white border-brand-500 shadow-sm; }
-  .btn-primary:hover  { @apply bg-brand-600 border-brand-600; }
-  .btn-primary:active { @apply bg-brand-700; }
+  .btn-primary   { background-color: var(--color-brand, #f59e0b); border-color: var(--color-brand, #f59e0b); color: white; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+  .btn-primary:hover  { filter: brightness(0.9); }
+  .btn-primary:active { filter: brightness(0.8); }
 
   .btn-secondary { background: #fff; color: #374151; border-color: #d1d5db; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
   .btn-secondary:hover { background: #f9fafb; }
@@ -233,20 +233,20 @@
    NAVBAR
    ============================================= */
 .nav-hipapa {
-  background-color: #0f172a;
-  border-bottom: 2px solid #f59e0b;
+  background-color: var(--color-brand-dark, #0f172a);
+  border-bottom: 2px solid var(--color-brand, #f59e0b);
   height: 58px;
   display: flex;
   align-items: center;
 }
 a.brand {
-  color: #f59e0b;
+  color: var(--color-brand, #f59e0b);
   font-weight: 800;
   font-size: 1.05rem;
   letter-spacing: -0.01em;
   text-decoration: none;
 }
-a.brand:hover { color: #fbbf24; }
+a.brand:hover { color: var(--color-accent, #fbbf24); }
 .nav-link-item {
   color: #94a3b8;
   font-size: 0.875rem;

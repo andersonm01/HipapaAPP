@@ -21,6 +21,7 @@ class HomeController < ApplicationController
     @current_order = Order.find(@new_order_id) if @new_order_id.present?
     @products = Product.where(activo: true).order(:nombre) if @current_order.present?
     @order_items = @current_order.order_items.includes(:product) if @current_order.present?
+    @sauces = Sauce.activas.select(:id, :nombre, :color)
   end
 
   def printer_config

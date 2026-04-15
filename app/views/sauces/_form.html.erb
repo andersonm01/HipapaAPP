@@ -1,0 +1,35 @@
+<% if sauce.errors.any? %>
+  <div class="alert-danger mb-4">
+    <ul class="text-sm list-disc ml-4">
+      <% sauce.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="space-y-4">
+  <div>
+    <label class="form-label">Nombre *</label>
+    <%= f.text_field :nombre, class: "form-input", placeholder: "Ej: Barbacoa, Picante, Ranch..." %>
+  </div>
+  <div>
+    <label class="form-label">Color</label>
+    <div class="flex gap-3 items-center">
+      <%= f.color_field :color, class: "h-12 w-16 rounded-lg border cursor-pointer" %>
+      <%= f.text_field :color, class: "form-input", placeholder: "#ef4444" %>
+    </div>
+    <p class="form-hint">El color se mostrará visualmente en el POS y en la página de pedidos</p>
+  </div>
+  <div>
+    <label class="form-label">Posición (orden visual)</label>
+    <%= f.number_field :posicion, class: "form-input", min: 0 %>
+  </div>
+  <div class="flex items-center gap-2">
+    <%= f.check_box :activo, class: "w-4 h-4 accent-yellow-500" %>
+    <label class="form-label mb-0">Activa</label>
+  </div>
+</div>
+
+<div class="flex gap-3 mt-5">
+  <%= f.submit sauce.persisted? ? "Actualizar salsa" : "Crear salsa", class: "btn-primary" %>
+  <%= link_to "Cancelar", sauces_path, class: "btn-secondary" %>
+</div>

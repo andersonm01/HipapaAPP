@@ -1,0 +1,11 @@
+<div class="page-header">
+  <h1 class="page-title">Editar Cliente</h1>
+  <%= link_to "← Volver", customers_path, class: "btn-secondary btn-sm" %>
+</div>
+<div class="card max-w-2xl">
+  <div class="card-body">
+    <%= form_with model: @customer, local: true, data: { turbo: false } do |f| %>
+      <%= render 'form', customer: @customer, f: f %>
+    <% end %>
+  </div>
+</div>

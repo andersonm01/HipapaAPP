@@ -1,0 +1,35 @@
+<div class="page-header">
+  <h1 class="page-title">Facturas</h1>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <% if @invoices.any? %>
+      <table class="table">
+        <thead><tr><th>Número</th><th>Fecha</th><th>Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>
+          <% @invoices.each do |inv| %>
+            <tr>
+              <td class="font-mono font-semibold"><%= inv.numero %></td>
+              <td class="text-sm text-gray-500"><%= inv.created_at.strftime('%d/%m/%Y %H:%M') %></td>
+              <td class="text-sm"><%= inv.order.numero_orden || "##{inv.order_id}" %></td>
+              <td class="text-sm"><%= inv.customer&.nombre || inv.order.cliente || '—' %></td>
+              <td class="font-semibold">$<%= number_with_precision(inv.total, precision: 0, delimiter: ',') %></td>
+              <td>
+                <span class="badge <%= inv.estado == 'emitida' ? 'badge-success' : 'badge-gray' %>">
+                  <%= inv.estado %>
+                </span>
+              </td>
+              <td class="flex gap-1">
+                <%= link_to "Ver", invoice_path(inv), class: "btn-secondary btn-xs" %>
+                <%= link_to "Imprimir", print_invoice_path(inv), class: "btn-secondary btn-xs", target: "_blank" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">No hay facturas registradas</div>
+    <% end %>
+  </div>
+</div>

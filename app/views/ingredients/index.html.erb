@@ -1,0 +1,86 @@
+<div class="page-header">
+  <h1 class="page-title">Ingredientes & Stock</h1>
+  <%= link_to "+ Nuevo ingrediente", new_ingredient_path, class: "btn-primary btn-sm" %>
+</div>
+
+<% if @low_stock.any? %>
+  <div class="alert-danger mb-4">
+    <svg class="w-4 h-4 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    <span class="flex-1">
+      <strong><%= @low_stock.count %> ingrediente(s) con stock bajo:</strong>
+      <%= @low_stock.map { |i| "#{i.nombre} (#{number_with_precision(i.stock_actual, precision:1)} #{i.unidad})" }.join(', ') %>
+    </span>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="card-body p-0">
+    <% if @ingredients.any? %>
+      <table class="table">
+        <thead>
+          <tr><th>Nombre</th><th>Precio/base</th><th>Stock actual</th><th>Stock mínimo</th><th>Unidad</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <% @ingredients.each do |ing| %>
+            <tr class="<%= ing.stock_bajo? ? 'bg-red-50' : '' %>">
+              <td class="font-medium">
+                <%= ing.nombre %>
+                <% if ing.stock_bajo? %>
+                  <span class="badge badge-danger ml-1">Stock bajo</span>
+                <% end %>
+              </td>
+              <td class="text-sm">$<%= number_with_precision(ing.precio, precision: 2) %> / <%= ing.unidad %></td>
+              <td class="font-semibold <%= ing.stock_bajo? ? 'text-red-600' : '' %>">
+                <%= number_with_precision(ing.stock_actual, precision: 2) %> <%= ing.unidad %>
+              </td>
+              <td class="text-sm text-gray-500"><%= number_with_precision(ing.stock_minimo, precision: 2) %> <%= ing.unidad %></td>
+              <td><span class="badge badge-gray"><%= ing.unidad %></span></td>
+              <td><span class="badge <%= ing.activo? ? 'badge-success' : 'badge-gray' %>"><%= ing.activo? ? 'Activo' : 'Inactivo' %></span></td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to "Editar", edit_ingredient_path(ing), class: "btn-secondary btn-xs" %>
+                  <button class="btn-secondary btn-xs"
+                          onclick="document.getElementById('stock-modal-<%= ing.id %>').classList.remove('hidden')">
+                    +/- Stock
+                  </button>
+                </div>
+                <!-- Mini modal de ajuste de stock -->
+                <div id="stock-modal-<%= ing.id %>" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+                  <div class="bg-white rounded-xl shadow-xl w-80 p-5">
+                    <h4 class="font-bold mb-3">Ajustar stock: <%= ing.nombre %></h4>
+                    <%= form_tag adjust_stock_ingredient_path(ing), method: :post, data: { turbo: false } do %>
+                      <div class="mb-3">
+                        <label class="form-label">Operación</label>
+                        <select name="operacion" class="form-select">
+                          <option value="add">Agregar</option>
+                          <option value="remove">Retirar</option>
+                          <option value="set">Establecer exacto</option>
+                        </select>
+                      </div>
+                      <div class="mb-4">
+                        <label class="form-label">Cantidad (<%= ing.unidad %>)</label>
+                        <input type="number" name="cantidad" class="form-input" step="0.001" min="0" required>
+                      </div>
+                      <div class="flex gap-2">
+                        <%= submit_tag "Aplicar", class: "btn-primary btn-sm flex-1" %>
+                        <button type="button" class="btn-secondary btn-sm flex-1"
+                                onclick="document.getElementById('stock-modal-<%= ing.id %>').classList.add('hidden')">Cancelar</button>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">
+        <p>No hay ingredientes registrados</p>
+        <%= link_to "+ Crear primero", new_ingredient_path, class: "btn-primary btn-sm mt-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>

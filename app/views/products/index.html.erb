@@ -19,7 +19,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th>#</th>
+            <th>Foto</th>
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Precio</th>
@@ -33,8 +33,24 @@
         <tbody>
           <% @products.each do |product| %>
             <tr>
-              <td class="text-slate-400 text-xs font-mono"><%= product.id %></td>
-              <td class="font-semibold text-slate-800"><%= product.nombre %></td>
+              <td>
+                <% if product.foto.attached? %>
+                  <%= image_tag product.foto, class: "w-10 h-10 rounded-lg object-cover" %>
+                <% else %>
+                  <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-lg">🍔</div>
+                <% end %>
+              </td>
+              <td class="font-semibold text-slate-800">
+                <%= product.nombre %>
+                <% if product.costo_calculado %>
+                  <span class="block text-xs font-normal text-gray-400">
+                    Costo: $<%= number_with_precision(product.costo_calculado, precision:2) %>
+                    <% if product.margen_ganancia %>
+                      · Margen: <span class="<%= product.rentable? ? 'text-green-500' : 'text-red-500' %>"><%= product.margen_ganancia %>%</span>
+                    <% end %>
+                  </span>
+                <% end %>
+              </td>
               <td class="text-slate-500 max-w-xs">
                 <%= truncate(product.descripcion, length: 60) if product.descripcion.present? %>
               </td>
@@ -52,6 +68,9 @@
               <% if current_user&.admin? || current_user&.supervisor? %>
                 <td class="text-right">
                   <div class="flex items-center justify-end gap-1">
+                    <%= link_to product_recipe_path(product), class: "btn-secondary btn-sm" do %>
+                      🧾 Receta
+                    <% end %>
                     <%= link_to product_path(product), class: "btn-ghost btn-sm" do %>
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

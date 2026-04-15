@@ -1,0 +1,101 @@
+<div class="page-header">
+  <h1 class="page-title">Caja #<%= @cash_register.id %></h1>
+  <div class="flex gap-2">
+    <% if @cash_register.abierta? %>
+      <%= link_to "Cerrar caja", close_cash_register_path(@cash_register), method: :post,
+          data: { turbo_method: :post, turbo_confirm: "¿Confirmar cierre?" },
+          class: "btn-danger btn-sm" %>
+    <% end %>
+    <%= link_to "← Cajas", cash_registers_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<!-- Resumen -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+  <div class="card">
+    <div class="card-body text-center">
+      <div class="text-xl font-bold text-green-600">$<%= number_with_precision(@cash_register.total_efectivo, precision: 0, delimiter: ',') %></div>
+      <div class="text-xs text-gray-500 mt-1">Efectivo ventas</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body text-center">
+      <div class="text-xl font-bold text-blue-600">$<%= number_with_precision(@cash_register.total_transferencia, precision: 0, delimiter: ',') %></div>
+      <div class="text-xs text-gray-500 mt-1">Transferencias</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body text-center">
+      <div class="text-xl font-bold text-red-500">$<%= number_with_precision(@cash_register.total_retiros, precision: 0, delimiter: ',') %></div>
+      <div class="text-xs text-gray-500 mt-1">Retiros</div>
+    </div>
+  </div>
+  <div class="card border-2 border-brand-400">
+    <div class="card-body text-center">
+      <div class="text-xl font-bold">$<%= number_with_precision(@cash_register.balance_calculado, precision: 0, delimiter: ',') %></div>
+      <div class="text-xs text-gray-500 mt-1">Balance en caja</div>
+    </div>
+  </div>
+</div>
+
+<!-- Agregar movimiento manual -->
+<% if @cash_register.abierta? %>
+<div class="card mb-5">
+  <div class="card-header"><span class="font-semibold text-sm">Registrar movimiento manual</span></div>
+  <div class="card-body">
+    <%= form_tag add_movement_cash_register_path(@cash_register), method: :post, class: "flex flex-wrap gap-3 items-end", data: { turbo: false } do %>
+      <div>
+        <label class="form-label">Tipo</label>
+        <select name="tipo" class="form-select">
+          <option value="retiro">Retiro</option>
+          <option value="ingreso">Ingreso manual</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Monto</label>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input type="number" name="monto" class="form-input w-28" step="0.01" min="0.01" required>
+        </div>
+      </div>
+      <div class="flex-1 min-w-40">
+        <label class="form-label">Descripción</label>
+        <input type="text" name="descripcion" class="form-input" placeholder="Motivo del retiro...">
+      </div>
+      <%= submit_tag "Registrar", class: "btn-primary btn-sm" %>
+    <% end %>
+  </div>
+</div>
+<% end %>
+
+<!-- Movimientos -->
+<div class="card">
+  <div class="card-header"><span class="font-semibold text-sm">Movimientos (<%= @movements.count %>)</span></div>
+  <div class="card-body p-0">
+    <% if @movements.any? %>
+      <table class="table">
+        <thead><tr><th>Hora</th><th>Tipo</th><th>Medio</th><th>Pedido</th><th>Descripción</th><th class="text-right">Monto</th></tr></thead>
+        <tbody>
+          <% @movements.each do |mov| %>
+            <tr>
+              <td class="text-xs text-gray-500"><%= mov.created_at.strftime('%H:%M') %></td>
+              <td>
+                <span class="badge <%= mov.tipo == 'venta' ? 'badge-success' : mov.tipo == 'retiro' ? 'badge-danger' : 'badge-info' %>">
+                  <%= mov.tipo %>
+                </span>
+              </td>
+              <td class="text-sm"><%= mov.medio_pago %></td>
+              <td class="text-sm text-gray-500"><%= mov.order&.numero_orden || '—' %></td>
+              <td class="text-sm text-gray-600"><%= mov.descripcion.presence || '—' %></td>
+              <td class="text-right font-semibold <%= mov.tipo == 'retiro' ? 'text-red-600' : 'text-green-600' %>">
+                <%= mov.tipo == 'retiro' ? '-' : '+' %>$<%= number_with_precision(mov.monto, precision: 0, delimiter: ',') %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">Sin movimientos registrados</div>
+    <% end %>
+  </div>
+</div>

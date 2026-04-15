@@ -50,6 +50,27 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <%= f.label :posicion, "Posición visual", class: "form-label" %>
+              <%= f.number_field :posicion, class: "form-input", min: 0 %>
+              <p class="form-hint">Orden en el menú (menor = primero)</p>
+            </div>
+          </div>
+
+          <!-- Foto del producto -->
+          <div>
+            <label class="form-label">Foto del producto</label>
+            <% if @product.persisted? && @product.foto.attached? %>
+              <div class="mb-2 flex items-center gap-3">
+                <%= image_tag @product.foto, class: "h-20 w-20 rounded-lg object-cover border" %>
+                <span class="text-sm text-gray-500">Foto actual</span>
+              </div>
+            <% end %>
+            <%= f.file_field :foto, class: "form-input", accept: "image/*" %>
+            <p class="form-hint">PNG/JPG recomendado. Se mostrará en pedidos online.</p>
+          </div>
+
           <label class="flex items-center gap-3 cursor-pointer group">
             <%= f.check_box :activo, class: "w-4 h-4 rounded border-slate-300 text-brand-500 focus:ring-brand-500", checked: true %>
             <div>

@@ -678,6 +678,10 @@
 }.to_json.html_safe %>
 </script>
 
+<script type="application/json" id="sauces-data">
+<%= @sauces.map { |s| { id: s.id, nombre: s.nombre, color: s.color } }.to_json.html_safe %>
+</script>
+
 <script type="module">
   import "home";
 </script>

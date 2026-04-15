@@ -1,0 +1,35 @@
+<% setting = BusinessSetting.current %>
+<div class="center bold" style="font-size:14px;"><%= setting.nombre %></div>
+<% if setting.direccion.present? %>
+  <div class="center" style="font-size:11px;"><%= setting.direccion %></div>
+<% end %>
+<% if setting.telefono.present? %>
+  <div class="center" style="font-size:11px;">Tel: <%= setting.telefono %></div>
+<% end %>
+<div class="separator"></div>
+<div class="row"><span>Factura:</span><span class="bold"><%= @invoice.numero %></span></div>
+<div class="row"><span>Fecha:</span><span><%= @invoice.created_at.strftime('%d/%m/%Y %H:%M') %></span></div>
+<div class="row"><span>Pedido:</span><span><%= @invoice.order.numero_orden || "##{@invoice.order_id}" %></span></div>
+<div class="row"><span>Cliente:</span><span><%= @invoice.customer&.nombre || @invoice.order.cliente || 'Consumidor final' %></span></div>
+<div class="separator"></div>
+<% @invoice.order.order_items.each do |item| %>
+  <div><%= item.cantidad %>x <%= item.product.nombre %></div>
+  <div class="row" style="padding-left:12px;">
+    <span>$<%= number_with_precision(item.precio_unitario, precision:0) %>/u</span>
+    <span class="bold">$<%= number_with_precision(item.subtotal, precision:0) %></span>
+  </div>
+  <% if item.comentario.present? %><div style="padding-left:12px;font-size:11px;"><%= item.comentario %></div><% end %>
+<% end %>
+<div class="separator"></div>
+<div class="row total-row"><span>TOTAL</span><span>$<%= number_with_precision(@invoice.total, precision:0) %></span></div>
+<% if @invoice.order.tipo_pago.present? %>
+  <div class="row"><span>Pago:</span><span><%= @invoice.order.tipo_pago %></span></div>
+  <% if @invoice.order.monto_pagado %>
+    <div class="row"><span>Pagó:</span><span>$<%= number_with_precision(@invoice.order.monto_pagado, precision:0) %></span></div>
+  <% end %>
+  <% if @invoice.order.vuelto.to_f > 0 %>
+    <div class="row"><span>Vuelto:</span><span>$<%= number_with_precision(@invoice.order.vuelto, precision:0) %></span></div>
+  <% end %>
+<% end %>
+<div class="separator"></div>
+<div class="center" style="font-size:11px;"><%= @invoice.estado == 'anulada' ? '*** ANULADA ***' : '¡Gracias por su compra!' %></div>

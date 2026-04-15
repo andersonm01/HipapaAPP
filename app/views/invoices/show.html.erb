@@ -1,0 +1,56 @@
+<div class="page-header">
+  <h1 class="page-title">Factura <%= @invoice.numero %></h1>
+  <div class="flex gap-2">
+    <%= link_to "Imprimir", print_invoice_path(@invoice), class: "btn-secondary btn-sm", target: "_blank" %>
+    <% if @invoice.estado == 'emitida' %>
+      <%= link_to "Anular", void_invoice_path(@invoice), method: :post,
+          data: { turbo_method: :post, turbo_confirm: "¿Anular factura #{@invoice.numero}?" },
+          class: "btn-outline-danger btn-sm" %>
+    <% end %>
+    <%= link_to "← Facturas", invoices_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<div class="card max-w-lg">
+  <div class="card-body">
+    <% setting = BusinessSetting.current %>
+    <div class="text-center mb-4 pb-4 border-b">
+      <h2 class="font-bold text-lg"><%= setting.nombre %></h2>
+      <p class="text-sm text-gray-500"><%= setting.direccion %></p>
+      <p class="text-sm text-gray-500"><%= setting.telefono %></p>
+    </div>
+    <div class="space-y-1 text-sm mb-4">
+      <div class="flex justify-between"><span class="text-gray-500">Factura N°</span><span class="font-mono font-bold"><%= @invoice.numero %></span></div>
+      <div class="flex justify-between"><span class="text-gray-500">Fecha</span><span><%= @invoice.created_at.strftime('%d/%m/%Y %H:%M') %></span></div>
+      <div class="flex justify-between"><span class="text-gray-500">Pedido</span><span><%= @invoice.order.numero_orden || "##{@invoice.order_id}" %></span></div>
+      <div class="flex justify-between"><span class="text-gray-500">Cliente</span><span><%= @invoice.customer&.nombre || @invoice.order.cliente || 'Consumidor final' %></span></div>
+    </div>
+    <table class="w-full text-sm mb-4">
+      <thead class="border-b">
+        <tr><th class="text-left pb-1">Producto</th><th class="text-center">Cant</th><th class="text-right">P/U</th><th class="text-right">Total</th></tr>
+      </thead>
+      <tbody>
+        <% @invoice.order.order_items.each do |item| %>
+          <tr class="border-b border-dashed">
+            <td class="py-1"><%= item.product.nombre %></td>
+            <td class="text-center"><%= item.cantidad %></td>
+            <td class="text-right">$<%= number_with_precision(item.precio_unitario, precision: 0) %></td>
+            <td class="text-right font-semibold">$<%= number_with_precision(item.subtotal, precision: 0) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <div class="flex justify-between font-bold text-base border-t pt-2">
+      <span>TOTAL</span>
+      <span>$<%= number_with_precision(@invoice.total, precision: 0, delimiter: ',') %></span>
+    </div>
+    <% if @invoice.order.tipo_pago.present? %>
+      <div class="flex justify-between text-sm text-gray-500 mt-1">
+        <span>Pago</span><span><%= @invoice.order.tipo_pago %></span>
+      </div>
+    <% end %>
+    <div class="mt-4 text-center text-xs text-gray-400">
+      <%= @invoice.estado == 'anulada' ? '*** FACTURA ANULADA ***' : '¡Gracias por su compra!' %>
+    </div>
+  </div>
+</div>

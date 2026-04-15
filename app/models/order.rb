@@ -1,6 +1,11 @@
 class Order < ApplicationRecord
+  belongs_to :customer, optional: true
+  belongs_to :user,     optional: true
+
   has_many :order_items, dependent: :destroy
   has_many :products, through: :order_items
+  has_one  :invoice, dependent: :destroy
+  has_many :cash_movements, dependent: :nullify
 
   KITCHEN_STATUSES = %w[pending preparing ready delivered].freeze
 
@@ -20,6 +25,8 @@ class Order < ApplicationRecord
       .order(created_at: :asc)
   }
 
+  before_create :assign_numero_orden
+
   def open?
     status == STATUS_OPEN
   end
@@ -36,7 +43,26 @@ class Order < ApplicationRecord
     open? && kitchen_status != 'delivered'
   end
 
+  def total_calculado
+    items_total = order_items.loaded? ? order_items.sum(&:subtotal) : order_items.sum('cantidad * precio_unitario')
+    desc = descuento.to_f
+    [items_total - desc, 0].max
+  end
+
+  # Mantiene compatibilidad con código existente
   def total
-    order_items.any? ? order_items.sum { |item| item.subtotal } : 0.0
+    total_calculado
+  end
+
+  def nombre_cliente
+    customer&.nombre || cliente
+  end
+
+  private
+
+  def assign_numero_orden
+    return if numero_orden.present?
+    last = Order.maximum(:id).to_i + 1
+    self.numero_orden = "##{last.to_s.rjust(4, '0')}"
   end
 end

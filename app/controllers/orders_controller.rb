@@ -54,6 +54,8 @@ class OrdersController < ApplicationController
         # Buscar si ya existe el producto en la orden
         order_item = @order.order_items.find_by(product_id: product.id)
         
+        sauce_ids = Array(item_params[:sauce_ids]).map(&:to_i).select(&:positive?)
+
         if order_item
           # Si existe, actualizar cantidad y comentario
           new_comentario = if order_item.comentario.present? && comentario.present?
@@ -63,19 +65,21 @@ class OrdersController < ApplicationController
           else
             order_item.comentario
           end
-          
+
           order_item.update(
             cantidad: order_item.cantidad + cantidad,
             comentario: new_comentario
           )
+          order_item.sauce_ids = sauce_ids if sauce_ids.any?
         else
           # Si no existe, crear nuevo item
-          @order.order_items.create(
+          new_item = @order.order_items.create(
             product: product,
             cantidad: cantidad,
             precio_unitario: product.precio,
             comentario: comentario
           )
+          new_item.sauce_ids = sauce_ids if sauce_ids.any?
         end
       end
       
@@ -108,33 +112,46 @@ class OrdersController < ApplicationController
 
   def close_order
     @order = Order.find(params[:id])
-    
+
     monto_pagado = params[:monto_pagado].to_f
-    tipo_pago = params[:tipo_pago]
-    vuelto = params[:vuelto].to_f
-    
-    if @order.update(
-      status: 1,
-      monto_pagado: monto_pagado,
-      tipo_pago: tipo_pago,
-      vuelto: vuelto
-    )
-      # Transmitir actualización en tiempo real
-      ActionCable.server.broadcast("orders_channel", {
-        type: "order_closed",
-        order: {
-          id: @order.id,
-          status: @order.status,
-          total: @order.total
-        }
-      })
-      redirect_to root_path, notice: 'Pedido cerrado exitosamente.'
-    else
-      redirect_to root_path, alert: "Error al cerrar el pedido: #{@order.errors.full_messages.join(', ')}"
+    tipo_pago    = params[:tipo_pago]
+    vuelto       = params[:vuelto].to_f
+    customer_id  = params[:customer_id].presence
+
+    ActiveRecord::Base.transaction do
+      @order.update!(
+        status:      Order::STATUS_CLOSED,
+        monto_pagado: monto_pagado,
+        tipo_pago:   tipo_pago,
+        vuelto:      vuelto,
+        total:       @order.total_calculado,
+        customer_id: customer_id,
+        user_id:     current_user&.id
+      )
+
+      # Generar factura
+      Invoices::GeneratorService.new(@order).call
+
+      # Descontar stock
+      Stock::DeductService.new(@order).call
+
+      # Registrar en caja si hay una abierta
+      caja = CashRegister.caja_abierta_para(current_user)
+      Cash::RegisterService.new(caja).record_sale(@order) if caja
     end
+
+    ActionCable.server.broadcast("orders_channel", {
+      type: "order_closed",
+      order: { id: @order.id, status: @order.status, total: @order.total }
+    })
+
+    redirect_to root_path, notice: 'Pedido cerrado exitosamente.'
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "Error en close_order: #{e.message}"
     redirect_to root_path, alert: 'Error: No se encontró la orden.'
+  rescue => e
+    Rails.logger.error "Error en close_order: #{e.message}"
+    redirect_to root_path, alert: "Error al cerrar el pedido: #{e.message}"
   end
 
   def cancel_order
@@ -226,7 +243,6 @@ class OrdersController < ApplicationController
   private
 
   def order_params
-    # form_with con url: envía los parámetros directamente, no anidados
-    params.permit(:cliente, :mesero, :comentario, :tipo_servicio)
+    params.permit(:cliente, :mesero, :comentario, :tipo_servicio, :customer_id, :user_id, :canal)
   end
 end

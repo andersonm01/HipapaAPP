@@ -1,0 +1,88 @@
+<div class="page-header">
+  <h1 class="page-title">Receta: <%= @product.nombre %></h1>
+  <div class="flex gap-2 items-center">
+    <% if @product.costo_calculado %>
+      <span class="badge badge-info text-sm px-3 py-1">
+        Costo: $<%= number_with_precision(@product.costo_calculado, precision: 2) %>
+        <% if @product.margen_ganancia %>
+          — Margen: <%= @product.margen_ganancia %>%
+          <span class="<%= @product.rentable? ? 'text-green-300' : 'text-red-300' %>">
+            (<%= @product.rentable? ? '✓' : '⚠' %>)
+          </span>
+        <% end %>
+      </span>
+    <% end %>
+    <%= link_to "← Productos", products_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<div class="card max-w-3xl">
+  <div class="card-body">
+    <%= form_with url: product_recipe_path(@product), method: :patch, local: true, data: { turbo: false } do |f| %>
+      <div class="mb-5">
+        <label class="form-label">Notas de la receta</label>
+        <%= text_area_tag 'recipe[notas]', @recipe.notas, class: "form-textarea", rows: 2,
+            placeholder: "Instrucciones especiales, tiempo de preparación..." %>
+      </div>
+
+      <h3 class="font-semibold text-sm text-gray-700 mb-3">Ingredientes</h3>
+
+      <div id="recipe-ingredients-list" class="space-y-3 mb-4">
+        <% @recipe.recipe_ingredients.each_with_index do |ri, i| %>
+          <div class="flex gap-2 items-center bg-gray-50 rounded-lg p-2">
+            <select name="recipe_ingredients[][ingredient_id]" class="form-select flex-1">
+              <option value="">— Seleccionar —</option>
+              <% @ingredients.each do |ing| %>
+                <option value="<%= ing.id %>" <%= ri.ingredient_id == ing.id ? 'selected' : '' %>>
+                  <%= ing.nombre %> (<%= ing.unidad %>) — $<%= number_with_precision(ing.precio, precision:2) %>/<%= ing.unidad %>
+                </option>
+              <% end %>
+            </select>
+            <input type="number" name="recipe_ingredients[][cantidad]"
+                   value="<%= ri.cantidad %>"
+                   step="0.001" min="0.001" placeholder="Cantidad"
+                   class="form-input w-28">
+            <button type="button" class="btn-outline-danger btn-sm"
+                    onclick="this.closest('div').remove()">✕</button>
+          </div>
+        <% end %>
+      </div>
+
+      <button type="button" id="add-ingredient-btn" class="btn-secondary btn-sm mb-6">
+        + Agregar ingrediente
+      </button>
+
+      <!-- Template (hidden) para nuevas filas -->
+      <template id="ingredient-row-tpl">
+        <div class="flex gap-2 items-center bg-gray-50 rounded-lg p-2">
+          <select name="recipe_ingredients[][ingredient_id]" class="form-select flex-1">
+            <option value="">— Seleccionar —</option>
+            <% @ingredients.each do |ing| %>
+              <option value="<%= ing.id %>">
+                <%= ing.nombre %> (<%= ing.unidad %>) — $<%= number_with_precision(ing.precio, precision:2) %>/<%= ing.unidad %>
+              </option>
+            <% end %>
+          </select>
+          <input type="number" name="recipe_ingredients[][cantidad]"
+                 step="0.001" min="0.001" placeholder="Cantidad"
+                 class="form-input w-28">
+          <button type="button" class="btn-outline-danger btn-sm"
+                  onclick="this.closest('div').remove()">✕</button>
+        </div>
+      </template>
+
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary">Guardar receta</button>
+        <%= link_to "Cancelar", products_path, class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.getElementById('add-ingredient-btn').addEventListener('click', () => {
+    const tpl = document.getElementById('ingredient-row-tpl');
+    const clone = tpl.content.cloneNode(true);
+    document.getElementById('recipe-ingredients-list').appendChild(clone);
+  });
+</script>

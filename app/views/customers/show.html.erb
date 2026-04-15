@@ -1,0 +1,89 @@
+<div class="page-header">
+  <h1 class="page-title"><%= @customer.nombre %></h1>
+  <div class="flex gap-2">
+    <%= link_to "Editar", edit_customer_path(@customer), class: "btn-secondary btn-sm" %>
+    <%= link_to "← Clientes", customers_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+  <div class="card">
+    <div class="card-body text-center">
+      <div class="text-2xl font-bold text-brand-600"><%= @customer.frecuencia %></div>
+      <div class="text-xs text-gray-500 mt-1">Pedidos totales</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body text-center">
+      <div class="text-2xl font-bold text-brand-600">$<%= number_with_precision(@customer.total_compras, precision: 0, delimiter: ',') %></div>
+      <div class="text-xs text-gray-500 mt-1">Total gastado</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body text-center">
+      <div class="text-sm font-semibold text-gray-700"><%= @customer.ultimo_pedido&.strftime('%d/%m/%Y') || '—' %></div>
+      <div class="text-xs text-gray-500 mt-1">Último pedido</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+  <div class="card">
+    <div class="card-header"><span class="font-semibold text-sm">Información</span></div>
+    <div class="card-body space-y-2 text-sm">
+      <div class="flex justify-between">
+        <span class="text-gray-500">WhatsApp</span>
+        <% if @customer.whatsapp.present? %>
+          <a href="https://wa.me/<%= @customer.whatsapp.gsub(/\D/,'') %>" target="_blank" class="text-green-600 font-medium hover:underline"><%= @customer.whatsapp %></a>
+        <% else %>
+          <span class="text-gray-400">—</span>
+        <% end %>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500">Dirección</span>
+        <span><%= @customer.direccion.presence || '—' %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500">Domicilio</span>
+        <span><%= @customer.precio_domicilio.to_f > 0 ? "$#{number_with_precision(@customer.precio_domicilio, precision:0)}" : 'Estándar' %></span>
+      </div>
+      <% if @customer.notas.present? %>
+        <div class="pt-2 border-t">
+          <span class="text-gray-500 block">Notas</span>
+          <p class="text-gray-700 mt-1"><%= @customer.notas %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="font-semibold text-sm">Historial de pedidos</span></div>
+  <div class="card-body p-0">
+    <% if @orders.any? %>
+      <table class="table">
+        <thead><tr><th>Pedido</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
+        <tbody>
+          <% @orders.each do |order| %>
+            <tr>
+              <td class="font-mono"><%= order.numero_orden || "##{order.id}" %></td>
+              <td class="text-sm text-gray-500"><%= order.created_at.strftime('%d/%m/%Y %H:%M') %></td>
+              <td class="font-semibold">$<%= number_with_precision(order.total, precision: 0, delimiter: ',') %></td>
+              <td>
+                <% if order.closed? %>
+                  <span class="badge badge-success">Cerrado</span>
+                <% elsif order.cancelled? %>
+                  <span class="badge badge-danger">Cancelado</span>
+                <% else %>
+                  <span class="badge badge-warning">Abierto</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">No hay pedidos registrados</div>
+    <% end %>
+  </div>
+</div>

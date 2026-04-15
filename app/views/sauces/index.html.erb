@@ -1,0 +1,50 @@
+<div class="page-header">
+  <h1 class="page-title">Salsas</h1>
+  <%= link_to "+ Nueva salsa", new_sauce_path, class: "btn-primary btn-sm" %>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <% if @sauces.any? %>
+      <table class="table">
+        <thead>
+          <tr><th>Color</th><th>Nombre</th><th>Posición</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <% @sauces.each do |sauce| %>
+            <tr>
+              <td>
+                <div class="w-7 h-7 rounded-full border border-gray-200 shadow-sm"
+                     style="background-color: <%= sauce.color %>;"
+                     title="<%= sauce.color %>"></div>
+              </td>
+              <td class="font-medium">
+                <span class="inline-flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                        style="background-color: <%= sauce.color %>"><%= sauce.nombre %></span>
+                </span>
+              </td>
+              <td class="text-gray-500 text-sm"><%= sauce.posicion %></td>
+              <td>
+                <span class="badge <%= sauce.activo? ? 'badge-success' : 'badge-gray' %>">
+                  <%= sauce.activo? ? 'Activa' : 'Inactiva' %>
+                </span>
+              </td>
+              <td class="flex gap-1">
+                <%= link_to "Editar", edit_sauce_path(sauce), class: "btn-secondary btn-xs" %>
+                <%= link_to "Eliminar", sauce_path(sauce), method: :delete,
+                    data: { turbo_method: :delete, turbo_confirm: "¿Desactivar salsa #{sauce.nombre}?" },
+                    class: "btn-outline-danger btn-xs" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">
+        <p>No hay salsas registradas</p>
+        <%= link_to "+ Crear primera salsa", new_sauce_path, class: "btn-primary btn-sm mt-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<div class="page-header">
+  <h1 class="page-title">Arqueo de Caja</h1>
+  <% unless @caja_abierta %>
+    <button class="btn-primary btn-sm" onclick="document.getElementById('open-caja-modal').classList.remove('hidden')">
+      + Abrir caja
+    </button>
+  <% end %>
+</div>
+
+<!-- Caja activa actual -->
+<% if @caja_abierta %>
+  <div class="card mb-5 border-l-4 border-l-green-400">
+    <div class="card-body">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="badge badge-success">Caja abierta</span>
+            <span class="text-sm text-gray-500">desde <%= @caja_abierta.abierta_en.strftime('%d/%m/%Y %H:%M') %></span>
+          </div>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div class="text-xl font-bold text-green-600">$<%= number_with_precision(@caja_abierta.total_efectivo, precision: 0, delimiter: ',') %></div>
+              <div class="text-xs text-gray-500">Efectivo</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold text-blue-600">$<%= number_with_precision(@caja_abierta.total_transferencia, precision: 0, delimiter: ',') %></div>
+              <div class="text-xs text-gray-500">Transferencia</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold">$<%= number_with_precision(@caja_abierta.balance_calculado, precision: 0, delimiter: ',') %></div>
+              <div class="text-xs text-gray-500">Balance</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <%= link_to "Ver detalles", cash_register_path(@caja_abierta), class: "btn-secondary btn-sm" %>
+          <%= link_to "Cerrar caja", close_cash_register_path(@caja_abierta), method: :post,
+              data: { turbo_method: :post, turbo_confirm: "¿Confirmar cierre de caja?" },
+              class: "btn-danger btn-sm" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!-- Historial -->
+<div class="card">
+  <div class="card-header"><span class="font-semibold text-sm">Historial de cajas</span></div>
+  <div class="card-body p-0">
+    <% if @cajas.any? %>
+      <table class="table">
+        <thead><tr><th>Apertura</th><th>Cierre</th><th>Mesero</th><th>Total ventas</th><th>Balance</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          <% @cajas.each do |caja| %>
+            <tr>
+              <td class="text-sm"><%= caja.abierta_en.strftime('%d/%m %H:%M') %></td>
+              <td class="text-sm text-gray-500"><%= caja.cerrada_en&.strftime('%d/%m %H:%M') || '—' %></td>
+              <td class="text-sm"><%= caja.user.name %></td>
+              <td class="font-semibold">$<%= number_with_precision(caja.total_ventas, precision: 0, delimiter: ',') %></td>
+              <td class="font-semibold">$<%= number_with_precision(caja.monto_cierre || caja.balance_calculado, precision: 0, delimiter: ',') %></td>
+              <td><span class="badge <%= caja.abierta? ? 'badge-success' : 'badge-gray' %>"><%= caja.estado %></span></td>
+              <td><%= link_to "Ver", cash_register_path(caja), class: "btn-secondary btn-xs" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">No hay cajas registradas</div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Modal abrir caja -->
+<div id="open-caja-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-xl shadow-xl w-80 p-5">
+    <h3 class="font-bold mb-4">Abrir Caja</h3>
+    <%= form_tag open_cash_registers_path, method: :post, data: { turbo: false } do %>
+      <div class="mb-4">
+        <label class="form-label">Monto de apertura ($)</label>
+        <input type="number" name="monto_apertura" class="form-input" step="0.01" min="0" value="0" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Notas (opcional)</label>
+        <textarea name="notas" class="form-textarea" rows="2"></textarea>
+      </div>
+      <div class="flex gap-2">
+        <%= submit_tag "Abrir caja", class: "btn-success flex-1" %>
+        <button type="button" class="btn-secondary flex-1"
+                onclick="document.getElementById('open-caja-modal').classList.add('hidden')">Cancelar</button>
+      </div>
+    <% end %>
+  </div>
+</div>

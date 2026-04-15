@@ -1,0 +1,11 @@
+<div class="page-header">
+  <h1 class="page-title">Editar Ingrediente</h1>
+  <%= link_to "← Volver", ingredients_path, class: "btn-secondary btn-sm" %>
+</div>
+<div class="card max-w-lg">
+  <div class="card-body">
+    <%= form_with model: @ingredient, local: true, data: { turbo: false } do |f| %>
+      <%= render 'form', ingredient: @ingredient, f: f %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<% if ingredient.errors.any? %>
+  <div class="alert-danger mb-4">
+    <ul class="text-sm list-disc ml-4">
+      <% ingredient.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+    </ul>
+  </div>
+<% end %>
+<div class="space-y-4">
+  <div>
+    <label class="form-label">Nombre *</label>
+    <%= f.text_field :nombre, class: "form-input", placeholder: "Ej: Carne de res, Papa, Queso cheddar..." %>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="form-label">Precio por unidad</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <%= f.number_field :precio, class: "form-input", step: "0.01", min: 0 %>
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Unidad</label>
+      <%= f.select :unidad, Ingredient::UNITS.map { |u| [u, u] }, {}, class: "form-select" %>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="form-label">Stock actual</label>
+      <%= f.number_field :stock_actual, class: "form-input", step: "0.001", min: 0 %>
+    </div>
+    <div>
+      <label class="form-label">Stock mínimo (alerta)</label>
+      <%= f.number_field :stock_minimo, class: "form-input", step: "0.001", min: 0 %>
+    </div>
+  </div>
+</div>
+<div class="flex gap-3 mt-5">
+  <%= f.submit ingredient.persisted? ? "Actualizar" : "Crear ingrediente", class: "btn-primary" %>
+  <%= link_to "Cancelar", ingredients_path, class: "btn-secondary" %>
+</div>

@@ -1,0 +1,159 @@
+<!-- Descripción del negocio -->
+<% if @business.descripcion.present? %>
+  <p class="text-center text-gray-500 text-sm mb-4"><%= @business.descripcion %></p>
+<% end %>
+
+<!-- Pestañas de categorías -->
+<% if @productos_por_categoria.any? %>
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+    <button class="category-tab active shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition"
+            onclick="showCategory('all', this)">Todos</button>
+    <% @productos_por_categoria.keys.each do |cat| %>
+      <button class="category-tab shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition"
+              onclick="showCategory('<%= cat.parameterize %>', this)">
+        <%= cat %>
+      </button>
+    <% end %>
+  </div>
+
+  <!-- Productos por categoría -->
+  <% @productos_por_categoria.each do |categoria, productos| %>
+    <div class="category-section mb-6" data-category="<%= categoria.parameterize %>">
+      <h2 class="font-bold text-gray-800 text-base mb-3"><%= categoria %></h2>
+      <div class="grid grid-cols-2 gap-3">
+        <% productos.each do |producto| %>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+               data-product-id="<%= producto.id %>"
+               data-product-nombre="<%= producto.nombre.html_safe %>"
+               data-product-precio="<%= producto.precio %>">
+            <!-- Foto del producto -->
+            <% if producto.foto.attached? %>
+              <%= image_tag producto.foto, class: "w-full h-32 object-cover", alt: producto.nombre %>
+            <% else %>
+              <div class="w-full h-24 flex items-center justify-center text-4xl" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+                🍔
+              </div>
+            <% end %>
+            <div class="p-3">
+              <p class="font-semibold text-sm text-gray-800 leading-tight"><%= producto.nombre %></p>
+              <% if producto.descripcion.present? %>
+                <p class="text-xs text-gray-400 mt-0.5 line-clamp-2"><%= producto.descripcion %></p>
+              <% end %>
+              <div class="flex items-center justify-between mt-2">
+                <span class="font-bold text-sm" style="color: var(--pub-brand, #f59e0b);">
+                  $<%= number_with_precision(producto.precio, precision: 0, delimiter: ',') %>
+                </span>
+                <button class="add-to-cart-btn w-7 h-7 rounded-full text-black font-bold text-lg leading-none"
+                        style="background: var(--pub-brand, #f59e0b);"
+                        data-id="<%= producto.id %>"
+                        data-nombre="<%= producto.nombre %>"
+                        data-precio="<%= producto.precio %>">+</button>
+              </div>
+              <!-- Salsas disponibles -->
+              <% if @sauces.any? %>
+                <div class="sauce-selector mt-2 hidden" id="sauces-<%= producto.id %>">
+                  <p class="text-xs text-gray-500 mb-1">Salsas:</p>
+                  <div class="flex flex-wrap gap-1">
+                    <% @sauces.each do |sauce| %>
+                      <label class="cursor-pointer">
+                        <input type="checkbox" class="sr-only sauce-cb"
+                               data-product-id="<%= producto.id %>"
+                               data-sauce-nombre="<%= sauce.nombre %>"
+                               value="<%= sauce.nombre %>">
+                        <span class="sauce-chip text-xs px-2 py-0.5 rounded-full text-white font-medium transition"
+                              style="background-color: <%= sauce.color %>; opacity: 0.7;">
+                          <%= sauce.nombre %>
+                        </span>
+                      </label>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="text-center py-16 text-gray-400">
+    <div class="text-5xl mb-3">🍔</div>
+    <p>Próximamente nuestro menú estará disponible</p>
+  </div>
+<% end %>
+
+<%= content_for :js do %>
+<script type="module">
+  import cart from "online_cart";
+
+  // Category tabs
+  window.showCategory = (cat, btn) => {
+    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.category-section').forEach(s => {
+      s.style.display = (cat === 'all' || s.dataset.category === cat) ? '' : 'none';
+    });
+  };
+
+  // Add to cart
+  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const { id, nombre, precio } = btn.dataset;
+      // Mostrar selector de salsas
+      const sauceSel = document.getElementById(`sauces-${id}`);
+      if (sauceSel) sauceSel.classList.toggle('hidden');
+      cart.add(parseInt(id), nombre, parseFloat(precio));
+    });
+  });
+
+  // Sauce chip toggle visual
+  document.querySelectorAll('.sauce-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const chip = cb.nextElementSibling;
+      chip.style.opacity = cb.checked ? '1' : '0.7';
+      chip.style.boxShadow = cb.checked ? '0 0 0 2px #000' : '';
+      // Actualizar item en carrito
+      const productId = parseInt(cb.dataset.productId);
+      const salsas = [...document.querySelectorAll(`.sauce-cb[data-product-id="${productId}"]:checked`)]
+        .map(c => c.dataset.sauceNombre);
+      cart.updateSauces(productId, salsas);
+    });
+  });
+
+  // Cart toggle
+  document.getElementById('cart-toggle')?.addEventListener('click', () => {
+    document.getElementById('cart-panel').classList.toggle('hidden');
+  });
+  document.getElementById('cart-close')?.addEventListener('click', () => {
+    document.getElementById('cart-panel').classList.add('hidden');
+  });
+
+  // Checkout
+  document.getElementById('checkout-btn')?.addEventListener('click', () => {
+    if (cart.items.length === 0) return;
+    document.getElementById('cart-panel').classList.add('hidden');
+    document.getElementById('checkout-modal').classList.remove('hidden');
+    document.getElementById('checkout-modal').style.display = 'flex';
+  });
+  document.getElementById('checkout-close')?.addEventListener('click', () => {
+    document.getElementById('checkout-modal').classList.add('hidden');
+    document.getElementById('checkout-modal').style.display = '';
+  });
+
+  // Tipo servicio → mostrar campo dirección
+  document.querySelectorAll('input[name="tipo_servicio"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('direccion-field').classList.toggle('hidden', r.value !== 'domicilio');
+    });
+  });
+
+  // Serializar carrito antes de submit
+  document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
+    if (cart.items.length === 0) { e.preventDefault(); return; }
+    document.getElementById('cart-items-json').value = JSON.stringify(cart.items);
+  });
+
+  // Category tab active style
+  document.querySelector('.category-tab.active')?.setAttribute('style', `background: var(--pub-brand, #f59e0b); color: #000; border-color: var(--pub-brand, #f59e0b);`);
+</script>
+<% end %>

@@ -1,0 +1,83 @@
+<div class="page-header">
+  <h1 class="page-title">Clientes</h1>
+  <%= link_to "+ Nuevo cliente", new_customer_path, class: "btn-primary btn-sm" %>
+</div>
+
+<!-- Ranking top 5 -->
+<% if @top_customers.any? %>
+<div class="card mb-5">
+  <div class="card-header">
+    <span class="font-semibold text-sm">Top clientes</span>
+  </div>
+  <div class="card-body p-0">
+    <table class="table">
+      <thead><tr><th>#</th><th>Cliente</th><th>Pedidos</th><th>Total gastado</th><th>Acción</th></tr></thead>
+      <tbody>
+        <% @top_customers.each_with_index do |c, i| %>
+          <tr>
+            <td><span class="badge <%= i == 0 ? 'badge-warning' : 'badge-gray' %>">#<%= i+1 %></span></td>
+            <td class="font-medium"><%= c.nombre %></td>
+            <td><%= c.pedidos_count %></td>
+            <td class="font-semibold">$<%= number_with_precision(c.total_gastado.to_f, precision: 0, delimiter: ',') %></td>
+            <td><%= link_to "Ver", customer_path(c), class: "btn-secondary btn-xs" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% end %>
+
+<!-- Búsqueda -->
+<%= form_tag customers_path, method: :get, class: "mb-4", data: { turbo: false } do %>
+  <div class="flex gap-2">
+    <%= text_field_tag :q, params[:q], class: "form-input", placeholder: "Buscar por nombre o WhatsApp..." %>
+    <%= submit_tag "Buscar", class: "btn-secondary btn-sm" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="card-body p-0">
+    <% if @customers.any? %>
+      <table class="table">
+        <thead>
+          <tr><th>Nombre</th><th>WhatsApp</th><th>Dirección</th><th>Domicilio</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <% @customers.each do |c| %>
+            <tr>
+              <td class="font-medium"><%= c.nombre %></td>
+              <td>
+                <% if c.whatsapp.present? %>
+                  <a href="https://wa.me/<%= c.whatsapp.gsub(/\D/,'') %>" target="_blank" class="text-green-600 hover:underline text-sm">
+                    <%= c.whatsapp %>
+                  </a>
+                <% else %>
+                  <span class="text-gray-400 text-xs">—</span>
+                <% end %>
+              </td>
+              <td class="text-sm text-gray-600"><%= c.direccion.presence || '—' %></td>
+              <td class="text-sm">
+                <% if c.precio_domicilio.to_f > 0 %>
+                  <span class="badge badge-info">$<%= number_with_precision(c.precio_domicilio, precision: 0) %></span>
+                <% else %>
+                  <span class="text-gray-400 text-xs">Estándar</span>
+                <% end %>
+              </td>
+              <td class="flex gap-1">
+                <%= link_to "Ver", customer_path(c), class: "btn-secondary btn-xs" %>
+                <%= link_to "Editar", edit_customer_path(c), class: "btn-secondary btn-xs" %>
+                <%= link_to "Eliminar", customer_path(c), method: :delete, data: { turbo_method: :delete, turbo_confirm: "¿Eliminar cliente #{c.nombre}?" }, class: "btn-outline-danger btn-xs" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">
+        <p>No hay clientes registrados</p>
+        <%= link_to "+ Crear primero", new_customer_path, class: "btn-primary btn-sm mt-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>
