@@ -52,6 +52,16 @@ Rails.application.configure do
   # information to avoid inadvertent exposure of personally identifiable information (PII).
   config.log_level = :info
 
+  # Host Authorization - allow Railway domain
+  config.hosts << "hipapaapp-production-c846.up.railway.app"
+
+  # Also allow localhost for internal health checks
+  config.hosts << "localhost"
+  config.hosts << "127.0.0.1"
+
+  # Optional: allow any subdomain of a parent domain if you plan to use custom domains
+  # config.hosts << /.*\.hipapaapp\..*/
+
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
