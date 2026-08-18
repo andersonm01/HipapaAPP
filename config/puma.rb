@@ -22,7 +22,10 @@ port ENV.fetch("PORT") { 3000 }
 environment ENV.fetch("RAILS_ENV") { "development" }
 
 # Specifies the `pidfile` that Puma will use.
-pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
+# Disabled for Railway (containerized environment): the container filesystem
+# is ephemeral and the app runs as PID 1, so a pidfile is unnecessary and
+# can cause Puma to fail to start if the directory doesn't exist yet.
+pidfile nil
 
 # Specifies the number of `workers` to boot in clustered mode.
 # Workers are forked web server processes. If using threads and workers together
