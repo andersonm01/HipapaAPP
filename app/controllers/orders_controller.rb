@@ -50,11 +50,9 @@ class OrdersController < ApplicationController
         cantidad = item_params[:cantidad].to_i
         cantidad = 1 if cantidad < 1
         comentario = item_params[:comentario].to_s.strip
-        
+
         # Buscar si ya existe el producto en la orden
         order_item = @order.order_items.find_by(product_id: product.id)
-        
-        sauce_ids = Array(item_params[:sauce_ids]).map(&:to_i).select(&:positive?)
 
         if order_item
           # Si existe, actualizar cantidad y comentario
@@ -70,16 +68,14 @@ class OrdersController < ApplicationController
             cantidad: order_item.cantidad + cantidad,
             comentario: new_comentario
           )
-          order_item.sauce_ids = sauce_ids if sauce_ids.any?
         else
           # Si no existe, crear nuevo item
-          new_item = @order.order_items.create(
+          @order.order_items.create(
             product: product,
             cantidad: cantidad,
             precio_unitario: product.precio,
             comentario: comentario
           )
-          new_item.sauce_ids = sauce_ids if sauce_ids.any?
         end
       end
       

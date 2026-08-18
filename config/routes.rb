@@ -43,9 +43,6 @@ Rails.application.routes.draw do
     member { get :orders_history }
   end
 
-  # Salsas
-  resources :sauces
-
   # Ingredientes
   resources :ingredients do
     member { post :adjust_stock }

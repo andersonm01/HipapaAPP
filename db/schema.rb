@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_04_15_000012) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_18_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -117,16 +117,6 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_15_000012) do
     t.index ["order_id"], name: "index_invoices_on_order_id"
   end
 
-  create_table "order_item_sauces", force: :cascade do |t|
-    t.integer "order_item_id", null: false
-    t.integer "sauce_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["order_item_id", "sauce_id"], name: "index_order_item_sauces_on_order_item_id_and_sauce_id", unique: true
-    t.index ["order_item_id"], name: "index_order_item_sauces_on_order_item_id"
-    t.index ["sauce_id"], name: "index_order_item_sauces_on_sauce_id"
-  end
-
   create_table "order_items", force: :cascade do |t|
     t.integer "order_id", null: false
     t.integer "product_id", null: false
@@ -193,15 +183,6 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_15_000012) do
     t.index ["product_id"], name: "index_recipes_on_product_id"
   end
 
-  create_table "sauces", force: :cascade do |t|
-    t.string "nombre", null: false
-    t.string "color", default: "#ef4444", null: false
-    t.integer "posicion", default: 0, null: false
-    t.boolean "activo", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
@@ -223,8 +204,6 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_15_000012) do
   add_foreign_key "cash_registers", "users"
   add_foreign_key "invoices", "customers"
   add_foreign_key "invoices", "orders"
-  add_foreign_key "order_item_sauces", "order_items"
-  add_foreign_key "order_item_sauces", "sauces"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "customers"

@@ -49,26 +49,6 @@
                         data-nombre="<%= producto.nombre %>"
                         data-precio="<%= producto.precio %>">+</button>
               </div>
-              <!-- Salsas disponibles -->
-              <% if @sauces.any? %>
-                <div class="sauce-selector mt-2 hidden" id="sauces-<%= producto.id %>">
-                  <p class="text-xs text-gray-500 mb-1">Salsas:</p>
-                  <div class="flex flex-wrap gap-1">
-                    <% @sauces.each do |sauce| %>
-                      <label class="cursor-pointer">
-                        <input type="checkbox" class="sr-only sauce-cb"
-                               data-product-id="<%= producto.id %>"
-                               data-sauce-nombre="<%= sauce.nombre %>"
-                               value="<%= sauce.nombre %>">
-                        <span class="sauce-chip text-xs px-2 py-0.5 rounded-full text-white font-medium transition"
-                              style="background-color: <%= sauce.color %>; opacity: 0.7;">
-                          <%= sauce.nombre %>
-                        </span>
-                      </label>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
             </div>
           </div>
         <% end %>
@@ -99,24 +79,7 @@
   document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const { id, nombre, precio } = btn.dataset;
-      // Mostrar selector de salsas
-      const sauceSel = document.getElementById(`sauces-${id}`);
-      if (sauceSel) sauceSel.classList.toggle('hidden');
       cart.add(parseInt(id), nombre, parseFloat(precio));
-    });
-  });
-
-  // Sauce chip toggle visual
-  document.querySelectorAll('.sauce-cb').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const chip = cb.nextElementSibling;
-      chip.style.opacity = cb.checked ? '1' : '0.7';
-      chip.style.boxShadow = cb.checked ? '0 0 0 2px #000' : '';
-      // Actualizar item en carrito
-      const productId = parseInt(cb.dataset.productId);
-      const salsas = [...document.querySelectorAll(`.sauce-cb[data-product-id="${productId}"]:checked`)]
-        .map(c => c.dataset.sauceNombre);
-      cart.updateSauces(productId, salsas);
     });
   });
 

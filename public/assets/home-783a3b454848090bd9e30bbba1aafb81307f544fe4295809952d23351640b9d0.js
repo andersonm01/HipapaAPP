@@ -22,10 +22,6 @@ function initHome() {
   const orderTotal = orderData.orderTotal || 0;
   const isOrderClosed = orderStatus !== 0;
 
-  // Salsas disponibles
-  const saucesEl = document.getElementById('sauces-data');
-  const availableSauces = saucesEl ? JSON.parse(saucesEl.textContent) : [];
-
   // Lista temporal de productos seleccionados
   let selectedProducts = [];
   // Tipo de servicio: solo se envía al pulsar "Confirmar cambio de servicio",
@@ -86,10 +82,10 @@ function initHome() {
         const productId = this.getAttribute('data-product-id');
         const productName = this.getAttribute('data-product-name');
         const productPrecio = parseFloat(this.getAttribute('data-product-precio'));
-        
+
         // Verificar si el producto ya está en la lista
         const existingIndex = selectedProducts.findIndex(p => p.product_id === productId);
-        
+
         if (existingIndex >= 0) {
           // Si existe, incrementar cantidad
           selectedProducts[existingIndex].cantidad += 1;
@@ -100,11 +96,10 @@ function initHome() {
             product_name: productName,
             precio: productPrecio,
             cantidad: 1,
-            comentario: '',
-            sauce_ids: []
+            comentario: ''
           });
         }
-        
+
         updateSelectedProductsList();
       });
     });
@@ -117,50 +112,34 @@ function initHome() {
     const confirmBtn = document.getElementById('confirmProductsBtn');
     const selectedTotalContainer = document.getElementById('selectedTotalContainer');
     const selectedTotal = document.getElementById('selectedTotal');
-    
+
     // Calcular el total primero
     let total = 0;
     selectedProducts.forEach(function(product) {
       total += product.cantidad * product.precio;
     });
-    
+
     // Actualizar el total siempre, incluso si no hay productos
     if (selectedTotal) {
       selectedTotal.textContent = '$' + total.toFixed(2);
     }
-    
+
     if (selectedProducts.length === 0) {
       if (container) container.style.display = 'none';
       if (confirmBtn) confirmBtn.disabled = true;
       if (selectedTotalContainer) selectedTotalContainer.style.display = 'none';
       return;
     }
-    
+
     if (container) container.style.display = 'block';
     if (confirmBtn) confirmBtn.disabled = false;
     if (selectedTotalContainer) selectedTotalContainer.style.display = 'flex';
-    
+
     if (list) list.innerHTML = '';
-    
+
     selectedProducts.forEach(function(product, index) {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'sel-item';
-      const saucePills = availableSauces.length > 0 ? `
-        <div class="sauce-pills" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
-          ${availableSauces.map(s => {
-            const checked = (product.sauce_ids || []).includes(s.id);
-            const ring = checked ? `box-shadow:0 0 0 2px white,0 0 0 4px ${s.color};transform:scale(1.15);` : '';
-            return `<button type="button"
-              class="sauce-pill-btn"
-              data-sauce-id="${s.id}"
-              data-index="${index}"
-              title="${s.nombre}"
-              style="width:22px;height:22px;border-radius:50%;border:2px solid ${s.color};
-                     background:${checked ? s.color : 'transparent'};cursor:pointer;
-                     transition:all .15s;${ring}"
-              aria-label="${s.nombre}"></button>`;
-          }).join('')}
-        </div>` : '';
 
       itemDiv.innerHTML = `
         <div class="sel-item-header">
@@ -174,7 +153,6 @@ function initHome() {
                data-index="${index}"
                placeholder="Comentario (ej: sin cebolla)..."
                value="${product.comentario}">
-        ${saucePills}
         <div class="sel-item-controls">
           <div class="sel-item-qty">
             <button type="button" class="btn-qty quantity-btn" data-index="${index}" data-action="decrease">−</button>
@@ -186,12 +164,12 @@ function initHome() {
       `;
       if (list) list.appendChild(itemDiv);
     });
-    
+
     // Asegurar que el total se actualice después de renderizar
     if (selectedTotal) {
       selectedTotal.textContent = '$' + total.toFixed(2);
     }
-    
+
     // Event listeners para comentarios
     document.querySelectorAll('.product-comment').forEach(function(input) {
       input.addEventListener('input', function() {
@@ -199,44 +177,28 @@ function initHome() {
         selectedProducts[index].comentario = this.value;
       });
     });
-    
+
     // Event listeners para botones de cantidad
     document.querySelectorAll('.quantity-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const index = parseInt(this.getAttribute('data-index'));
         const action = this.getAttribute('data-action');
-        
+
         if (action === 'increase') {
           selectedProducts[index].cantidad += 1;
         } else if (action === 'decrease' && selectedProducts[index].cantidad > 1) {
           selectedProducts[index].cantidad -= 1;
         }
-        
+
         updateSelectedProductsList();
       });
     });
-    
+
     // Event listeners para eliminar productos
     document.querySelectorAll('.remove-product-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const index = parseInt(this.getAttribute('data-index'));
         selectedProducts.splice(index, 1);
-        updateSelectedProductsList();
-      });
-    });
-
-    // Event listeners para salsas
-    document.querySelectorAll('.sauce-pill-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const idx = parseInt(this.getAttribute('data-index'));
-        const sauceId = parseInt(this.getAttribute('data-sauce-id'));
-        const ids = selectedProducts[idx].sauce_ids;
-        const pos = ids.indexOf(sauceId);
-        if (pos >= 0) {
-          ids.splice(pos, 1);
-        } else {
-          ids.push(sauceId);
-        }
         updateSelectedProductsList();
       });
     });
@@ -287,7 +249,7 @@ function initHome() {
     items.forEach(function(p) {
       operaciones.push({ nombre: 'EscribirTexto', argumentos: [p.cantidad + ' x ' + p.product_name + '\n'] });
       var c = (p.comentario && p.comentario.trim()) ? p.comentario.trim() : '';
-      if (c) operaciones.push({ nombre: 'EscribirTexto', argumentos: ['  Salsas: ' + c + '\n'] });
+      if (c) operaciones.push({ nombre: 'EscribirTexto', argumentos: ['  Nota: ' + c + '\n'] });
     });
     operaciones.push(
       { nombre: 'Feed', argumentos: [1] },
@@ -392,15 +354,6 @@ function initHome() {
         comentarioInput.name = 'order_items[' + index + '][comentario]';
         comentarioInput.value = product.comentario || '';
         confirmForm.appendChild(comentarioInput);
-
-        // Sauce IDs
-        (product.sauce_ids || []).forEach(function(sauceId) {
-          const sauceInput = document.createElement('input');
-          sauceInput.type = 'hidden';
-          sauceInput.name = 'order_items[' + index + '][sauce_ids][]';
-          sauceInput.value = sauceId;
-          confirmForm.appendChild(sauceInput);
-        });
       });
 
       // Imprimir comanda y luego enviar formulario
@@ -479,14 +432,14 @@ function initHome() {
       connected() {
         console.log("Conectado al canal de órdenes");
       },
-      
+
       disconnected() {
         console.log("Desconectado del canal de órdenes");
       },
-      
+
       received(data) {
         console.log("Datos recibidos:", data);
-        
+
         if (data.type === "order_created") {
           // No recargar si ya estamos viendo ese pedido (evita perder ?order_id= en la URL)
           const currentPath = window.location.pathname;

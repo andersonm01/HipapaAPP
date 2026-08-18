@@ -52,7 +52,6 @@
           <%= link_to "Impresora",  printer_config_path,   class: "nav-link-item" %>
           <% if current_user&.admin? || current_user&.supervisor? %>
             <%= link_to "Reportes", reportes_path,         class: "nav-link-item" %>
-            <%= link_to "Salsas",   sauces_path,           class: "nav-link-item" %>
             <%= link_to "Stock",    ingredients_path,      class: "nav-link-item" %>
           <% end %>
           <% if current_user&.admin? %>

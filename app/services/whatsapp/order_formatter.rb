@@ -12,9 +12,6 @@ module Whatsapp
       @items.each do |item|
         lines << "• #{item[:cantidad]}x #{item[:nombre]} — $#{format_price(item[:precio] * item[:cantidad])}"
         lines << "  _#{item[:notas]}_" if item[:notas].present?
-        if item[:salsas]&.any?
-          lines << "  Salsas: #{item[:salsas].join(', ')}"
-        end
       end
 
       lines << ""

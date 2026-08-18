@@ -6,6 +6,5 @@ class Public::MenuController < ApplicationController
     setting = BusinessSetting.current
     @business = setting
     @productos_por_categoria = Product.activos.por_categoria.group_by(&:categoria)
-    @sauces = Sauce.activas
   end
 end

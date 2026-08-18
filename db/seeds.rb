@@ -32,27 +32,6 @@ setting.assign_attributes(
 setting.save!
 puts "✓ BusinessSetting configurado"
 
-# ── Salsas ──────────────────────────────────────────────────
-sauces_data = [
-  { nombre: 'Kétchup',            color: '#dc2626', posicion: 1 },
-  { nombre: 'Mayonesa',           color: '#fbbf24', posicion: 2 },
-  { nombre: 'Mostaza',            color: '#ca8a04', posicion: 3 },
-  { nombre: 'BBQ',                color: '#92400e', posicion: 4 },
-  { nombre: 'Picante',            color: '#ef4444', posicion: 5 },
-  { nombre: 'Ranch',              color: '#a3e635', posicion: 6 },
-  { nombre: 'Especial Hi Papa',   color: '#f97316', posicion: 7 },
-  { nombre: 'Sin salsa',          color: '#94a3b8', posicion: 8 },
-]
-
-sauces_data.each do |s|
-  Sauce.find_or_create_by!(nombre: s[:nombre]) do |sauce|
-    sauce.color    = s[:color]
-    sauce.posicion = s[:posicion]
-    sauce.activo   = true
-  end
-end
-puts "✓ #{Sauce.count} salsas creadas"
-
 # ── Ingredientes ─────────────────────────────────────────────
 # Precios de compra estimados por unidad/kg/L
 ingredients_data = [
@@ -284,4 +263,4 @@ puts ""
 puts "=== Seeds completados ==="
 puts "   URL pública del menú: http://localhost:3000/public"
 puts "   Admin: admin@hipapa.com / Admin123!"
-puts "   Salsas: #{Sauce.count} | Productos: #{Product.count} | Ingredientes: #{Ingredient.count}"
+puts "   Productos: #{Product.count} | Ingredientes: #{Ingredient.count}"

@@ -15,7 +15,7 @@ class OnlineCart {
     if (existing) {
       existing.cantidad += cantidad;
     } else {
-      this._items.push({ product_id: productId, nombre, precio, cantidad, notas: '', salsas: [] });
+      this._items.push({ product_id: productId, nombre, precio, cantidad, notas: '' });
     }
     this._save();
     this._render();
@@ -34,11 +34,6 @@ class OnlineCart {
     item.cantidad = cantidad;
     this._save();
     this._render();
-  }
-
-  updateSauces(productId, salsas) {
-    const item = this._items.find(i => i.product_id === productId);
-    if (item) { item.salsas = salsas; this._save(); }
   }
 
   clear() {
@@ -82,7 +77,6 @@ class OnlineCart {
       <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold truncate">${item.nombre}</p>
-          ${item.salsas?.length ? `<p class="text-xs text-gray-400">${item.salsas.join(', ')}</p>` : ''}
           <p class="text-xs font-bold" style="color: var(--pub-brand, #f59e0b);">$${(item.precio * item.cantidad).toLocaleString('es-CO', { maximumFractionDigits: 0 })}</p>
         </div>
         <div class="flex items-center gap-1 shrink-0">
