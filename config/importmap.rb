@@ -9,6 +9,7 @@ pin "bootstrap", to: "https://ga.jspm.io/npm:bootstrap@5.3.2/dist/js/bootstrap.e
 pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.8/lib/index.js"
 pin "@rails/actioncable", to: "actioncable.esm.js"
 pin "home",             to: "home.js"
+pin "sidebar",          to: "sidebar.js"
 pin "cocina",           to: "cocina.js"
 pin "qztray_printer",   to: "qztray_printer.js"
 pin "webserial_printer", to: "webserial_printer.js"

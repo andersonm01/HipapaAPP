@@ -1,0 +1,88 @@
+<% if logged_in? %>
+  <button type="button" class="sidebar-overlay" data-sidebar-overlay aria-label="Cerrar menú"></button>
+
+  <header class="mobile-topbar">
+    <button type="button" class="mobile-topbar-toggle" data-sidebar-toggle aria-label="Abrir menú" aria-expanded="false">
+      <%= icon :menu, css_class: "w-6 h-6" %>
+    </button>
+    <% if business_setting&.logo&.attached? %>
+      <%= image_tag business_setting.logo, class: "mobile-topbar-logo" %>
+    <% end %>
+    <span class="mobile-topbar-brand"><%= business_setting&.nombre || 'Hi Papa' %></span>
+  </header>
+
+  <aside class="app-sidebar" data-sidebar id="appSidebar">
+    <div class="sidebar-header">
+      <%= link_to root_path, class: "sidebar-brand" do %>
+        <% if business_setting&.logo&.attached? %>
+          <%= image_tag business_setting.logo, class: "sidebar-brand-logo" %>
+        <% else %>
+          <span class="sidebar-brand-mark">🍔</span>
+        <% end %>
+        <span class="sidebar-brand-name"><%= business_setting&.nombre || 'Hi Papa' %></span>
+      <% end %>
+      <button type="button" class="sidebar-collapse-btn" data-sidebar-collapse-toggle
+              aria-label="Contraer menú" title="Contraer / expandir menú">
+        <%= icon :chevron, css_class: "w-4 h-4" %>
+      </button>
+      <button type="button" class="sidebar-close-btn" data-sidebar-close aria-label="Cerrar menú">
+        <%= icon :close, css_class: "w-5 h-5" %>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navegación principal">
+      <% sidebar_sections.each do |section| %>
+        <% next if section.key?(:visible) && !section[:visible] %>
+
+        <% if section[:title].present? %>
+          <div class="sidebar-group <%= 'open' if sidebar_group_active?(section) %>" data-sidebar-group data-group-name="<%= section[:title] %>">
+            <button type="button" class="sidebar-group-toggle" data-sidebar-group-toggle>
+              <span class="sidebar-link-icon"><%= icon section[:icon] %></span>
+              <span class="sidebar-link-label"><%= section[:title] %></span>
+              <%= icon :chevron, css_class: "w-4 h-4 sidebar-group-chevron" %>
+              <span class="sidebar-tooltip"><%= section[:title] %></span>
+            </button>
+            <div class="sidebar-submenu" data-sidebar-submenu><div>
+              <% section[:items].each do |item| %>
+                <%= link_to item[:path], class: "sidebar-sublink #{'active' if sidebar_item_active?(item[:key])}" do %>
+                  <span class="sidebar-sublink-dot"></span>
+                  <span class="sidebar-link-label"><%= item[:label] %></span>
+                  <% if item[:badge].to_i > 0 %>
+                    <span class="sidebar-badge"><%= item[:badge] %></span>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </div></div>
+          </div>
+        <% else %>
+          <% section[:items].each do |item| %>
+            <%= link_to item[:path], class: "sidebar-link #{'active' if sidebar_item_active?(item[:key])}" do %>
+              <span class="sidebar-link-icon"><%= icon item[:icon] %></span>
+              <span class="sidebar-link-label"><%= item[:label] %></span>
+              <% if item[:badge].to_i > 0 %>
+                <span class="sidebar-badge"><%= item[:badge] %></span>
+              <% end %>
+              <span class="sidebar-tooltip"><%= item[:label] %></span>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar"><%= current_user.name.to_s.first(1).upcase %></div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name"><%= current_user.name %></span>
+          <span class="nav-role-badge role-<%= current_user.role %>"><%= current_user.role %></span>
+        </div>
+      </div>
+      <%= form_tag logout_path, method: :delete, class: "sidebar-logout-form", data: { turbo: false } do %>
+        <button type="submit" class="sidebar-logout-btn" title="Cerrar sesión">
+          <%= icon :logout, css_class: "w-5 h-5" %>
+          <span class="sidebar-link-label">Cerrar sesión</span>
+        </button>
+      <% end %>
+    </div>
+  </aside>
+<% end %>
