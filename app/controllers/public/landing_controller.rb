@@ -4,6 +4,6 @@ class Public::LandingController < ApplicationController
 
   def index
     @business = BusinessSetting.current
-    @productos_por_categoria = Product.activos.por_categoria.group_by(&:categoria)
+    @destacados = Product.activos.por_posicion.limit(6)
   end
 end

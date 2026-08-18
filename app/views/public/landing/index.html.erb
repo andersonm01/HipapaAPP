@@ -24,71 +24,69 @@
   </div>
 </section>
 
-<!-- ============ INFO: horario, dirección, teléfono ============ -->
+<!-- ============ INFO: horario, dirección, teléfono — una sola franja ============ -->
 <% if @business.horario.present? || @business.direccion.present? || @business.telefono.present? %>
-  <section class="landing-container landing-info-grid">
-    <% if @business.horario.present? %>
-      <div class="landing-info-card">
-        <span class="landing-info-icon">🕒</span>
-        <div>
-          <p class="landing-info-label">Horario</p>
-          <p class="landing-info-value"><%= @business.horario %></p>
+  <div class="landing-container">
+    <section class="landing-info-band">
+      <% if @business.horario.present? %>
+        <div class="landing-info-item">
+          <span class="landing-info-icon">🕒</span>
+          <div>
+            <p class="landing-info-label">Horario</p>
+            <p class="landing-info-value"><%= @business.horario %></p>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
 
-    <% if @business.direccion.present? %>
-      <div class="landing-info-card">
-        <span class="landing-info-icon">📍</span>
-        <div>
-          <p class="landing-info-label">Dirección</p>
-          <p class="landing-info-value"><%= @business.direccion %></p>
-          <%= link_to "Cómo llegar →", "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@business.direccion)}",
-                class: "landing-info-link", target: "_blank", rel: "noopener" %>
+      <% if @business.direccion.present? %>
+        <div class="landing-info-item">
+          <span class="landing-info-icon">📍</span>
+          <div>
+            <p class="landing-info-label">Dirección</p>
+            <p class="landing-info-value"><%= @business.direccion %></p>
+            <%= link_to "Cómo llegar →", "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@business.direccion)}",
+                  class: "landing-info-link", target: "_blank", rel: "noopener" %>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
 
-    <% if @business.telefono.present? %>
-      <div class="landing-info-card">
-        <span class="landing-info-icon">📞</span>
-        <div>
-          <p class="landing-info-label">Teléfono</p>
-          <%= link_to @business.telefono, "tel:#{@business.telefono.gsub(/\D/, '')}", class: "landing-info-value landing-info-link" %>
+      <% if @business.telefono.present? %>
+        <div class="landing-info-item">
+          <span class="landing-info-icon">📞</span>
+          <div>
+            <p class="landing-info-label">Teléfono</p>
+            <%= link_to @business.telefono, "tel:#{@business.telefono.gsub(/\D/, '')}", class: "landing-info-value landing-info-link" %>
+          </div>
         </div>
-      </div>
-    <% end %>
-  </section>
+      <% end %>
+    </section>
+  </div>
 <% end %>
 
-<!-- ============ MENÚ ============ -->
-<% if @productos_por_categoria.any? %>
-  <section class="landing-container landing-menu-section">
-    <h2 class="landing-section-title">Nuestro Menú</h2>
+<!-- ============ DESTACADOS: vitrina corta, no el catálogo completo ============ -->
+<% if @destacados.any? %>
+  <section class="landing-container landing-highlights-section">
+    <h2 class="landing-section-title">Algunos de nuestros favoritos</h2>
 
-    <% @productos_por_categoria.each do |categoria, productos| %>
-      <div class="landing-menu-category">
-        <h3 class="landing-menu-category-title"><%= categoria %></h3>
-        <div class="landing-menu-grid">
-          <% productos.each do |producto| %>
-            <div class="landing-product-card">
-              <% if producto.foto.attached? %>
-                <%= image_tag producto.foto, class: "landing-product-photo", alt: producto.nombre %>
-              <% else %>
-                <div class="landing-product-photo landing-product-photo-fallback">🍔</div>
-              <% end %>
-              <div class="landing-product-body">
-                <p class="landing-product-name"><%= producto.nombre %></p>
-                <% if producto.descripcion.present? %>
-                  <p class="landing-product-desc"><%= truncate(producto.descripcion, length: 90) %></p>
-                <% end %>
-                <p class="landing-product-price">$<%= number_with_precision(producto.precio, precision: 0, delimiter: ',') %></p>
-              </div>
-            </div>
+    <div class="landing-highlights-grid">
+      <% @destacados.each do |producto| %>
+        <div class="landing-highlight-card">
+          <% if producto.foto.attached? %>
+            <%= image_tag producto.foto, class: "landing-highlight-photo", alt: producto.nombre %>
+          <% else %>
+            <div class="landing-highlight-photo landing-highlight-photo-fallback">🍔</div>
           <% end %>
+          <div class="landing-highlight-body">
+            <p class="landing-highlight-name"><%= producto.nombre %></p>
+            <p class="landing-highlight-price">$<%= number_with_precision(producto.precio, precision: 0, delimiter: ',') %></p>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
+
+    <div class="landing-highlights-cta">
+      <%= link_to "Ver menú completo →", public_menu_path, class: "landing-btn landing-btn-outline" %>
+    </div>
   </section>
 <% end %>
 
