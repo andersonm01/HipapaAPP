@@ -38,6 +38,12 @@
         </div>
 
         <div class="md:col-span-2">
+          <label class="form-label">Horario de atención</label>
+          <%= f.text_field :horario, class: "form-input", placeholder: "Lun a Sáb: 11:00am - 9:00pm" %>
+          <p class="form-hint">Se muestra tal cual en la página de inicio pública.</p>
+        </div>
+
+        <div class="md:col-span-2">
           <label class="form-label">Descripción</label>
           <%= f.text_area :descripcion, class: "form-textarea", rows: 3, placeholder: "Las mejores hamburguesas y papas..." %>
         </div>
@@ -84,6 +90,7 @@
       <div class="flex gap-3 mt-6">
         <%= f.submit "Guardar cambios", class: "btn-primary" %>
         <%= link_to "Vista pública del menú", public_menu_path, class: "btn-secondary", target: "_blank" %>
+        <%= link_to "Vista página de inicio", landing_path, class: "btn-secondary", target: "_blank" %>
       </div>
     <% end %>
   </div>

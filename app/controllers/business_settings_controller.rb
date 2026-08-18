@@ -18,7 +18,7 @@ class BusinessSettingsController < ApplicationController
 
   def setting_params
     params.require(:business_setting).permit(
-      :nombre, :telefono, :direccion, :descripcion,
+      :nombre, :telefono, :direccion, :descripcion, :horario,
       :color_primario, :color_secundario, :color_acento,
       :whatsapp_negocio, :logo
     )

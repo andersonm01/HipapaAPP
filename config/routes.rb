@@ -79,6 +79,9 @@ Rails.application.routes.draw do
     get  '/pedido/:id/estado', to: 'orders#status', as: :order_status
   end
 
+  # Home page pública (landing informativa, sin login) — separada del flujo de pedidos
+  get '/inicio', to: 'public/landing#index', as: :landing
+
   # Impresora
   get  "print/config",          to: redirect("/printer/config")
   get  "printer/config",        to: "home#printer_config",    as: :printer_config

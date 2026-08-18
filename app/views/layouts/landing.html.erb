@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <% setting = @business %>
+    <title><%= setting&.nombre || 'Hi Papa' %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="<%= setting&.color_secundario || '#0f172a' %>">
+    <% if setting&.descripcion.present? %>
+      <meta name="description" content="<%= setting.descripcion %>">
+    <% end %>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <link rel="manifest" href="/manifest.json">
+    <% if setting %>
+    <style>
+      :root {
+        --pub-brand:  <%= setting.color_primario %>;
+        --pub-dark:   <%= setting.color_secundario %>;
+        --pub-accent: <%= setting.color_acento %>;
+      }
+    </style>
+    <% end %>
+  </head>
+  <body class="landing-body">
+    <%= yield %>
+  </body>
+</html>
