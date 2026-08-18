@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title><%= BusinessSetting.current.nombre rescue 'Hi Papa' %> — Pedidos</title>
+    <% setting = business_setting rescue nil %>
+    <title><%= setting&.nombre || 'Hi Papa' %> — Pedidos</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#f59e0b">
     <%= csrf_meta_tags %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <link rel="manifest" href="/manifest.json">
-    <% setting = BusinessSetting.current rescue nil %>
     <% if setting %>
     <style>
       :root {

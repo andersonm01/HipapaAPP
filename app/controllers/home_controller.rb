@@ -9,14 +9,9 @@ class HomeController < ApplicationController
   end
 
   def index
-    valor = 0 
-    Order.where("id >= 62").each do |order|
-      valor += order.order_items.sum(:precio_unitario)
-    end
-    puts "Total de valor de los productos: #{valor}"
-    @orders = Order.open.order(created_at: :desc)
-    @closed_orders = Order.closed.order(created_at: :desc).limit(10)
-    @cancelled_orders = Order.cancelled.order(created_at: :desc).limit(5)
+    @orders = Order.open.includes(:order_items).order(created_at: :desc)
+    @closed_orders = Order.closed.includes(:order_items).order(created_at: :desc).limit(10)
+    @cancelled_orders = Order.cancelled.includes(:order_items).order(created_at: :desc).limit(5)
     @new_order_id = params[:order_id].presence || params[:id].presence
     @current_order = Order.find(@new_order_id) if @new_order_id.present?
     @products = Product.where(activo: true).order(:nombre) if @current_order.present?

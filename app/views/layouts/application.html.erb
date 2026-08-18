@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title><%= BusinessSetting.current.nombre rescue 'Hi Papa' %></title>
+    <% setting = business_setting rescue nil %>
+    <title><%= setting&.nombre || 'Hi Papa' %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="<%= BusinessSetting.current.color_secundario rescue '#0f172a' %>">
+    <meta name="theme-color" content="<%= setting&.color_secundario || '#0f172a' %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
@@ -12,7 +13,6 @@
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <!-- Tema configurable como CSS variables -->
-    <% setting = BusinessSetting.current rescue nil %>
     <% if setting %>
     <style>
       :root {
