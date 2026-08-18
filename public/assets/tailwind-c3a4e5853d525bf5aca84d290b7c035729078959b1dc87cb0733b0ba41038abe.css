@@ -484,3 +484,257 @@ html.no-scroll { overflow: hidden; }
 .landing-highlights-cta { margin-top: 2.25rem; }
 .landing-btn-outline { background: transparent; color: var(--pub-brand, #d97706); border: 2px solid var(--pub-brand, #f59e0b); padding: 0.65rem 1.6rem; }
 .landing-btn-outline:hover { background: var(--pub-brand, #f59e0b); color: #1e293b; }
+
+/* ===== Landing page v3 — full navbar + sections redesign (hand-appended, supersedes all previous .landing-* patches) ===== */
+   LANDING — Home page pública (sin login)
+   ============================================= */
+html:has(.landing-body) { scroll-behavior: smooth; }
+.landing-body { background: #f8fafc; color: #1e293b; margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+.landing-container { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; }
+.landing-eyebrow { display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--pub-brand, #d97706); margin-bottom: 0.5rem; }
+.landing-eyebrow-light { color: var(--pub-accent, #fbbf24); }
+
+/* ---- Scroll reveal ---- */
+[data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-reveal].revealed { opacity: 1; transform: translateY(0); }
+
+/* ---- Navbar ---- */
+.landing-navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: transparent;
+  transition: background 0.25s ease, box-shadow 0.25s ease, backdrop-filter 0.25s ease;
+}
+.landing-navbar.scrolled {
+  background: rgba(15,23,42,0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 18px rgba(0,0,0,.15);
+}
+.landing-navbar-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 1.25rem;
+  height: 4.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.landing-navbar-brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; flex-shrink: 0; }
+.landing-navbar-logo { width: 2.25rem; height: 2.25rem; border-radius: 0.6rem; object-fit: cover; }
+.landing-navbar-logo-fallback { display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: rgba(255,255,255,.1); }
+.landing-navbar-name { color: #fff; font-weight: 800; font-size: 1.05rem; letter-spacing: -0.01em; }
+.landing-navbar-toggle {
+  display: none; flex-direction: column; justify-content: center; gap: 5px;
+  width: 2.5rem; height: 2.5rem; background: transparent; border: none; cursor: pointer; z-index: 101;
+}
+.landing-navbar-toggle span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
+.landing-navbar-links { display: flex; align-items: center; gap: 1.75rem; }
+.landing-navbar-link { color: rgba(255,255,255,.85); font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: color 0.15s ease; }
+.landing-navbar-link:hover { color: var(--pub-brand, #f59e0b); }
+.landing-navbar-actions { display: flex; align-items: center; gap: 0.75rem; }
+.landing-navbar-login { color: rgba(255,255,255,.6); font-size: 0.82rem; font-weight: 600; text-decoration: none; }
+.landing-navbar-login:hover { color: #fff; }
+.landing-navbar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.6); z-index: 99; opacity: 0; transition: opacity 0.25s ease; }
+.landing-navbar-overlay.open { display: block; opacity: 1; }
+
+@media (max-width: 900px) {
+  .landing-navbar-toggle { display: flex; }
+  .landing-navbar-links {
+    position: fixed; top: 0; right: 0; height: 100vh; width: min(320px, 85vw);
+    background: #0f172a; flex-direction: column; align-items: flex-start;
+    padding: 6rem 1.75rem 2rem; gap: 1.25rem;
+    transform: translateX(100%); transition: transform 0.3s ease;
+    z-index: 100; overflow-y: auto;
+  }
+  .landing-navbar-links.open { transform: translateX(0); }
+  .landing-navbar-actions { flex-direction: column; align-items: flex-start; width: 100%; gap: 0.85rem; margin-top: 0.5rem; }
+  .landing-navbar-actions .landing-btn { width: 100%; }
+}
+
+/* ---- Buttons ---- */
+.landing-cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
+.landing-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.75rem 1.75rem; border-radius: 999px;
+  font-weight: 700; font-size: 0.95rem; text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+.landing-btn-primary { background: var(--pub-brand, #f59e0b); color: #1e293b; box-shadow: 0 6px 16px rgba(245,158,11,.35); }
+.landing-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(245,158,11,.45); }
+.landing-btn-ghost { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.25); }
+.landing-btn-ghost:hover { background: rgba(255,255,255,.16); }
+.landing-btn-outline { background: transparent; color: var(--pub-brand, #d97706); border: 2px solid var(--pub-brand, #f59e0b); }
+.landing-btn-outline:hover { background: var(--pub-brand, #f59e0b); color: #1e293b; }
+.landing-btn-sm { padding: 0.5rem 1.1rem; font-size: 0.82rem; }
+
+/* ---- Hero ---- */
+.landing-hero {
+  background: linear-gradient(135deg, var(--pub-dark, #0f172a), #1e293b 80%);
+  color: #fff;
+  padding: 8.5rem 0 4.5rem;
+  text-align: center;
+  scroll-margin-top: 4.5rem;
+}
+.landing-hero-inner { display: flex; flex-direction: column; align-items: center; gap: 0.85rem; max-width: 46rem; margin: 0 auto; }
+.landing-hero-kicker { color: var(--pub-accent, #fbbf24); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.14em; margin: 0; }
+.landing-title { font-size: 2.75rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1.15; margin: 0; }
+.landing-subtitle { max-width: 38rem; color: #cbd5e1; font-size: 1.05rem; line-height: 1.6; margin: 0; }
+
+/* Franja de info: una sola tarjeta consolidada (nunca queda "coja" con 1-2 datos) */
+.landing-info-band {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 32px rgba(15,23,42,.12);
+  margin-top: -2.25rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem 1.75rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.75rem;
+}
+.landing-info-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex: 1 1 200px;
+  max-width: 280px;
+  padding: 0 1.25rem;
+  border-left: 1px solid #eef0f4;
+}
+.landing-info-item:first-child { border-left: none; padding-left: 0; }
+.landing-info-icon { font-size: 1.4rem; line-height: 1.2; flex-shrink: 0; }
+.landing-info-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin: 0 0 0.2rem; }
+.landing-info-value { font-size: 0.9rem; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.4; }
+.landing-info-link { display: inline-block; margin-top: 0.3rem; font-size: 0.8rem; font-weight: 700; color: var(--pub-brand, #d97706); text-decoration: none; }
+.landing-info-link:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .landing-info-band { flex-direction: column; gap: 1.1rem; padding: 1.5rem; }
+  .landing-info-item { border-left: none; padding-left: 0; max-width: none; }
+}
+
+/* Vitrina corta de destacados — no el catálogo completo */
+.landing-highlights-section { padding-bottom: 4rem; text-align: center; }
+.landing-section-title { font-size: 1.6rem; font-weight: 800; margin: 0 0 2rem; color: #0f172a; }
+.landing-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.1rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+.landing-highlight-card {
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(15,23,42,.07);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+}
+.landing-highlight-card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(15,23,42,.14); }
+.landing-highlight-photo { width: 100%; height: 8rem; object-fit: cover; display: block; }
+.landing-highlight-photo-fallback { display: flex; align-items: center; justify-content: center; font-size: 2.25rem; background: linear-gradient(135deg,#fef3c7,#fde68a); }
+.landing-highlight-body { padding: 0.75rem 0.9rem 0.9rem; }
+.landing-highlight-name { font-weight: 700; font-size: 0.85rem; color: #1e293b; margin: 0 0 0.25rem; line-height: 1.3; }
+.landing-highlight-price { font-weight: 800; font-size: 0.9rem; color: var(--pub-brand, #d97706); margin: 0; }
+
+.landing-highlights-cta { margin-top: 2.25rem; }
+
+/* ---- Menú interactivo (tabs + grid) ---- */
+.landing-menu-section { padding: 1.5rem 0 4.5rem; text-align: center; scroll-margin-top: 4.5rem; }
+.landing-section-title { font-size: 1.75rem; font-weight: 800; margin: 0 0 0.5rem; color: #0f172a; }
+.landing-section-title-left { text-align: left; margin-bottom: 1rem; }
+.landing-section-title-onDark { color: #fff; }
+.landing-section-subtitle { color: #94a3b8; font-size: 0.9rem; margin: 0 0 2rem; }
+
+.landing-menu-tabs { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-bottom: 2rem; }
+.landing-menu-tab {
+  background: #fff; border: 1px solid #e2e8f0; color: #475569;
+  font-size: 0.85rem; font-weight: 700; padding: 0.5rem 1.1rem;
+  border-radius: 999px; cursor: pointer; transition: all 0.15s ease;
+}
+.landing-menu-tab:hover { border-color: var(--pub-brand, #f59e0b); color: var(--pub-brand, #d97706); }
+.landing-menu-tab.active { background: var(--pub-brand, #f59e0b); border-color: var(--pub-brand, #f59e0b); color: #1e293b; }
+
+.landing-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.1rem; text-align: left; }
+.landing-menu-item {
+  display: flex; gap: 0.85rem; align-items: flex-start;
+  background: #fff; border-radius: 1rem; padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(15,23,42,.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.landing-menu-item:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(15,23,42,.1); }
+.landing-menu-item-photo { width: 4.5rem; height: 4.5rem; border-radius: 0.75rem; object-fit: cover; flex-shrink: 0; }
+.landing-menu-item-photo-fallback { display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: linear-gradient(135deg,#fef3c7,#fde68a); }
+.landing-menu-item-body { min-width: 0; }
+.landing-menu-item-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.landing-menu-item-name { font-weight: 700; font-size: 0.9rem; color: #1e293b; margin: 0; }
+.landing-menu-item-price { font-weight: 800; font-size: 0.85rem; color: var(--pub-brand, #d97706); margin: 0; flex-shrink: 0; }
+.landing-menu-item-desc { font-size: 0.78rem; color: #94a3b8; margin: 0.25rem 0 0; line-height: 1.4; }
+.landing-menu-cta { margin-top: 2.5rem; }
+
+/* ---- Nosotros ---- */
+.landing-nosotros { padding: 4.5rem 0; scroll-margin-top: 4.5rem; }
+.landing-nosotros-inner { max-width: 42rem; }
+.landing-nosotros-text { font-size: 1.05rem; line-height: 1.75; color: #475569; margin: 0; }
+
+/* ---- Experiencia (sección oscura) ---- */
+.landing-experiencia { background: var(--pub-dark, #0f172a); padding: 4.5rem 0; text-align: center; }
+.landing-experiencia-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+.landing-experiencia-card { padding: 1.5rem 1rem; }
+.landing-experiencia-icon { font-size: 2rem; display: block; margin-bottom: 0.75rem; }
+.landing-experiencia-title { color: #fff; font-weight: 700; font-size: 0.95rem; margin: 0 0 0.4rem; }
+.landing-experiencia-text { color: #94a3b8; font-size: 0.82rem; line-height: 1.5; margin: 0; }
+
+/* ---- Reservas CTA ---- */
+.landing-reservas { padding: 4rem 0; scroll-margin-top: 4.5rem; }
+.landing-reservas-card {
+  background: linear-gradient(120deg, #fffbeb, #fef3c7);
+  border: 1px solid #fde68a;
+  border-radius: 1.5rem;
+  padding: 2.25rem 2rem;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;
+}
+.landing-reservas-text { color: #78350f; font-size: 0.95rem; max-width: 30rem; margin: 0; }
+
+/* ---- Galería ---- */
+.landing-galeria { padding: 1rem 0 4.5rem; }
+.landing-galeria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.85rem; }
+.landing-galeria-item { position: relative; border-radius: 0.85rem; overflow: hidden; aspect-ratio: 1 / 1; }
+.landing-galeria-photo { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+.landing-galeria-item:hover .landing-galeria-photo { transform: scale(1.08); }
+.landing-galeria-caption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.65), transparent);
+  color: #fff; font-size: 0.75rem; font-weight: 700;
+  padding: 1.5rem 0.6rem 0.5rem;
+}
+
+/* ---- CTA final ---- */
+.landing-cta-final { background: linear-gradient(135deg, var(--pub-dark, #0f172a), #1e293b); padding: 4.5rem 0; text-align: center; }
+.landing-cta-final-inner { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.landing-cta-final-title { color: #fff; font-size: 1.9rem; font-weight: 800; max-width: 34rem; margin: 0 0 0.5rem; letter-spacing: -0.01em; }
+
+/* ---- Footer ---- */
+.landing-footer { background: #0f172a; color: #94a3b8; padding: 3.5rem 0 0; scroll-margin-top: 4.5rem; }
+.landing-footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+.landing-footer-brand { min-width: 0; }
+.landing-footer-col { min-width: 0; }
+.landing-footer-logo { width: 2.75rem; height: 2.75rem; border-radius: 0.6rem; object-fit: cover; margin-bottom: 0.6rem; }
+.landing-footer-name { color: #fff; font-weight: 800; font-size: 1.05rem; margin: 0 0 0.4rem; }
+.landing-footer-desc { font-size: 0.82rem; line-height: 1.5; margin: 0; max-width: 26rem; }
+.landing-footer-heading { color: #fff; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 0.85rem; }
+.landing-footer-line { font-size: 0.85rem; margin: 0 0 0.55rem; }
+.landing-footer-link { color: #94a3b8; text-decoration: none; transition: color 0.15s ease; }
+.landing-footer-link:hover { color: #fff; }
+.landing-footer-bottom { text-align: center; font-size: 0.78rem; padding: 1.25rem 1rem; }
+
+@media (max-width: 768px) {
+  .landing-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+@media (max-width: 480px) {
+  .landing-title { font-size: 2rem; }
+  .landing-hero { padding: 7.5rem 0 3.5rem; }
+  .landing-reservas-card { padding: 1.75rem 1.5rem; }
+  .landing-cta-final-title { font-size: 1.5rem; }
+}

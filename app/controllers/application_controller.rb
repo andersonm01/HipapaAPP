@@ -25,13 +25,13 @@ class ApplicationController < ActionController::Base
 
   def require_admin
     unless current_user&.admin?
-      redirect_to root_path, alert: "Solo los administradores pueden acceder a esta sección."
+      redirect_to mostrador_path, alert: "Solo los administradores pueden acceder a esta sección."
     end
   end
 
   def require_admin_or_supervisor
     unless current_user&.admin? || current_user&.supervisor?
-      redirect_to root_path, alert: "No tienes permisos para acceder a esta sección."
+      redirect_to mostrador_path, alert: "No tienes permisos para acceder a esta sección."
     end
   end
 end

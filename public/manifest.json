@@ -2,7 +2,7 @@
   "name": "Hi Papa POS",
   "short_name": "HiPapa",
   "description": "Sistema de punto de venta para Hi Papa",
-  "start_url": "/",
+  "start_url": "/mostrador",
   "display": "standalone",
   "background_color": "#f1f5f9",
   "theme_color": "#0f172a",
@@ -23,7 +23,7 @@
   "shortcuts": [
     {
       "name": "Nuevo Pedido",
-      "url": "/",
+      "url": "/mostrador",
       "description": "Crear un pedido nuevo"
     },
     {

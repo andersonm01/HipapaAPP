@@ -1,0 +1,22 @@
+<%
+  wa_number_res2 = @business.whatsapp_negocio.to_s.gsub(/\D/, '')
+  reserva_wa_href2 = wa_number_res2.present? ? "https://wa.me/#{wa_number_res2}?text=#{ERB::Util.url_encode('Hola, quiero reservar una mesa')}" : nil
+%>
+<section class="landing-container landing-reservas" id="reservas" data-reveal>
+  <div class="landing-reservas-card">
+    <div>
+      <span class="landing-eyebrow">Reservas</span>
+      <h2 class="landing-section-title landing-section-title-left">¿Vienes con más gente?</h2>
+      <p class="landing-reservas-text">
+        <% if reserva_wa_href2 %>
+          Escríbenos por WhatsApp y te confirmamos tu mesa.
+        <% else %>
+          Contáctanos para coordinar tu mesa — configura el WhatsApp del negocio desde el panel de administración para habilitar reservas por chat.
+        <% end %>
+      </p>
+    </div>
+    <% if reserva_wa_href2 %>
+      <%= link_to "Reservar por WhatsApp", reserva_wa_href2, class: "landing-btn landing-btn-primary", target: "_blank", rel: "noopener" %>
+    <% end %>
+  </div>
+</section>

@@ -9,7 +9,7 @@ module ApplicationHelper
     [
       {
         items: [
-          { key: :inicio,    label: "Inicio",    path: root_path,           icon: :home,
+          { key: :inicio,    label: "Inicio",    path: mostrador_path,      icon: :home,
             badge: logged_in? ? Order.open.count : nil },
           { key: :cocina,    label: "Cocina",    path: cocina_path,         icon: :kitchen,
             badge: logged_in? ? Order.for_kitchen.count : nil },

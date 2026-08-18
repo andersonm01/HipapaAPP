@@ -1,0 +1,13 @@
+<% if @fotos_galeria.size >= 3 %>
+  <section class="landing-container landing-galeria" data-reveal>
+    <h2 class="landing-section-title">Galería</h2>
+    <div class="landing-galeria-grid">
+      <% @fotos_galeria.each do |producto| %>
+        <div class="landing-galeria-item">
+          <%= image_tag producto.foto, class: "landing-galeria-photo", alt: producto.nombre, loading: "lazy" %>
+          <span class="landing-galeria-caption"><%= producto.nombre %></span>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>

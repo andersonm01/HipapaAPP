@@ -1,0 +1,13 @@
+<%
+  historia = @business.descripcion.presence ||
+    "#{@business.nombre} nació con una idea simple: servir comida honesta, preparada al momento, " \
+    "para que cada visita se sienta como la primera. Este texto es provisional — reemplázalo desde " \
+    "Negocio → Descripción en el panel de administración."
+%>
+<section class="landing-container landing-nosotros" id="nosotros" data-reveal>
+  <div class="landing-nosotros-inner">
+    <span class="landing-eyebrow">Nuestra historia</span>
+    <h2 class="landing-section-title landing-section-title-left">Sobre <%= @business.nombre %></h2>
+    <p class="landing-nosotros-text"><%= historia %></p>
+  </div>
+</section>

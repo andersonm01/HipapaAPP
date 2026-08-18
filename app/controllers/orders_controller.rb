@@ -23,14 +23,14 @@ class OrdersController < ApplicationController
         <!DOCTYPE html>
         <html><head><meta charset="utf-8"><title>Redirigiendo...</title></head>
         <body>
-        <script>window.location.replace("/?order_id=#{@order.id}");</script>
+        <script>window.location.replace("#{mostrador_path(order_id: @order.id)}");</script>
         <p>Redirigiendo...</p>
         </body></html>
       HTML
     else
       Rails.logger.debug "Errores: #{@order.errors.full_messages}"
       flash[:alert] = "Error al crear el pedido: #{@order.errors.full_messages.join(', ')}"
-      redirect_to root_path
+      redirect_to mostrador_path
     end
   end
 
@@ -119,7 +119,7 @@ class OrdersController < ApplicationController
     end
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "Error en confirm_items: #{e.message}"
-    redirect_to root_path, alert: 'Error: No se encontró la orden o el producto.'
+    redirect_to mostrador_path, alert: 'Error: No se encontró la orden o el producto.'
   end
 
   def close_order
@@ -157,13 +157,13 @@ class OrdersController < ApplicationController
       order: { id: @order.id, status: @order.status, total: @order.total }
     })
 
-    redirect_to root_path, notice: 'Pedido cerrado exitosamente.'
+    redirect_to mostrador_path, notice: 'Pedido cerrado exitosamente.'
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "Error en close_order: #{e.message}"
-    redirect_to root_path, alert: 'Error: No se encontró la orden.'
+    redirect_to mostrador_path, alert: 'Error: No se encontró la orden.'
   rescue => e
     Rails.logger.error "Error en close_order: #{e.message}"
-    redirect_to root_path, alert: "Error al cerrar el pedido: #{e.message}"
+    redirect_to mostrador_path, alert: "Error al cerrar el pedido: #{e.message}"
   end
 
   def cancel_order
@@ -178,12 +178,12 @@ class OrdersController < ApplicationController
         type: "order_cancelled",
         order: { id: @order.id }
       })
-      redirect_to root_path, notice: "Pedido ##{@order.id} cancelado."
+      redirect_to mostrador_path, notice: "Pedido ##{@order.id} cancelado."
     else
       redirect_to pedido_path(@order.id), alert: "Error al cancelar el pedido."
     end
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: 'No se encontró el pedido.'
+    redirect_to mostrador_path, alert: 'No se encontró el pedido.'
   end
 
   def destroy_item
@@ -206,9 +206,9 @@ class OrdersController < ApplicationController
   def destroy
     @order = Order.find(params[:id])
     @order.destroy
-    redirect_to root_path, notice: 'Pedido eliminado.'
+    redirect_to mostrador_path, notice: 'Pedido eliminado.'
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: 'No se encontró el pedido.'
+    redirect_to mostrador_path, alert: 'No se encontró el pedido.'
   end
 
   def update_kitchen_status
@@ -249,7 +249,7 @@ class OrdersController < ApplicationController
       redirect_to pedido_path(@order.id), alert: 'Error al actualizar.'
     end
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: 'No se encontró el pedido.'
+    redirect_to mostrador_path, alert: 'No se encontró el pedido.'
   end
 
   private

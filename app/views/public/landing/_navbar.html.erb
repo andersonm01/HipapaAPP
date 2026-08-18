@@ -1,0 +1,37 @@
+<%
+  wa_number_res = @business.whatsapp_negocio.to_s.gsub(/\D/, '')
+  reserva_wa_href = wa_number_res.present? ? "https://wa.me/#{wa_number_res}?text=#{ERB::Util.url_encode('Hola, quiero reservar una mesa')}" : nil
+%>
+<header class="landing-navbar" data-landing-navbar>
+  <nav class="landing-navbar-inner" aria-label="Navegación principal">
+    <%= link_to root_path, class: "landing-navbar-brand" do %>
+      <% if @business.logo.attached? %>
+        <%= image_tag @business.logo, class: "landing-navbar-logo" %>
+      <% else %>
+        <span class="landing-navbar-logo landing-navbar-logo-fallback">🍔</span>
+      <% end %>
+      <span class="landing-navbar-name"><%= @business.nombre %></span>
+    <% end %>
+
+    <button type="button" class="landing-navbar-toggle" data-landing-nav-toggle aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="landing-navbar-links" data-landing-nav-panel>
+      <%= link_to "Inicio",   root_path,   class: "landing-navbar-link" %>
+      <%= link_to "Menú",     "#menu",     class: "landing-navbar-link" %>
+      <%= link_to "Nosotros", "#nosotros", class: "landing-navbar-link" %>
+      <%= link_to "Reservas", "#reservas", class: "landing-navbar-link" %>
+      <%= link_to "Contacto", "#contacto", class: "landing-navbar-link" %>
+
+      <div class="landing-navbar-actions">
+        <%= link_to "Iniciar sesión", login_path, class: "landing-navbar-login" %>
+        <% if reserva_wa_href %>
+          <%= link_to "Reservar mesa", reserva_wa_href, class: "landing-btn landing-btn-outline landing-btn-sm", target: "_blank", rel: "noopener" %>
+        <% end %>
+        <%= link_to "Ordenar ahora", public_menu_path, class: "landing-btn landing-btn-primary landing-btn-sm" %>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="landing-navbar-overlay" data-landing-nav-overlay></div>

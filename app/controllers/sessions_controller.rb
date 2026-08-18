@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   layout 'sessions'
 
   def new
-    redirect_to root_path if logged_in?
+    redirect_to mostrador_path if logged_in?
   end
 
   def create
@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
     if user&.authenticate(params[:password])
       if user.active?
         session[:user_id] = user.id
-        redirect_to root_path, notice: "Bienvenido, #{user.name}!"
+        redirect_to mostrador_path, notice: "Bienvenido, #{user.name}!"
       else
         flash.now[:alert] = "Tu cuenta está desactivada. Contacta al administrador."
         render :new, status: :unprocessable_entity
@@ -39,7 +39,7 @@ class SessionsController < ApplicationController
     else
       user.update(provider: auth.provider, uid: auth.uid) if user.provider.blank?
       session[:user_id] = user.id
-      redirect_to root_path, notice: "Bienvenido, #{user.name}!"
+      redirect_to mostrador_path, notice: "Bienvenido, #{user.name}!"
     end
   end
 

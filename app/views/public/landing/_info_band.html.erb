@@ -1,0 +1,37 @@
+<% if @business.horario.present? || @business.direccion.present? || @business.telefono.present? %>
+  <div class="landing-container">
+    <section class="landing-info-band" data-reveal>
+      <% if @business.horario.present? %>
+        <div class="landing-info-item">
+          <span class="landing-info-icon">🕒</span>
+          <div>
+            <p class="landing-info-label">Horario</p>
+            <p class="landing-info-value"><%= @business.horario %></p>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @business.direccion.present? %>
+        <div class="landing-info-item">
+          <span class="landing-info-icon">📍</span>
+          <div>
+            <p class="landing-info-label">Dirección</p>
+            <p class="landing-info-value"><%= @business.direccion %></p>
+            <%= link_to "Cómo llegar →", "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@business.direccion)}",
+                  class: "landing-info-link", target: "_blank", rel: "noopener" %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @business.telefono.present? %>
+        <div class="landing-info-item">
+          <span class="landing-info-icon">📞</span>
+          <div>
+            <p class="landing-info-label">Teléfono</p>
+            <%= link_to @business.telefono, "tel:#{@business.telefono.gsub(/\D/, '')}", class: "landing-info-value landing-info-link" %>
+          </div>
+        </div>
+      <% end %>
+    </section>
+  </div>
+<% end %>

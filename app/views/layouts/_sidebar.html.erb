@@ -13,7 +13,7 @@
 
   <aside class="app-sidebar" data-sidebar id="appSidebar">
     <div class="sidebar-header">
-      <%= link_to root_path, class: "sidebar-brand" do %>
+      <%= link_to mostrador_path, class: "sidebar-brand" do %>
         <% if business_setting&.logo&.attached? %>
           <%= image_tag business_setting.logo, class: "sidebar-brand-logo" %>
         <% else %>

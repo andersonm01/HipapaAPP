@@ -1,0 +1,22 @@
+<%
+  wa_number_hero = @business.whatsapp_negocio.to_s.gsub(/\D/, '')
+  reserva_wa_href = wa_number_hero.present? ? "https://wa.me/#{wa_number_hero}?text=#{ERB::Util.url_encode('Hola, quiero reservar una mesa')}" : nil
+  hero_subtitle = @business.descripcion.presence || "Ingredientes frescos, preparación al momento y una atención que se nota. Así se vive #{@business.nombre}."
+%>
+<section class="landing-hero" id="top">
+  <div class="landing-container landing-hero-inner">
+    <p class="landing-hero-kicker" data-reveal>Bienvenido a</p>
+    <h1 class="landing-title" data-reveal>Sabores que se sienten,<br>momentos que se comparten</h1>
+    <p class="landing-subtitle" data-reveal><%= hero_subtitle %></p>
+
+    <div class="landing-cta-row" data-reveal>
+      <% if reserva_wa_href %>
+        <%= link_to "Reservar mesa", reserva_wa_href, class: "landing-btn landing-btn-primary", target: "_blank", rel: "noopener" %>
+        <%= link_to "Ver menú", "#menu", class: "landing-btn landing-btn-ghost" %>
+      <% else %>
+        <%= link_to "Ver menú", "#menu", class: "landing-btn landing-btn-primary" %>
+        <%= link_to "Ordenar ahora", public_menu_path, class: "landing-btn landing-btn-ghost" %>
+      <% end %>
+    </div>
+  </div>
+</section>

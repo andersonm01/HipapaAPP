@@ -1,0 +1,15 @@
+<%
+  wa_number_final = @business.whatsapp_negocio.to_s.gsub(/\D/, '')
+  reserva_wa_href_final = wa_number_final.present? ? "https://wa.me/#{wa_number_final}?text=#{ERB::Util.url_encode('Hola, quiero reservar una mesa')}" : nil
+%>
+<section class="landing-cta-final" data-reveal>
+  <div class="landing-container landing-cta-final-inner">
+    <h2 class="landing-cta-final-title">Tu próxima experiencia gastronómica comienza aquí</h2>
+    <div class="landing-cta-row">
+      <% if reserva_wa_href_final %>
+        <%= link_to "Reservar mesa", reserva_wa_href_final, class: "landing-btn landing-btn-primary", target: "_blank", rel: "noopener" %>
+      <% end %>
+      <%= link_to "Ver menú", "#menu", class: "landing-btn landing-btn-ghost" %>
+    </div>
+  </div>
+</section>

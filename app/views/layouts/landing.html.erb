@@ -2,15 +2,28 @@
 <html lang="es">
   <head>
     <% setting = @business %>
-    <title><%= setting&.nombre || 'Hi Papa' %></title>
+    <% site_name = setting&.nombre.presence || 'Nuestro Restaurante' %>
+    <% site_desc = setting&.descripcion.presence || "Comida preparada al momento, con ingredientes frescos y buena atención." %>
+
+    <title><%= site_name %> — Comida que se disfruta</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="<%= setting&.color_secundario || '#0f172a' %>">
-    <% if setting&.descripcion.present? %>
-      <meta name="description" content="<%= setting.descripcion %>">
+    <meta name="description" content="<%= site_desc %>">
+    <link rel="canonical" href="<%= root_url %>">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="<%= site_name %>">
+    <meta property="og:title" content="<%= site_name %>">
+    <meta property="og:description" content="<%= site_desc %>">
+    <meta property="og:url" content="<%= root_url %>">
+    <% if setting&.logo&.attached? %>
+      <meta property="og:image" content="<%= url_for(setting.logo) %>">
     <% end %>
+
     <%= csrf_meta_tags %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
-    <link rel="manifest" href="/manifest.json">
+    <%= javascript_importmap_tags %>
     <% if setting %>
     <style>
       :root {
@@ -22,6 +35,11 @@
     <% end %>
   </head>
   <body class="landing-body">
+    <%= render "public/landing/navbar" %>
     <%= yield %>
+    <%= render "public/landing/footer" %>
+    <script type="module">
+      import "landing";
+    </script>
   </body>
 </html>

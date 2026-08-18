@@ -1,0 +1,41 @@
+<footer class="landing-footer" id="contacto">
+  <div class="landing-container landing-footer-grid">
+    <div class="landing-footer-brand">
+      <% if @business.logo.attached? %>
+        <%= image_tag @business.logo, class: "landing-footer-logo" %>
+      <% end %>
+      <p class="landing-footer-name"><%= @business.nombre %></p>
+      <% if @business.descripcion.present? %>
+        <p class="landing-footer-desc"><%= truncate(@business.descripcion, length: 120) %></p>
+      <% end %>
+    </div>
+
+    <% if @business.horario.present? || @business.direccion.present? || @business.telefono.present? %>
+      <div class="landing-footer-col">
+        <p class="landing-footer-heading">Contacto</p>
+        <% if @business.direccion.present? %>
+          <p class="landing-footer-line">📍 <%= @business.direccion %></p>
+        <% end %>
+        <% if @business.telefono.present? %>
+          <p class="landing-footer-line">
+            <%= link_to "📞 #{@business.telefono}", "tel:#{@business.telefono.gsub(/\D/, '')}", class: "landing-footer-link" %>
+          </p>
+        <% end %>
+        <% if @business.horario.present? %>
+          <p class="landing-footer-line">🕒 <%= @business.horario %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="landing-footer-col">
+      <p class="landing-footer-heading">Enlaces</p>
+      <p class="landing-footer-line"><%= link_to "Ver menú", public_menu_path, class: "landing-footer-link" %></p>
+      <p class="landing-footer-line"><%= link_to "Reservas", "#reservas", class: "landing-footer-link" %></p>
+      <p class="landing-footer-line"><%= link_to "Iniciar sesión", login_path, class: "landing-footer-link" %></p>
+    </div>
+  </div>
+
+  <div class="landing-footer-bottom">
+    <p>&copy; <%= Date.current.year %> <%= @business.nombre %>. Todos los derechos reservados.</p>
+  </div>
+</footer>

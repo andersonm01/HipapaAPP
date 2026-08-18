@@ -13,8 +13,11 @@ Rails.application.routes.draw do
     end
   end
 
-  # POS root
-  root 'home#index'
+  # Home pública del restaurante (landing, sin login) — raíz del sitio
+  root 'public/landing#index'
+
+  # POS (staff) — antes vivía en la raíz ("/"); ahora tiene su propia URL
+  get  '/mostrador',  to: 'home#index', as: :mostrador
   get  'home/index'
   get  'pedido/:id', to: 'home#index', as: :pedido, constraints: { id: /\d+/ }
 
@@ -79,8 +82,8 @@ Rails.application.routes.draw do
     get  '/pedido/:id/estado', to: 'orders#status', as: :order_status
   end
 
-  # Home page pública (landing informativa, sin login) — separada del flujo de pedidos
-  get '/inicio', to: 'public/landing#index', as: :landing
+  # /inicio ahora vive en la raíz ("/"); se mantiene como alias por compatibilidad
+  get '/inicio', to: redirect('/')
 
   # Impresora
   get  "print/config",          to: redirect("/printer/config")
