@@ -36,13 +36,23 @@ class OrdersController < ApplicationController
 
   def confirm_items
     @order = Order.find(params[:id])
-    
+
     # Verificar que el pedido esté abierto
     unless @order.open?
       redirect_to pedido_path(@order.id), alert: 'No se pueden agregar productos a un pedido cerrado o cancelado.'
       return
     end
-    
+
+    # Tipo de servicio: viaja en el mismo formulario que los productos, así
+    # se guarda junto con ellos al confirmar (sin recargar ni perder la
+    # selección de productos aún no confirmados).
+    servicio_actualizado = false
+    tipo_servicio = params[:tipo_servicio].to_s
+    if %w[mesa llevar domicilio].include?(tipo_servicio) && tipo_servicio != @order.tipo_servicio
+      @order.update(tipo_servicio: tipo_servicio)
+      servicio_actualizado = true
+    end
+
     # Recibir array de productos con comentarios
     if params[:order_items].present?
       params[:order_items].each do |key, item_params|
@@ -98,8 +108,14 @@ class OrdersController < ApplicationController
       })
 
       redirect_to pedido_path(@order.id), notice: 'Productos confirmados exitosamente.'
+    elsif servicio_actualizado
+      ActionCable.server.broadcast("orders_channel", {
+        type: "order_updated",
+        order: { id: @order.id, total: @order.total, status: @order.status }
+      })
+      redirect_to pedido_path(@order.id), notice: 'Tipo de servicio actualizado.'
     else
-      redirect_to pedido_path(@order.id), alert: 'No hay productos para confirmar.'
+      redirect_to pedido_path(@order.id), alert: 'No hay productos ni cambios de servicio para confirmar.'
     end
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "Error en confirm_items: #{e.message}"

@@ -49,25 +49,25 @@
           <div>
             <p class="form-label mb-2">Servicio</p>
             <% if @current_order.status == 0 %>
-              <%= form_with url: update_servicio_order_path(@current_order), method: :patch, local: true, data: { turbo: false }, id: "tipoServicioForm" do |f| %>
-                <div class="radio-group">
-                  <label>
-                    <input type="radio" name="tipo_servicio" value="mesa" <%= 'checked' if @current_order.tipo_servicio == 'mesa' %>>
-                    <span>En mesa</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="tipo_servicio" value="llevar" <%= 'checked' if @current_order.tipo_servicio == 'llevar' %>>
-                    <span>Llevar</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="tipo_servicio" value="domicilio" <%= 'checked' if @current_order.tipo_servicio == 'domicilio' %>>
-                    <span>Domicilio</span>
-                  </label>
-                </div>
-                <button type="submit" id="guardarServicioBtn" class="btn-primary btn-xs w-full mt-2" style="display:none;">
-                  Confirmar cambio de servicio
-                </button>
-              <% end %>
+              <%# Los radios pertenecen al form "confirmProductsForm" (atributo form=)
+                  para que el cambio de servicio se guarde junto con los productos al
+                  pulsar "Confirmar Productos", sin recargar la página ni perder la
+                  selección de productos aún no confirmados. %>
+              <div class="radio-group">
+                <label>
+                  <input type="radio" name="tipo_servicio" form="confirmProductsForm" value="mesa" <%= 'checked' if @current_order.tipo_servicio == 'mesa' %>>
+                  <span>En mesa</span>
+                </label>
+                <label>
+                  <input type="radio" name="tipo_servicio" form="confirmProductsForm" value="llevar" <%= 'checked' if @current_order.tipo_servicio == 'llevar' %>>
+                  <span>Llevar</span>
+                </label>
+                <label>
+                  <input type="radio" name="tipo_servicio" form="confirmProductsForm" value="domicilio" <%= 'checked' if @current_order.tipo_servicio == 'domicilio' %>>
+                  <span>Domicilio</span>
+                </label>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Se guarda al confirmar productos.</p>
             <% else %>
               <span class="badge-gray">
                 <%= case @current_order.tipo_servicio

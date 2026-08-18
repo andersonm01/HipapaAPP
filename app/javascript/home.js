@@ -24,30 +24,25 @@ function initHome() {
 
   // Lista temporal de productos seleccionados
   let selectedProducts = [];
-  // Tipo de servicio: solo se envía al pulsar "Confirmar cambio de servicio",
-  // así no se pierde la selección de productos aún no confirmados al elegir una opción.
-  const tipoServicioForm = document.getElementById('tipoServicioForm');
-  if (tipoServicioForm) {
-    const guardarServicioBtn = document.getElementById('guardarServicioBtn');
-    const tipoServicioInicial = tipoServicioForm.querySelector('input[name="tipo_servicio"]:checked')?.value;
 
-    tipoServicioForm.querySelectorAll('input[name="tipo_servicio"]').forEach(function(radio) {
-      radio.addEventListener('change', function() {
-        if (guardarServicioBtn) {
-          guardarServicioBtn.style.display = (this.value !== tipoServicioInicial) ? 'flex' : 'none';
-        }
-      });
-    });
+  // Tipo de servicio: es un campo más del formulario "Confirmar Productos"
+  // (los radios usan form="confirmProductsForm"), así se guarda junto con
+  // los productos al confirmar, sin recargar la página ni perder la
+  // selección en curso.
+  const tipoServicioRadios = document.querySelectorAll('input[name="tipo_servicio"][form="confirmProductsForm"]');
+  const tipoServicioInicial = document.querySelector('input[name="tipo_servicio"][form="confirmProductsForm"]:checked')?.value;
 
-    tipoServicioForm.addEventListener('submit', function(e) {
-      if (selectedProducts.length > 0) {
-        const continuar = confirm('Tienes productos sin confirmar. Si cambias el tipo de servicio se perderá esa selección. ¿Deseas continuar?');
-        if (!continuar) {
-          e.preventDefault();
-        }
-      }
-    });
+  function tipoServicioChanged() {
+    const checked = document.querySelector('input[name="tipo_servicio"][form="confirmProductsForm"]:checked');
+    return !!checked && checked.value !== tipoServicioInicial;
   }
+
+  tipoServicioRadios.forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      const confirmBtn = document.getElementById('confirmProductsBtn');
+      if (confirmBtn) confirmBtn.disabled = selectedProducts.length === 0 && !tipoServicioChanged();
+    });
+  });
 
   // Búsqueda de productos (solo si el pedido no está cerrado)
   const productSearch = document.getElementById('productSearch');
@@ -126,7 +121,7 @@ function initHome() {
     
     if (selectedProducts.length === 0) {
       if (container) container.style.display = 'none';
-      if (confirmBtn) confirmBtn.disabled = true;
+      if (confirmBtn) confirmBtn.disabled = !tipoServicioChanged();
       if (selectedTotalContainer) selectedTotalContainer.style.display = 'none';
       return;
     }
@@ -330,8 +325,9 @@ function initHome() {
     confirmForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      if (selectedProducts.length === 0) {
-        alert('No hay productos para confirmar.');
+      const hasProducts = selectedProducts.length > 0;
+      if (!hasProducts && !tipoServicioChanged()) {
+        alert('No hay productos ni cambios de servicio para confirmar.');
         return;
       }
 
@@ -356,10 +352,15 @@ function initHome() {
         confirmForm.appendChild(comentarioInput);
       });
 
-      // Imprimir comanda y luego enviar formulario
-      printComanda(selectedProducts, function() {
+      if (hasProducts) {
+        // Imprimir comanda y luego enviar formulario
+        printComanda(selectedProducts, function() {
+          confirmForm.submit();
+        });
+      } else {
+        // Solo cambió el servicio: nada que imprimir, solo guardar.
         confirmForm.submit();
-      });
+      }
     });
   }
 
