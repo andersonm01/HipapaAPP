@@ -9,9 +9,9 @@ threads min_threads_count, max_threads_count
 port ENV.fetch("PORT") { 3000 }
 environment ENV.fetch("RAILS_ENV") { "development" }
 
-# Disable all state file operations for containerized environments
-pidfile nil
-state_path nil
+# Don't call pidfile/state_path at all: Puma's DSL does `path.to_s`, so
+# passing nil turns into an empty string (truthy), which makes Puma try
+# to write a pidfile/state file to "" and crash with ENOENT. Leaving
+# these unset keeps them at Puma's real default of disabled (nil).
 
 # Single mode (no clustering)
-# Avoid any file I/O that could fail in ephemeral container filesystems
