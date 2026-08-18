@@ -28,13 +28,28 @@ function initHome() {
 
   // Lista temporal de productos seleccionados
   let selectedProducts = [];
-  // Tipo de servicio: enviar formulario al cambiar selección
+  // Tipo de servicio: solo se envía al pulsar "Confirmar cambio de servicio",
+  // así no se pierde la selección de productos aún no confirmados al elegir una opción.
   const tipoServicioForm = document.getElementById('tipoServicioForm');
   if (tipoServicioForm) {
+    const guardarServicioBtn = document.getElementById('guardarServicioBtn');
+    const tipoServicioInicial = tipoServicioForm.querySelector('input[name="tipo_servicio"]:checked')?.value;
+
     tipoServicioForm.querySelectorAll('input[name="tipo_servicio"]').forEach(function(radio) {
       radio.addEventListener('change', function() {
-        tipoServicioForm.submit();
+        if (guardarServicioBtn) {
+          guardarServicioBtn.style.display = (this.value !== tipoServicioInicial) ? 'flex' : 'none';
+        }
       });
+    });
+
+    tipoServicioForm.addEventListener('submit', function(e) {
+      if (selectedProducts.length > 0) {
+        const continuar = confirm('Tienes productos sin confirmar. Si cambias el tipo de servicio se perderá esa selección. ¿Deseas continuar?');
+        if (!continuar) {
+          e.preventDefault();
+        }
+      }
     });
   }
 

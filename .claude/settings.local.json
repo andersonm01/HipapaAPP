@@ -10,7 +10,8 @@
       "Bash(bin/rails tailwindcss:install:*)",
       "Bash(bin/rails tailwindcss:build:*)",
       "Bash(openssl genrsa:*)",
-      "Bash(openssl req:*)"
+      "Bash(openssl req:*)",
+      "Bash(git rm *)"
     ]
   }
 }
