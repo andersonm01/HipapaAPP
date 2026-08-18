@@ -265,3 +265,88 @@ html.sidebar-collapsed .sidebar-submenu { display: none; }
   .sidebar-overlay.mobile-open { display: block; opacity: 1; }
 }
 html.no-scroll { overflow: hidden; }
+
+/* ===== Cocina card redesign (hand-appended patch - see app/assets/tailwind/application.css) ===== */
+.kitchen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+.kitchen-card {
+  background: #fff;
+  border-radius: 1.1rem;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(15,23,42,.06);
+  transition: border-color 0.35s ease, background-color 0.35s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.kitchen-card:hover { box-shadow: 0 10px 24px rgba(15,23,42,.12); transform: translateY(-3px); }
+.kitchen-card.state-warning {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+.kitchen-card.state-critical {
+  border-color: #ef4444;
+  background: #fef2f2;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.12), 0 2px 6px rgba(15,23,42,.06);
+}
+.kitchen-card.state-critical:hover { box-shadow: 0 0 0 3px rgba(239,68,68,0.16), 0 10px 24px rgba(15,23,42,.12); }
+
+.kitchen-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.1rem 1.35rem;
+  border-bottom: 1px solid rgba(15,23,42,.07);
+}
+.kitchen-order-id { font-size: 1.7rem; font-weight: 900; color: #0f172a; line-height: 1; letter-spacing: -0.02em; }
+.kitchen-card-header .badge { font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 0.4rem; }
+
+.kitchen-card-body { flex: 1; min-height: 0; overflow-y: auto; padding: 1rem 1.35rem 1.25rem; }
+
+.kitchen-meta-row { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.35rem; }
+.kitchen-cliente { font-weight: 700; color: #1e293b; font-size: 1.05rem; }
+.kitchen-mesero, .kitchen-hora { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.2rem; }
+
+.kitchen-items { list-style: none; margin: 0; padding: 0.85rem 0 0; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 0.55rem; }
+.kitchen-item-line { display: flex; align-items: baseline; gap: 0.5rem; font-size: 1rem; }
+.kitchen-item-qty { font-weight: 800; color: var(--color-brand, #d97706); flex-shrink: 0; line-height: 1; }
+.kitchen-item-name { color: #1e293b; font-weight: 600; line-height: 1.35; }
+.kitchen-item-note {
+  margin-left: 1.6rem; margin-top: 0.3rem;
+  font-size: 0.8rem; color: #92400e;
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 0.4rem; padding: 0.3rem 0.55rem;
+}
+.kitchen-empty-items { font-size: 0.85rem; color: #94a3b8; font-style: italic; padding-top: 0.85rem; border-top: 1px solid #f1f5f9; }
+.kitchen-note-general {
+  margin-top: 0.85rem; font-size: 0.82rem; color: #475569;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 0.5rem; padding: 0.55rem 0.7rem;
+}
+
+.kitchen-card-footer { display: flex; gap: 0.5rem; padding: 0.9rem 1.1rem 1.1rem; }
+.kitchen-card-footer .btn { flex: 1; padding: 0.65rem 0.5rem; font-size: 0.8rem; font-weight: 700; }
+
+.kitchen-timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+.kitchen-timer.timer-warning { color: #b45309; }
+.kitchen-timer.timer-critical { color: #b91c1c; font-weight: 700; }
+.kitchen-alert-bar {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.35rem 0.75rem;
+  display: none;
+  letter-spacing: 0.02em;
+}
+.kitchen-alert-bar.warning  { background: #fef3c7; color: #92400e; display: block; }
+.kitchen-alert-bar.critical { background: #fee2e2; color: #991b1b; display: block; }

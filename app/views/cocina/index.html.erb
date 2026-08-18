@@ -36,8 +36,7 @@
     </div>
 
   <% else %>
-    <%# ── Tarjetas pequeñas con flex (diseño Pencil) ── %>
-    <div class="flex flex-wrap gap-4">
+    <div class="kitchen-grid">
       <% @orders.each do |order| %>
         <%= render 'cocina/order_card', order: order %>
       <% end %>
