@@ -738,3 +738,18 @@ html:has(.landing-body) { scroll-behavior: smooth; }
   .landing-reservas-card { padding: 1.75rem 1.5rem; }
   .landing-cta-final-title { font-size: 1.5rem; }
 }
+
+/* ===== Fix: sidebar body padding leaking into non-POS pages (landing, /public, /login) ===== */
+/* Earlier patches set padding-left directly on the bare `body` selector (including inside
+   !important media queries). That only belongs on the POS layout, which now carries the
+   app-body class. body:not(.app-body) has higher specificity than bare `body`, so this
+   correctly cancels the leak on every other layout regardless of viewport width. */
+body:not(.app-body) { padding-left: 0 !important; padding-top: 0 !important; }
+.app-body { padding-left: var(--sidebar-w, 264px); transition: padding-left 0.25s ease; }
+html.sidebar-collapsed .app-body { padding-left: var(--sidebar-w-collapsed); }
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .app-body { padding-left: var(--sidebar-w-collapsed) !important; }
+}
+@media (max-width: 767.98px) {
+  .app-body { padding-left: 0 !important; padding-top: 56px !important; }
+}

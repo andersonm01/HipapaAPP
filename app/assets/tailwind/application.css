@@ -24,8 +24,6 @@
     background-color: #f1f5f9;
     color: #1e293b;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    padding-left: var(--sidebar-w, 264px);
-    transition: padding-left 0.25s ease;
   }
 }
 
@@ -291,6 +289,12 @@
   transition: opacity 0.25s ease;
 }
 
+/* Solo el layout del POS (application.html.erb, <body class="app-body">)
+   reserva espacio para el sidebar. Otras páginas (landing, público, login)
+   comparten esta misma hoja de estilos y no deben verse afectadas. */
+.app-body { padding-left: var(--sidebar-w, 264px); transition: padding-left 0.25s ease; }
+html.sidebar-collapsed .app-body { padding-left: var(--sidebar-w-collapsed); }
+
 /* ---- Sidebar shell ---- */
 .app-sidebar {
   position: fixed;
@@ -502,7 +506,7 @@ html.sidebar-collapsed .sidebar-submenu { display: none; }
    ============================================= */
 /* Tablet: sidebar defaults to icon rail */
 @media (min-width: 768px) and (max-width: 1023.98px) {
-  body { padding-left: var(--sidebar-w-collapsed) !important; }
+  .app-body { padding-left: var(--sidebar-w-collapsed) !important; }
   .app-sidebar { width: var(--sidebar-w-collapsed) !important; }
   .sidebar-brand-name, .sidebar-link-label, .sidebar-badge,
   .sidebar-group-chevron, .sidebar-user-info { opacity: 0; width: 0; overflow: hidden; pointer-events: none; }
@@ -515,7 +519,7 @@ html.sidebar-collapsed .sidebar-submenu { display: none; }
 
 /* Mobile: off-canvas */
 @media (max-width: 767.98px) {
-  body { padding-left: 0 !important; padding-top: 56px; }
+  .app-body { padding-left: 0 !important; padding-top: 56px; }
   .mobile-topbar { display: flex; }
   .app-sidebar {
     width: min(280px, 85vw);
