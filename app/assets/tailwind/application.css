@@ -949,9 +949,62 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 .landing-menu-cta { margin-top: 2.5rem; }
 
 /* ---- Nosotros ---- */
-.landing-nosotros { padding: 4.5rem 0; scroll-margin-top: 4.5rem; }
-.landing-nosotros-inner { max-width: 42rem; }
-.landing-nosotros-text { font-size: 1.05rem; line-height: 1.75; color: #475569; margin: 0; }
+.landing-nosotros { padding: 5rem 0; scroll-margin-top: 4.5rem; overflow: hidden; }
+.landing-nosotros-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+.landing-nosotros-copy { max-width: 34rem; }
+.landing-nosotros-text {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #475569;
+  margin: 0;
+  white-space: pre-line;
+}
+/* Reveal escalonado: cada elemento entra con un pequeño retraso extra
+   respecto al anterior, en vez de aparecer todos juntos. */
+.landing-nosotros-copy [data-reveal]:nth-child(1) { transition-delay: 0s; }
+.landing-nosotros-copy [data-reveal]:nth-child(2) { transition-delay: .12s; }
+.landing-nosotros-copy [data-reveal]:nth-child(3) { transition-delay: .24s; }
+.landing-nosotros-media[data-reveal] { transition-delay: .2s; }
+
+.landing-nosotros-media { position: relative; }
+.landing-nosotros-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 48px -12px rgba(15,23,42,.25);
+}
+.landing-nosotros-photo-fallback {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5rem;
+  background: linear-gradient(135deg,#fef3c7,#fde68a);
+}
+.landing-nosotros-quote {
+  position: absolute;
+  top: -2.25rem;
+  left: -1.5rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 8rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--pub-brand, #f59e0b);
+  opacity: .2;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 860px) {
+  .landing-nosotros-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .landing-nosotros-media { order: -1; max-width: 18rem; margin: 0 auto; }
+  .landing-nosotros-copy { max-width: none; text-align: center; }
+  .landing-nosotros-quote { display: none; }
+}
 
 /* ---- Experiencia (sección oscura) ---- */
 .landing-experiencia { background: var(--pub-dark, #0f172a); padding: 4.5rem 0; text-align: center; }

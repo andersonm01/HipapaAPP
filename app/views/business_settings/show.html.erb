@@ -46,6 +46,13 @@
         <div class="md:col-span-2">
           <label class="form-label">Descripción</label>
           <%= f.text_area :descripcion, class: "form-textarea", rows: 3, placeholder: "Las mejores hamburguesas y papas..." %>
+          <p class="form-hint">Frase corta — se usa como bajada/tagline en varias partes de la página pública.</p>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="form-label">Nuestra historia</label>
+          <%= f.text_area :historia, class: "form-textarea", rows: 6, placeholder: "Contá cómo nació el negocio, qué los hace distintos, algún hito importante..." %>
+          <p class="form-hint">Texto más largo para la sección "Sobre nosotros" de la página de inicio. Podés usar varios párrafos.</p>
         </div>
 
         <!-- Colores -->

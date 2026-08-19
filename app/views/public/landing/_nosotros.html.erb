@@ -1,13 +1,26 @@
 <%
-  historia = @business.descripcion.presence ||
+  historia = @business.historia.presence || @business.descripcion.presence ||
     "#{@business.nombre} nació con una idea simple: servir comida honesta, preparada al momento, " \
     "para que cada visita se sienta como la primera. Este texto es provisional — reemplázalo desde " \
-    "Negocio → Descripción en el panel de administración."
+    "Negocio → Configuración → Nuestra historia en el panel de administración."
+  foto_nosotros = Product.activos.where(categoria: 'Papas').with_attached_foto.to_a.find { |p| p.foto.attached? }
 %>
-<section class="landing-container landing-nosotros" id="nosotros" data-reveal>
-  <div class="landing-nosotros-inner">
-    <span class="landing-eyebrow">Nuestra historia</span>
-    <h2 class="landing-section-title landing-section-title-left">Sobre <%= @business.nombre %></h2>
-    <p class="landing-nosotros-text"><%= historia %></p>
+<section class="landing-nosotros" id="nosotros">
+  <div class="landing-container landing-nosotros-grid">
+    <div class="landing-nosotros-copy">
+      <span class="landing-eyebrow" data-reveal>Nuestra historia</span>
+      <h2 class="landing-section-title landing-section-title-left" data-reveal>Sobre <%= @business.nombre %></h2>
+      <p class="landing-nosotros-text" data-reveal><%= historia %></p>
+    </div>
+    <div class="landing-nosotros-media" data-reveal>
+      <span class="landing-nosotros-quote" aria-hidden="true">“</span>
+      <% if foto_nosotros %>
+        <%= image_tag foto_nosotros.foto, class: "landing-nosotros-photo", alt: foto_nosotros.nombre %>
+      <% elsif @business.logo.attached? %>
+        <%= image_tag @business.logo, class: "landing-nosotros-photo" %>
+      <% else %>
+        <div class="landing-nosotros-photo landing-nosotros-photo-fallback">🍟</div>
+      <% end %>
+    </div>
   </div>
 </section>
