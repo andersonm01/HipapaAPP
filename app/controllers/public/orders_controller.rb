@@ -34,6 +34,22 @@ class Public::OrdersController < ApplicationController
           comentario:      item['notas'].to_s
         )
       end
+
+      # Pedidos a domicilio: se agrega el cargo de domicilio como un ítem
+      # más del pedido (no como un campo aparte), con la tarifa más alta
+      # por defecto. El personal ajusta la tarifa correcta desde el
+      # Mostrador según la zona real del cliente.
+      if @order.tipo_servicio == 'domicilio'
+        domicilio_producto = Product.activos.find_by(categoria: 'Domicilio', precio: 6_000)
+        if domicilio_producto
+          @order.order_items.create!(
+            product:         domicilio_producto,
+            cantidad:        1,
+            precio_unitario: domicilio_producto.precio,
+            comentario:      ''
+          )
+        end
+      end
     end
 
     ActionCable.server.broadcast("orders_channel", {

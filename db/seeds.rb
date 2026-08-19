@@ -134,6 +134,11 @@ products_data = [
   { nombre: 'Agua Brisa Mini',      descripcion: 'Agua Brisa mini',               precio:  2_500, categoria: 'Bebidas', posicion: 10 },
   { nombre: 'Agua Brisa 1.5',       descripcion: 'Agua Brisa 1.5 litros',         precio:  6_000, categoria: 'Bebidas', posicion: 11 },
   { nombre: 'Agua Natural',         descripcion: 'Agua natural',                  precio:  2_500, categoria: 'Bebidas', posicion: 12 },
+  # ── Domicilio (se agrega como un ítem más del pedido, no como campo aparte) ──
+  { nombre: 'Domicilio $3.000',     descripcion: 'Cargo por domicilio - zona cercana',   precio: 3_000, categoria: 'Domicilio', posicion: 1 },
+  { nombre: 'Domicilio $4.000',     descripcion: 'Cargo por domicilio',                  precio: 4_000, categoria: 'Domicilio', posicion: 2 },
+  { nombre: 'Domicilio $5.000',     descripcion: 'Cargo por domicilio',                  precio: 5_000, categoria: 'Domicilio', posicion: 3 },
+  { nombre: 'Domicilio $6.000',     descripcion: 'Cargo por domicilio - zona lejana',    precio: 6_000, categoria: 'Domicilio', posicion: 4 },
 ]
 
 products_data.each do |p|

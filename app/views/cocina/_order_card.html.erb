@@ -53,10 +53,11 @@
     <%# Hora exacta de ingreso %>
     <div class="kitchen-hora">Ingresó: <%= order.created_at.strftime("%H:%M") %></div>
 
-    <%# Lista de productos %>
-    <% if order.order_items.any? %>
+    <%# Lista de productos (el cargo de domicilio no es algo para preparar) %>
+    <% kitchen_items = order.order_items.reject { |i| i.product.categoria == 'Domicilio' } %>
+    <% if kitchen_items.any? %>
       <ul class="kitchen-items">
-        <% order.order_items.each do |item| %>
+        <% kitchen_items.each do |item| %>
           <li>
             <div class="kitchen-item-line">
               <span class="kitchen-item-qty"><%= item.cantidad %>×</span>
