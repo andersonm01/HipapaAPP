@@ -845,9 +845,9 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 
 /* Franja de info: una sola tarjeta consolidada (nunca queda "coja" con 1-2 datos) */
 .landing-info-band {
-  background: #fff;
+  background: var(--pub-dark, #0f172a);
   border-radius: 1.25rem;
-  box-shadow: 0 12px 32px rgba(15,23,42,.12);
+  box-shadow: 0 12px 32px rgba(15,23,42,.22);
   margin-top: -2.25rem;
   margin-bottom: 3rem;
   padding: 1.5rem 1.75rem;
@@ -866,18 +866,19 @@ html:has(.landing-body) { scroll-behavior: smooth; }
   flex: 1 1 200px;
   max-width: 280px;
   padding: 0 1.25rem;
-  border-left: 1px solid #eef0f4;
+  border-left: 1px solid rgba(255,255,255,.12);
 }
 .landing-info-item:first-child { border-left: none; padding-left: 0; }
 .landing-info-icon { font-size: 1.4rem; line-height: 1.2; flex-shrink: 0; }
 .landing-info-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin: 0 0 0.2rem; }
-.landing-info-value { font-size: 0.9rem; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.4; }
-.landing-info-link { display: inline-block; margin-top: 0.3rem; font-size: 0.8rem; font-weight: 700; color: var(--pub-brand, #d97706); text-decoration: none; }
+.landing-info-value { font-size: 0.9rem; font-weight: 600; color: #f1f5f9; margin: 0; line-height: 1.4; }
+.landing-info-link { display: inline-block; margin-top: 0.3rem; font-size: 0.8rem; font-weight: 700; color: var(--pub-accent, #fbbf24); text-decoration: none; }
 .landing-info-link:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
-  .landing-info-band { flex-direction: column; gap: 1.1rem; padding: 1.5rem; }
-  .landing-info-item { border-left: none; padding-left: 0; max-width: none; }
+  .landing-info-band { flex-direction: column; gap: 0.85rem; padding: 1.1rem 1.25rem; margin-top: -1.5rem; }
+  .landing-info-item { border-left: none; padding-left: 0; max-width: none; gap: 0.6rem; }
+  .landing-info-icon { font-size: 1.15rem; }
 }
 
 /* Vitrina corta de destacados — no el catálogo completo */
