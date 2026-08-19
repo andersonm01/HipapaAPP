@@ -31,7 +31,7 @@ async function connect() {
   });
 
   _connectPromise = qz.websocket
-    .connect({ retries: 3, delay: 0.5 })
+    .connect({ retries: 1, delay: 0.5 })
     .then(() => { _connectPromise = null; })
     .catch((err) => { _connectPromise = null; throw err; });
 
