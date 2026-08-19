@@ -812,6 +812,9 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 /* ---- Hero ---- */
 .landing-hero {
   background: linear-gradient(135deg, var(--pub-dark, #0f172a), #1e293b 80%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: #fff;
   padding: 8.5rem 0 4.5rem;
   text-align: center;

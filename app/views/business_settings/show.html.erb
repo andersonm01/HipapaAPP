@@ -85,6 +85,19 @@
           <%= f.file_field :logo, class: "form-input", accept: "image/*" %>
           <p class="form-hint">PNG o JPG recomendado. Máx 2MB.</p>
         </div>
+
+        <!-- Foto de portada (Inicio) -->
+        <div class="md:col-span-2">
+          <label class="form-label">Foto de portada (Inicio)</label>
+          <% if @setting.foto_hero.attached? %>
+            <div class="mb-2 flex items-center gap-3">
+              <%= image_tag @setting.foto_hero, class: "h-24 w-full max-w-sm rounded-lg object-cover border" %>
+              <span class="text-sm text-gray-500">Foto actual</span>
+            </div>
+          <% end %>
+          <%= f.file_field :foto_hero, class: "form-input", accept: "image/*" %>
+          <p class="form-hint">Se muestra de fondo en la sección "Bienvenido a..." de la página de inicio. Recomendado horizontal, buena iluminación. Máx 2MB.</p>
+        </div>
       </div>
 
       <div class="flex gap-3 mt-6">
