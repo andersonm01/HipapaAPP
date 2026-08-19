@@ -13,13 +13,14 @@
   --color-navy-800:  #1e293b;
   --color-navy-900:  #0f172a;
 
-  /* El sidebar pasa a su ancho completo (264px) recién en 1280px (ver
-     .app-sidebar más abajo). Si "lg:" siguiera activándose en 1024px,
-     el panel del Mostrador pasaría a 2 columnas justo cuando el sidebar
-     también se expande, y ambos cambios compitiendo por el mismo espacio
-     es lo que rompía el layout en 1024×768. Alineamos "lg" con ese mismo
-     punto de corte para que ambas transiciones ocurran juntas en un
-     ancho donde sí sobra espacio. */
+  /* El sidebar pasa a su ancho completo (264px, ver .app-sidebar más abajo)
+     justo en 1024px. Si "lg:" siguiera activándose también en 1024px, el
+     panel del Mostrador pasaría a 2 columnas en el mismo instante en que el
+     sidebar le quita 264px de ancho al contenido — ambos cambios compitiendo
+     por el mismo espacio es lo que rompía el layout en 1024×768. Subimos
+     "lg" a 1280px para que el contenido se quede apilado (a todo el ancho
+     disponible) mientras el sidebar ya está expandido, y solo pase a 2
+     columnas cuando el viewport es lo bastante ancho para ambos a la vez. */
   --breakpoint-lg: 80rem; /* 1280px, en vez del default de Tailwind (1024px) */
 }
 
@@ -442,7 +443,7 @@ html.sidebar-collapsed .sidebar-collapse-btn { transform: rotate(180deg); }
   transition: opacity 0.15s ease, transform 0.15s ease;
   z-index: 80;
 }
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   html.sidebar-collapsed .sidebar-link:hover .sidebar-tooltip,
   html.sidebar-collapsed .sidebar-group-toggle:hover .sidebar-tooltip {
     opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0);
@@ -513,11 +514,8 @@ html.sidebar-collapsed .sidebar-submenu { display: none; }
 /* =============================================
    RESPONSIVE — tablet & mobile
    ============================================= */
-/* Tablet & small desktop (768–1279px): sidebar defaults to icon rail.
-   This range now also covers 1024×768 / 1280×800-adjacent widths, since
-   the full 264px sidebar only kicks in at 1280px (matches --breakpoint-lg
-   above), where there's enough room for it alongside the 2-column content. */
-@media (min-width: 768px) and (max-width: 1279.98px) {
+/* Tablet: sidebar defaults to icon rail */
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .app-body { padding-left: var(--sidebar-w-collapsed) !important; }
   .app-sidebar { width: var(--sidebar-w-collapsed) !important; }
   .sidebar-brand-name, .sidebar-link-label, .sidebar-badge,
