@@ -4,9 +4,8 @@
     <p class="landing-section-subtitle">Explora por categoría</p>
 
     <div class="landing-menu-tabs" data-menu-tabs role="tablist">
-      <button type="button" class="landing-menu-tab active" data-menu-tab="all">Todos</button>
-      <% @productos_por_categoria.keys.each do |categoria| %>
-        <button type="button" class="landing-menu-tab" data-menu-tab="<%= categoria.parameterize %>"><%= categoria %></button>
+      <% @productos_por_categoria.keys.each_with_index do |categoria, index| %>
+        <button type="button" class="landing-menu-tab<%= ' active' if index.zero? %>" data-menu-tab="<%= categoria.parameterize %>"><%= categoria %></button>
       <% end %>
     </div>
 

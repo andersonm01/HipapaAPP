@@ -53,19 +53,25 @@ function initMenuTabs() {
   const tabs = tabsWrap.querySelectorAll('[data-menu-tab]');
   const items = grid.querySelectorAll('[data-menu-category]');
 
+  function showCategory(category) {
+    items.forEach(function(item) {
+      const show = category === 'all' || item.getAttribute('data-menu-category') === category;
+      item.style.display = show ? '' : 'none';
+    });
+  }
+
   tabs.forEach(function(tab) {
     tab.addEventListener('click', function() {
-      const category = tab.getAttribute('data-menu-tab');
-
       tabs.forEach(function(t) { t.classList.remove('active'); });
       tab.classList.add('active');
-
-      items.forEach(function(item) {
-        const show = category === 'all' || item.getAttribute('data-menu-category') === category;
-        item.style.display = show ? '' : 'none';
-      });
+      showCategory(tab.getAttribute('data-menu-tab'));
     });
   });
+
+  // Filtrar de entrada según la pestaña marcada como activa en el HTML
+  // (por defecto, la primera categoría — Papas).
+  const initialTab = tabsWrap.querySelector('.landing-menu-tab.active');
+  if (initialTab) showCategory(initialTab.getAttribute('data-menu-tab'));
 }
 
 function initScrollReveal() {
