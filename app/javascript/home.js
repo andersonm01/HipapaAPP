@@ -373,45 +373,68 @@ function initHome() {
     newOrderForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
+      // Validación explícita en vez de confiar solo en el "required" nativo:
+      // el campo puede quedar fuera de vista dentro del contenedor con
+      // scroll interno, y ahí el tooltip de validación del navegador no
+      // siempre es visible/obvio.
+      const clienteInput = document.getElementById('newOrderCliente');
+      if (clienteInput && !clienteInput.value.trim()) {
+        clienteInput.scrollIntoView({ block: 'center' });
+        clienteInput.focus();
+        alert('Ingresa el nombre del cliente.');
+        return;
+      }
+
       const submitBtn = document.getElementById('newOrderSubmitBtn');
       if (submitBtn) submitBtn.disabled = true;
 
-      appendOrderItemInputs(newOrderForm, selectedProducts);
+      // Si algo falla en el camino "bonito" (fetch/JSON/imprimir), igual
+      // queremos que el pedido se cree con los productos ya elegidos: se
+      // manda el formulario de forma normal (form.submit() no dispara el
+      // evento 'submit' de nuevo, así que no hay recursión). Se pierde
+      // únicamente la impresión de la comanda ANTES de navegar.
+      function fallbackSubmit(motivo) {
+        console.error('Nuevo Pedido: fetch falló, se envía el formulario normal.', motivo);
+        newOrderForm.submit();
+      }
 
-      fetch(newOrderForm.action, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-        },
-        body: new FormData(newOrderForm)
-      })
-        .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
-        .then(function(res) {
-          if (!res.ok) {
-            alert(res.data && res.data.error ? res.data.error : 'No se pudo crear el pedido.');
-            if (submitBtn) submitBtn.disabled = false;
-            return;
-          }
+      try {
+        appendOrderItemInputs(newOrderForm, selectedProducts);
 
-          const order = res.data;
-          function goToOrder() { window.location.href = '/?order_id=' + order.id; }
-
-          if (selectedProducts.length > 0) {
-            printComanda(selectedProducts, {
-              orderId: order.id,
-              cliente: order.cliente,
-              tipoServicio: order.tipo_servicio,
-              createdAt: order.created_at
-            }, goToOrder);
-          } else {
-            goToOrder();
-          }
+        fetch(newOrderForm.action, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          },
+          body: new FormData(newOrderForm)
         })
-        .catch(function() {
-          alert('No se pudo crear el pedido. Verifica tu conexión.');
-          if (submitBtn) submitBtn.disabled = false;
-        });
+          .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+          .then(function(res) {
+            if (!res.ok) {
+              alert(res.data && res.data.error ? res.data.error : 'No se pudo crear el pedido.');
+              if (submitBtn) submitBtn.disabled = false;
+              return;
+            }
+
+            const order = res.data;
+            function goToOrder() { window.location.href = '/?order_id=' + order.id; }
+
+            if (selectedProducts.length > 0) {
+              printComanda(selectedProducts, {
+                orderId: order.id,
+                cliente: order.cliente,
+                tipoServicio: order.tipo_servicio,
+                createdAt: order.created_at
+              }, goToOrder);
+            } else {
+              goToOrder();
+            }
+          })
+          .catch(fallbackSubmit);
+      } catch (err) {
+        fallbackSubmit(err);
+      }
     });
   }
 
