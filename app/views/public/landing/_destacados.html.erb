@@ -8,7 +8,7 @@
           <% if producto.foto.attached? %>
             <%= image_tag producto.foto, class: "landing-highlight-photo", alt: producto.nombre %>
           <% else %>
-            <div class="landing-highlight-photo landing-highlight-photo-fallback">🍔</div>
+            <div class="landing-highlight-photo landing-highlight-photo-fallback">🍟</div>
           <% end %>
           <div class="landing-highlight-body">
             <p class="landing-highlight-name"><%= producto.nombre %></p>

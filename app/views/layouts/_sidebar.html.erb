@@ -17,7 +17,7 @@
         <% if business_setting&.logo&.attached? %>
           <%= image_tag business_setting.logo, class: "sidebar-brand-logo" %>
         <% else %>
-          <span class="sidebar-brand-mark">🍔</span>
+          <span class="sidebar-brand-mark">🍟</span>
         <% end %>
         <span class="sidebar-brand-name"><%= business_setting&.nombre || 'Hi Papa' %></span>
       <% end %>

@@ -7,7 +7,7 @@ module Whatsapp
     end
 
     def message
-      lines = ["*Pedido Hi Papa* 🍔", ""]
+      lines = ["*Pedido Hi Papa* 🍟", ""]
 
       @items.each do |item|
         lines << "• #{item[:cantidad]}x #{item[:nombre]} — $#{format_price(item[:precio] * item[:cantidad])}"
