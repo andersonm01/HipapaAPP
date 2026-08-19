@@ -11,14 +11,15 @@ local:
 # eso las imágenes subidas (logo, foto de portada, fotos de producto) se
 # guardan acá en vez de en :local. Credenciales por variables de entorno
 # (configurar en Railway → Variables): B2_KEY_ID, B2_APPLICATION_KEY,
-# B2_BUCKET, B2_REGION (ej: us-west-004) y B2_ENDPOINT
-# (https://s3.<B2_REGION>.backblazeb2.com) — la región exacta la muestra
-# el bucket en el dashboard de B2, junto al "Endpoint".
+# B2_BUCKET, B2_ENDPOINT (https://s3.<region>.backblazeb2.com). B2_REGION
+# es opcional: si no se define, se deduce del propio B2_ENDPOINT (la
+# región va en medio de esa URL), para que un solo dato mal cargado no
+# tumbe el arranque de la app.
 backblaze_b2:
   service: S3
   access_key_id: <%= ENV["B2_KEY_ID"] %>
   secret_access_key: <%= ENV["B2_APPLICATION_KEY"] %>
-  region: <%= ENV["B2_REGION"] %>
+  region: <%= ENV["B2_REGION"].presence || ENV["B2_ENDPOINT"].to_s[/s3\.([a-z0-9-]+)\.backblazeb2\.com/i, 1] %>
   bucket: <%= ENV["B2_BUCKET"] %>
   endpoint: <%= ENV["B2_ENDPOINT"] %>
   force_path_style: true
