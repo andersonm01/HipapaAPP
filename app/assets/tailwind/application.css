@@ -932,17 +932,6 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 .landing-experiencia-title { color: #fff; font-weight: 700; font-size: 0.95rem; margin: 0 0 0.4rem; }
 .landing-experiencia-text { color: #94a3b8; font-size: 0.82rem; line-height: 1.5; margin: 0; }
 
-/* ---- Reservas CTA ---- */
-.landing-reservas { padding: 4rem 0; scroll-margin-top: 4.5rem; }
-.landing-reservas-card {
-  background: linear-gradient(120deg, #fffbeb, #fef3c7);
-  border: 1px solid #fde68a;
-  border-radius: 1.5rem;
-  padding: 2.25rem 2rem;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;
-}
-.landing-reservas-text { color: #78350f; font-size: 0.95rem; max-width: 30rem; margin: 0; }
-
 /* ---- Galería ---- */
 .landing-galeria { padding: 1rem 0 4.5rem; }
 .landing-galeria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.85rem; }
@@ -982,6 +971,5 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 @media (max-width: 480px) {
   .landing-title { font-size: 2rem; }
   .landing-hero { padding: 7.5rem 0 3.5rem; }
-  .landing-reservas-card { padding: 1.75rem 1.5rem; }
   .landing-cta-final-title { font-size: 1.5rem; }
 }
