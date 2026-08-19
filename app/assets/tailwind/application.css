@@ -876,30 +876,35 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 .landing-info-link:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
-  /* Columna (no scroll horizontal), pero cada valor se trunca a una sola
-     línea con "…" para que ningún ítem crezca de más — la dirección
-     completa igual queda accesible tocándola (abre Google Maps). */
+  /* Fila (no columna, no scroll horizontal): los 3 ítems se reparten el
+     ancho disponible en partes iguales y cada valor se trunca a una sola
+     línea con "…" si no entra — la dirección completa igual queda
+     accesible tocándola (abre Google Maps). Así la tarjeta siempre entra
+     en el ancho de la pantalla sin necesidad de deslizar. */
   .landing-info-band {
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.9rem 1.1rem;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 0.4rem;
+    padding: 0.85rem 0.9rem;
     margin-top: -1.5rem;
   }
   .landing-info-item {
     border-left: none;
     padding-left: 0;
     max-width: none;
+    flex: 1 1 0;
+    min-width: 0;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.4rem;
   }
   .landing-info-item > div { min-width: 0; flex: 1; }
-  .landing-info-icon { font-size: 1.05rem; }
+  .landing-info-icon { font-size: 1rem; }
   /* La etiqueta ("HORARIO"/"DIRECCIÓN"/"TELÉFONO") se oculta acá: el ícono
      ya da el contexto, y sacarla achica bastante la altura de la tarjeta. */
   .landing-info-label { display: none; }
   .landing-info-value {
     display: block;
-    font-size: 0.82rem;
+    font-size: 0.72rem;
     line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
