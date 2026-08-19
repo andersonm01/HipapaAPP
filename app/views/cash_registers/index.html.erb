@@ -48,22 +48,24 @@
   <div class="card-header"><span class="font-semibold text-sm">Historial de cajas</span></div>
   <div class="card-body p-0">
     <% if @cajas.any? %>
-      <table class="table">
-        <thead><tr><th>Apertura</th><th>Cierre</th><th>Mesero</th><th>Total ventas</th><th>Balance</th><th>Estado</th><th></th></tr></thead>
-        <tbody>
-          <% @cajas.each do |caja| %>
-            <tr>
-              <td class="text-sm"><%= caja.abierta_en.strftime('%d/%m %H:%M') %></td>
-              <td class="text-sm text-gray-500"><%= caja.cerrada_en&.strftime('%d/%m %H:%M') || '—' %></td>
-              <td class="text-sm"><%= caja.user.name %></td>
-              <td class="font-semibold">$<%= number_with_precision(caja.total_ventas, precision: 0, delimiter: ',') %></td>
-              <td class="font-semibold">$<%= number_with_precision(caja.monto_cierre || caja.balance_calculado, precision: 0, delimiter: ',') %></td>
-              <td><span class="badge <%= caja.abierta? ? 'badge-success' : 'badge-gray' %>"><%= caja.estado %></span></td>
-              <td><%= link_to "Ver", cash_register_path(caja), class: "btn-secondary btn-xs" %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead><tr><th>Apertura</th><th>Cierre</th><th>Mesero</th><th>Total ventas</th><th>Balance</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            <% @cajas.each do |caja| %>
+              <tr>
+                <td class="text-sm"><%= caja.abierta_en.strftime('%d/%m %H:%M') %></td>
+                <td class="text-sm text-gray-500"><%= caja.cerrada_en&.strftime('%d/%m %H:%M') || '—' %></td>
+                <td class="text-sm"><%= caja.user.name %></td>
+                <td class="font-semibold">$<%= number_with_precision(caja.total_ventas, precision: 0, delimiter: ',') %></td>
+                <td class="font-semibold">$<%= number_with_precision(caja.monto_cierre || caja.balance_calculado, precision: 0, delimiter: ',') %></td>
+                <td><span class="badge <%= caja.abierta? ? 'badge-success' : 'badge-gray' %>"><%= caja.estado %></span></td>
+                <td><%= link_to "Ver", cash_register_path(caja), class: "btn-secondary btn-xs" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
       <div class="empty-state">No hay cajas registradas</div>
     <% end %>

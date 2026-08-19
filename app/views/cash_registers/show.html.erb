@@ -73,27 +73,29 @@
   <div class="card-header"><span class="font-semibold text-sm">Movimientos (<%= @movements.count %>)</span></div>
   <div class="card-body p-0">
     <% if @movements.any? %>
-      <table class="table">
-        <thead><tr><th>Hora</th><th>Tipo</th><th>Medio</th><th>Pedido</th><th>Descripción</th><th class="text-right">Monto</th></tr></thead>
-        <tbody>
-          <% @movements.each do |mov| %>
-            <tr>
-              <td class="text-xs text-gray-500"><%= mov.created_at.strftime('%H:%M') %></td>
-              <td>
-                <span class="badge <%= mov.tipo == 'venta' ? 'badge-success' : mov.tipo == 'retiro' ? 'badge-danger' : 'badge-info' %>">
-                  <%= mov.tipo %>
-                </span>
-              </td>
-              <td class="text-sm"><%= mov.medio_pago %></td>
-              <td class="text-sm text-gray-500"><%= mov.order&.numero_orden || '—' %></td>
-              <td class="text-sm text-gray-600"><%= mov.descripcion.presence || '—' %></td>
-              <td class="text-right font-semibold <%= mov.tipo == 'retiro' ? 'text-red-600' : 'text-green-600' %>">
-                <%= mov.tipo == 'retiro' ? '-' : '+' %>$<%= number_with_precision(mov.monto, precision: 0, delimiter: ',') %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead><tr><th>Hora</th><th>Tipo</th><th>Medio</th><th>Pedido</th><th>Descripción</th><th class="text-right">Monto</th></tr></thead>
+          <tbody>
+            <% @movements.each do |mov| %>
+              <tr>
+                <td class="text-xs text-gray-500"><%= mov.created_at.strftime('%H:%M') %></td>
+                <td>
+                  <span class="badge <%= mov.tipo == 'venta' ? 'badge-success' : mov.tipo == 'retiro' ? 'badge-danger' : 'badge-info' %>">
+                    <%= mov.tipo %>
+                  </span>
+                </td>
+                <td class="text-sm"><%= mov.medio_pago %></td>
+                <td class="text-sm text-gray-500"><%= mov.order&.numero_orden || '—' %></td>
+                <td class="text-sm text-gray-600"><%= mov.descripcion.presence || '—' %></td>
+                <td class="text-right font-semibold <%= mov.tipo == 'retiro' ? 'text-red-600' : 'text-green-600' %>">
+                  <%= mov.tipo == 'retiro' ? '-' : '+' %>$<%= number_with_precision(mov.monto, precision: 0, delimiter: ',') %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
       <div class="empty-state">Sin movimientos registrados</div>
     <% end %>
