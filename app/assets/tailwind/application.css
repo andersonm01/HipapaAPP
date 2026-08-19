@@ -876,9 +876,14 @@ html:has(.landing-body) { scroll-behavior: smooth; }
 .landing-info-link:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
-  .landing-info-band { flex-direction: column; gap: 0.85rem; padding: 1.1rem 1.25rem; margin-top: -1.5rem; }
-  .landing-info-item { border-left: none; padding-left: 0; max-width: none; gap: 0.6rem; }
-  .landing-info-icon { font-size: 1.15rem; }
+  .landing-info-band { flex-direction: column; gap: 0.6rem; padding: 1rem 1.25rem; margin-top: -1.5rem; }
+  .landing-info-item { border-left: none; padding-left: 0; max-width: none; gap: 0.6rem; align-items: center; }
+  .landing-info-icon { font-size: 1.1rem; }
+  /* La etiqueta ("HORARIO"/"DIRECCIÓN"/"TELÉFONO") se oculta acá: el ícono
+     ya da el contexto, y sacarla achica bastante la altura de la tarjeta. */
+  .landing-info-label { display: none; }
+  .landing-info-value { font-size: 0.85rem; line-height: 1.3; }
+  .landing-info-link { margin-top: 0.15rem; font-size: 0.75rem; }
 }
 
 /* Vitrina corta de destacados — no el catálogo completo */
