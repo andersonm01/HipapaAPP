@@ -16,9 +16,8 @@
           <span class="landing-info-icon">📍</span>
           <div>
             <p class="landing-info-label">Dirección</p>
-            <p class="landing-info-value"><%= @business.direccion %></p>
-            <%= link_to "Cómo llegar →", "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@business.direccion)}",
-                  class: "landing-info-link", target: "_blank", rel: "noopener" %>
+            <%= link_to @business.direccion, "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@business.direccion)}",
+                  class: "landing-info-value landing-info-link", target: "_blank", rel: "noopener" %>
           </div>
         </div>
       <% end %>
