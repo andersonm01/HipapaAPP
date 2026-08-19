@@ -1,4 +1,19 @@
 // Home page JavaScript functionality
+import { SAUCES } from "sauces"
+
+function isPapas(item) {
+  return (item.category || '').toLowerCase().indexOf('papa') !== -1;
+}
+
+// Comentario final de un producto seleccionado, con las salsas elegidas
+// agregadas al texto — se usa tanto al enviar el pedido como al imprimir
+// la comanda, para que la cocina siempre vea qué salsa va en cada papa.
+function noteWithSauces(product) {
+  const parts = [];
+  if (product.comentario && product.comentario.trim()) parts.push(product.comentario.trim());
+  if (product.sauces && product.sauces.length) parts.push('Salsas: ' + product.sauces.join(', '));
+  return parts.join(' — ');
+}
 
 function initHome() {
   // Click en filas de orden
@@ -77,10 +92,12 @@ function initHome() {
         const productId = this.getAttribute('data-product-id');
         const productName = this.getAttribute('data-product-name');
         const productPrecio = parseFloat(this.getAttribute('data-product-precio'));
-        
+        const productItem = this.closest('.product-item');
+        const productCategory = productItem ? (productItem.getAttribute('data-product-category') || '') : '';
+
         // Verificar si el producto ya está en la lista
         const existingIndex = selectedProducts.findIndex(p => p.product_id === productId);
-        
+
         if (existingIndex >= 0) {
           // Si existe, incrementar cantidad
           selectedProducts[existingIndex].cantidad += 1;
@@ -91,10 +108,12 @@ function initHome() {
             product_name: productName,
             precio: productPrecio,
             cantidad: 1,
-            comentario: ''
+            comentario: '',
+            category: productCategory,
+            sauces: []
           });
         }
-        
+
         updateSelectedProductsList();
       });
     });
@@ -136,6 +155,15 @@ function initHome() {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'sel-item';
 
+      const sauceRow = isPapas(product) ? `
+        <div class="sel-sauce-row">
+          ${SAUCES.map(function(s) {
+            const selected = (product.sauces || []).indexOf(s) !== -1;
+            return '<button type="button" class="sauce-pill' + (selected ? ' selected' : '') + '" data-index="' + index + '" data-sauce="' + s + '">' + s + '</button>';
+          }).join('')}
+        </div>
+      ` : '';
+
       itemDiv.innerHTML = `
         <div class="sel-item-header">
           <div>
@@ -148,6 +176,7 @@ function initHome() {
                data-index="${index}"
                placeholder="Comentario (ej: sin cebolla)..."
                value="${product.comentario}">
+        ${sauceRow}
         <div class="sel-item-controls">
           <div class="sel-item-qty">
             <button type="button" class="btn-qty quantity-btn" data-index="${index}" data-action="decrease">−</button>
@@ -172,7 +201,21 @@ function initHome() {
         selectedProducts[index].comentario = this.value;
       });
     });
-    
+
+    // Event listeners para pills de salsa
+    document.querySelectorAll('.sauce-pill').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const index = parseInt(this.getAttribute('data-index'));
+        const sauce = this.getAttribute('data-sauce');
+        const product = selectedProducts[index];
+        product.sauces = product.sauces || [];
+        const sauceIndex = product.sauces.indexOf(sauce);
+        if (sauceIndex >= 0) product.sauces.splice(sauceIndex, 1);
+        else product.sauces.push(sauce);
+        updateSelectedProductsList();
+      });
+    });
+
     // Event listeners para botones de cantidad
     document.querySelectorAll('.quantity-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -246,7 +289,7 @@ function initHome() {
     ];
     items.forEach(function(p) {
       operaciones.push({ nombre: 'EscribirTexto', argumentos: [p.cantidad + ' x ' + p.product_name + '\n'] });
-      var c = (p.comentario && p.comentario.trim()) ? p.comentario.trim() : '';
+      var c = noteWithSauces(p);
       if (c) operaciones.push({ nombre: 'EscribirTexto', argumentos: ['  Nota: ' + c + '\n'] });
     });
     operaciones.push(
@@ -327,7 +370,7 @@ function initHome() {
   function appendOrderItemInputs(form, items) {
     form.querySelectorAll('input[name^="order_items"]').forEach(function(el) { el.remove(); });
     items.forEach(function(product, index) {
-      [['product_id', product.product_id], ['cantidad', product.cantidad], ['comentario', product.comentario || '']]
+      [['product_id', product.product_id], ['cantidad', product.cantidad], ['comentario', noteWithSauces(product)]]
         .forEach(function(pair) {
           const input = document.createElement('input');
           input.type = 'hidden';

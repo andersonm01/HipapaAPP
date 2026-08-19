@@ -1,5 +1,4 @@
-// Salsas disponibles para elegir en productos de la categoría "Papas".
-const SAUCES = ['Kétchup', 'Mayonesa', 'Mostaza', 'BBQ', 'Picante', 'Ranch', 'Especial de la casa'];
+import { SAUCES } from "sauces"
 
 /**
  * Online cart for Hi Papa public menu.
