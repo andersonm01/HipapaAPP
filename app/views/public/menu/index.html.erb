@@ -122,6 +122,9 @@
       return { product_id: i.product_id, cantidad: i.cantidad, notas };
     });
     document.getElementById('cart-items-json').value = JSON.stringify(itemsToSend);
+    // El form sigue su submit nativo (no se hace preventDefault acá), así
+    // que el carrito se vacía justo antes de navegar a la página del pedido.
+    cart.clear();
   });
 
   // Category tab active style
