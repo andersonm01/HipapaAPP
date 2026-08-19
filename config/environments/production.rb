@@ -37,8 +37,9 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Backblaze B2 (ver config/storage.yml) — el disco local del contenedor en
+  # Railway no persiste entre deploys, así que no se puede usar :local acá.
+  config.active_storage.service = :backblaze_b2
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil

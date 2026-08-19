@@ -6,6 +6,23 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Backblaze B2 (API compatible con S3) — usado en producción. El disco local
+# del contenedor en Railway no es persistente: se pierde en cada deploy, por
+# eso las imágenes subidas (logo, foto de portada, fotos de producto) se
+# guardan acá en vez de en :local. Credenciales por variables de entorno
+# (configurar en Railway → Variables): B2_KEY_ID, B2_APPLICATION_KEY,
+# B2_BUCKET, B2_REGION (ej: us-west-004) y B2_ENDPOINT
+# (https://s3.<B2_REGION>.backblazeb2.com) — la región exacta la muestra
+# el bucket en el dashboard de B2, junto al "Endpoint".
+backblaze_b2:
+  service: S3
+  access_key_id: <%= ENV["B2_KEY_ID"] %>
+  secret_access_key: <%= ENV["B2_APPLICATION_KEY"] %>
+  region: <%= ENV["B2_REGION"] %>
+  bucket: <%= ENV["B2_BUCKET"] %>
+  endpoint: <%= ENV["B2_ENDPOINT"] %>
+  force_path_style: true
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

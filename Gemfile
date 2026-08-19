@@ -50,6 +50,12 @@ gem "tailwindcss-rails"
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+# Almacenamiento de Active Storage en Backblaze B2 (API compatible con S3) en
+# producción, para que las imágenes subidas (logo, foto de portada, fotos de
+# productos) no se pierdan en cada deploy de Railway (el disco local del
+# contenedor no es persistente).
+gem "aws-sdk-s3", require: false
+
 group :production do
   gem "pg"
 end
