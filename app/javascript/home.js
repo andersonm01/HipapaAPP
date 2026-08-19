@@ -418,7 +418,7 @@ function initHome() {
             }
 
             const order = res.data;
-            function goToOrder() { window.location.href = '/?order_id=' + order.id; }
+            function goToOrder() { window.location.href = '/pedido/' + order.id; }
 
             if (selectedProducts.length > 0) {
               printComanda(selectedProducts, {
