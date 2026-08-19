@@ -47,7 +47,8 @@
                         style="background: var(--pub-brand, #f59e0b);"
                         data-id="<%= producto.id %>"
                         data-nombre="<%= producto.nombre %>"
-                        data-precio="<%= producto.precio %>">+</button>
+                        data-precio="<%= producto.precio %>"
+                        data-categoria="<%= producto.categoria %>">+</button>
               </div>
             </div>
           </div>
@@ -78,8 +79,8 @@
   // Add to cart
   document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const { id, nombre, precio } = btn.dataset;
-      cart.add(parseInt(id), nombre, parseFloat(precio));
+      const { id, nombre, precio, categoria } = btn.dataset;
+      cart.add(parseInt(id), nombre, parseFloat(precio), categoria);
     });
   });
 
@@ -110,10 +111,17 @@
     });
   });
 
-  // Serializar carrito antes de submit
+  // Serializar carrito antes de submit — las salsas elegidas se agregan
+  // como texto a la nota de cada producto (así llegan igual a la comanda
+  // de cocina sin necesidad de cambios en el backend).
   document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
     if (cart.items.length === 0) { e.preventDefault(); return; }
-    document.getElementById('cart-items-json').value = JSON.stringify(cart.items);
+    const itemsToSend = cart.items.map(i => {
+      const saucesText = (i.sauces && i.sauces.length) ? `Salsas: ${i.sauces.join(', ')}` : '';
+      const notas = [i.notas, saucesText].filter(Boolean).join(' — ');
+      return { product_id: i.product_id, cantidad: i.cantidad, notas };
+    });
+    document.getElementById('cart-items-json').value = JSON.stringify(itemsToSend);
   });
 
   // Category tab active style
