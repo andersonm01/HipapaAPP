@@ -245,6 +245,27 @@ recipes_data = {
   },
 }
 
+# ── Clientes de ejemplo (tarifas de domicilio) ─────────────────
+# precio_domicilio es un valor libre por cliente/zona; estas 4 tarifas
+# son las que se manejan realmente. Se seedean como ejemplo para tener
+# datos de referencia en desarrollo.
+customers_data = [
+  { nombre: 'Cliente Zona Centro',  whatsapp: '573001112233', direccion: 'Barrio Centro, cerca al parque principal', precio_domicilio: 3_000 },
+  { nombre: 'Cliente Zona Norte',   whatsapp: '573001112244', direccion: 'Barrio Norte, sector residencial',         precio_domicilio: 4_000 },
+  { nombre: 'Cliente Zona Sur',     whatsapp: '573001112255', direccion: 'Barrio Sur, cerca a la iglesia',           precio_domicilio: 5_000 },
+  { nombre: 'Cliente Zona Lejana',  whatsapp: '573001112266', direccion: 'Vereda / sector alejado del local',        precio_domicilio: 6_000 },
+]
+
+customers_data.each do |c|
+  Customer.find_or_create_by!(nombre: c[:nombre]) do |cust|
+    cust.whatsapp         = c[:whatsapp]
+    cust.direccion        = c[:direccion]
+    cust.precio_domicilio = c[:precio_domicilio]
+    cust.activo           = true
+  end
+end
+puts "✓ #{Customer.count} clientes creados"
+
 recipes_data.each do |product_name, data|
   product = Product.find_by(nombre: product_name)
   next unless product && product.recipe.nil?
