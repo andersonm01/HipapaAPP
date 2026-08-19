@@ -15,7 +15,8 @@ class Public::LandingController < ApplicationController
                                               .sort_by { |categoria, _| CATEGORIA_ORDEN.index(categoria) || CATEGORIA_ORDEN.size }
                                               .to_h
 
-    # Fotos reales de productos para la galería — si no hay suficientes, la sección se omite en la vista.
-    @fotos_galeria = menu_productos.with_attached_foto.to_a.select { |p| p.foto.attached? }.first(8)
+    # Fotos reales de productos para la galería — solo Papas, no bebidas.
+    # Si no hay suficientes, la sección se omite en la vista.
+    @fotos_galeria = menu_productos.where(categoria: 'Papas').with_attached_foto.to_a.select { |p| p.foto.attached? }.first(8)
   end
 end
