@@ -540,6 +540,10 @@ function initHome() {
         } else if (data.type === "order_closed") {
           // Orden cerrada - recargar para actualizar las tablas
           location.reload();
+        } else if (data.type === "new_web_order") {
+          // Pedido nuevo desde el módulo público (pedidos online): recargar
+          // para que aparezca en "En Curso" sin que haya que refrescar a mano.
+          location.reload();
         }
       }
     });

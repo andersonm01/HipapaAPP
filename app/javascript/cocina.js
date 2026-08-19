@@ -102,7 +102,7 @@ function initCocina() {
 
     App.cable.subscriptions.create('OrdersChannel', {
       received: function (data) {
-        if (data.type === 'order_created' || data.type === 'order_updated') {
+        if (data.type === 'order_created' || data.type === 'order_updated' || data.type === 'new_web_order') {
           location.reload();
         }
       }
