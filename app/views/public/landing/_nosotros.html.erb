@@ -3,7 +3,7 @@
     "#{@business.nombre} nació con una idea simple: servir comida honesta, preparada al momento, " \
     "para que cada visita se sienta como la primera. Este texto es provisional — reemplázalo desde " \
     "Negocio → Configuración → Nuestra historia en el panel de administración."
-  foto_nosotros = Product.activos.where(categoria: 'Papas').with_attached_foto.to_a.find { |p| p.foto.attached? }
+  foto_producto = Product.activos.where(categoria: 'Papas').with_attached_foto.to_a.find { |p| p.foto.attached? } unless @business.foto_nosotros.attached?
 %>
 <section class="landing-nosotros" id="nosotros">
   <div class="landing-container landing-nosotros-grid">
@@ -14,8 +14,10 @@
     </div>
     <div class="landing-nosotros-media" data-reveal>
       <span class="landing-nosotros-quote" aria-hidden="true">“</span>
-      <% if foto_nosotros %>
-        <%= image_tag foto_nosotros.foto, class: "landing-nosotros-photo", alt: foto_nosotros.nombre %>
+      <% if @business.foto_nosotros.attached? %>
+        <%= image_tag @business.foto_nosotros, class: "landing-nosotros-photo" %>
+      <% elsif foto_producto %>
+        <%= image_tag foto_producto.foto, class: "landing-nosotros-photo", alt: foto_producto.nombre %>
       <% elsif @business.logo.attached? %>
         <%= image_tag @business.logo, class: "landing-nosotros-photo" %>
       <% else %>

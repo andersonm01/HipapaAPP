@@ -20,7 +20,7 @@ class BusinessSettingsController < ApplicationController
     params.require(:business_setting).permit(
       :nombre, :telefono, :direccion, :descripcion, :horario, :historia,
       :color_primario, :color_secundario, :color_acento,
-      :whatsapp_negocio, :logo, :foto_hero
+      :whatsapp_negocio, :logo, :foto_hero, :foto_nosotros
     )
   end
 end

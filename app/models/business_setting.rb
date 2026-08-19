@@ -1,6 +1,7 @@
 class BusinessSetting < ApplicationRecord
   has_one_attached :logo
   has_one_attached :foto_hero
+  has_one_attached :foto_nosotros
 
   validates :nombre,           presence: true
   validates :color_primario,   presence: true, format: { with: /\A#[0-9a-fA-F]{6}\z/, message: "debe ser un color hex válido (#rrggbb)" }

@@ -105,6 +105,19 @@
           <%= f.file_field :foto_hero, class: "form-input", accept: "image/*" %>
           <p class="form-hint">Se muestra de fondo en la sección "Bienvenido a..." de la página de inicio. Recomendado horizontal, buena iluminación. Máx 2MB.</p>
         </div>
+
+        <!-- Foto de "Nuestra historia" -->
+        <div class="md:col-span-2">
+          <label class="form-label">Foto de "Nuestra historia"</label>
+          <% if @setting.foto_nosotros.attached? %>
+            <div class="mb-2 flex items-center gap-3">
+              <%= image_tag @setting.foto_nosotros, class: "h-24 w-24 rounded-lg object-cover border" %>
+              <span class="text-sm text-gray-500">Foto actual</span>
+            </div>
+          <% end %>
+          <%= f.file_field :foto_nosotros, class: "form-input", accept: "image/*" %>
+          <p class="form-hint">Se muestra junto al texto en la sección "Sobre nosotros" de la página de inicio. Si no cargás una, se usa automáticamente una foto de algún producto de Papas. Máx 2MB.</p>
+        </div>
       </div>
 
       <div class="flex gap-3 mt-6">
