@@ -427,6 +427,39 @@ function initHome() {
     }
   }
 
+  // Formulario "Nuevo Pedido": resumen en vivo mientras se completan los campos
+  // (el resaltado visual de las tarjetas/pills seleccionadas ya lo resuelve
+  // el CSS con :has(input:checked), esto solo actualiza el texto del resumen).
+  const newOrderForm = document.getElementById('newOrderForm');
+  if (newOrderForm) {
+    const clienteInput = document.getElementById('newOrderCliente');
+    const summaryCliente = document.getElementById('summaryCliente');
+    const summaryServicio = document.getElementById('summaryServicio');
+    const summaryMesero = document.getElementById('summaryMesero');
+
+    if (clienteInput && summaryCliente) {
+      clienteInput.addEventListener('input', function() {
+        summaryCliente.textContent = this.value.trim() || '—';
+      });
+    }
+
+    if (summaryServicio) {
+      newOrderForm.querySelectorAll('input[name="tipo_servicio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+          summaryServicio.textContent = this.dataset.serviceLabel || this.value;
+        });
+      });
+    }
+
+    if (summaryMesero) {
+      newOrderForm.querySelectorAll('input[name="mesero"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+          summaryMesero.textContent = this.dataset.meseroLabel || this.value;
+        });
+      });
+    }
+  }
+
   // ActionCable - Suscripción para actualizaciones en tiempo real
   if (typeof App !== 'undefined' && App.cable) {
     const ordersChannel = App.cable.subscriptions.create("OrdersChannel", {

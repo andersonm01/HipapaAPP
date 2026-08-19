@@ -13,7 +13,7 @@
   <!-- ========================================
        PANEL DERECHO: Formulario / Detalle
        ======================================== -->
-  <div class="lg:order-last flex-1">
+  <div class="lg:order-last flex-1 lg:flex-[2] xl:flex-1 min-w-0">
 
     <% if @new_order_id.present? && @current_order.present? %>
       <!-- ---- Detalle del pedido actual ---- -->
@@ -219,54 +219,94 @@
 
     <% else %>
       <!-- ---- Formulario Nuevo Pedido ---- -->
-      <div class="card">
-        <div class="px-4 py-3 bg-navy-900 text-white rounded-t-xl shrink-0">
-          <h2 class="font-bold">Nuevo Pedido</h2>
+      <div class="card overflow-hidden">
+        <div class="px-4 py-3.5 bg-gradient-to-br from-navy-900 to-navy-800 text-white rounded-t-xl shrink-0 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl shrink-0">🧾</div>
+          <div class="min-w-0">
+            <h2 class="font-bold leading-tight">Nuevo Pedido</h2>
+            <p class="text-xs text-slate-400">Completa los datos para abrir la mesa</p>
+          </div>
         </div>
         <div class="card-body">
-          <%= form_tag orders_path, method: :post, data: { turbo: false } do %>
-            <div class="space-y-4">
+          <%= form_tag orders_path, method: :post, data: { turbo: false }, id: "newOrderForm" do %>
+            <div class="space-y-5">
+              <!-- Cliente -->
               <div>
                 <label for="cliente" class="form-label">Cliente</label>
-                <%= text_field_tag :cliente, nil, class: "form-input", placeholder: "Nombre del cliente", required: true %>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                  </span>
+                  <%= text_field_tag :cliente, nil, class: "form-input", placeholder: "Nombre del cliente", required: true, id: "newOrderCliente", autocomplete: "off" %>
+                </div>
               </div>
 
+              <!-- Tipo de servicio: selector visual -->
               <div>
-                <label class="form-label mb-2">Servicio</label>
-                <div class="radio-group">
-                  <label>
-                    <input type="radio" name="tipo_servicio" value="mesa" checked>
-                    <span>En mesa</span>
+                <label class="form-label mb-2">Tipo de servicio</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <label class="service-card">
+                    <input type="radio" name="tipo_servicio" value="mesa" class="sr-only" data-service-label="En mesa" checked>
+                    <span class="service-card-icon">🍽️</span>
+                    <span class="service-card-label">En mesa</span>
                   </label>
-                  <label>
-                    <input type="radio" name="tipo_servicio" value="llevar">
-                    <span>Llevar</span>
+                  <label class="service-card">
+                    <input type="radio" name="tipo_servicio" value="llevar" class="sr-only" data-service-label="Para llevar">
+                    <span class="service-card-icon">🥡</span>
+                    <span class="service-card-label">Llevar</span>
                   </label>
-                  <label>
-                    <input type="radio" name="tipo_servicio" value="domicilio">
-                    <span>Domicilio</span>
+                  <label class="service-card">
+                    <input type="radio" name="tipo_servicio" value="domicilio" class="sr-only" data-service-label="Domicilio">
+                    <span class="service-card-icon">🛵</span>
+                    <span class="service-card-label">Domicilio</span>
                   </label>
                 </div>
               </div>
 
+              <!-- Mesero -->
               <div>
-                <label for="mesero" class="form-label">Mesero</label>
-                <%= select_tag :mesero,
-                    options_for_select([
-                      ["Seleccionar mesero...", ""],
-                      ["Mesero 1", "mesero1"],
-                      ["Mesero 2", "mesero2"],
-                      ["Mesero 3", "mesero3"]
-                    ]),
-                    class: "form-select" %>
+                <label class="form-label mb-2">Mesero <span class="text-slate-400 font-normal">(opcional)</span></label>
+                <div class="flex flex-wrap gap-2">
+                  <label class="mesero-pill">
+                    <input type="radio" name="mesero" value="mesero1" class="sr-only" data-mesero-label="Mesero 1">
+                    <span class="mesero-pill-avatar">M1</span> Mesero 1
+                  </label>
+                  <label class="mesero-pill">
+                    <input type="radio" name="mesero" value="mesero2" class="sr-only" data-mesero-label="Mesero 2">
+                    <span class="mesero-pill-avatar">M2</span> Mesero 2
+                  </label>
+                  <label class="mesero-pill">
+                    <input type="radio" name="mesero" value="mesero3" class="sr-only" data-mesero-label="Mesero 3">
+                    <span class="mesero-pill-avatar">M3</span> Mesero 3
+                  </label>
+                </div>
               </div>
 
+              <!-- Comentario -->
               <div>
                 <label for="comentario" class="form-label">Comentario <span class="text-slate-400 font-normal">(opcional)</span></label>
-                <%= text_area_tag :comentario, nil, class: "form-textarea", rows: 3, placeholder: "Instrucciones especiales..." %>
+                <%= text_area_tag :comentario, nil, class: "form-textarea", rows: 2, placeholder: "Instrucciones especiales..." %>
               </div>
 
-              <button type="submit" class="btn-primary w-full">
+              <!-- Resumen en vivo -->
+              <div class="new-order-summary">
+                <div class="new-order-summary-row">
+                  <span>Cliente</span>
+                  <strong id="summaryCliente">—</strong>
+                </div>
+                <div class="new-order-summary-row">
+                  <span>Servicio</span>
+                  <strong id="summaryServicio">En mesa</strong>
+                </div>
+                <div class="new-order-summary-row">
+                  <span>Mesero</span>
+                  <strong id="summaryMesero">Sin asignar</strong>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary btn-lg w-full">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -282,7 +322,7 @@
   <!-- ========================================
        PANEL IZQUIERDO: Tablas de pedidos
        ======================================== -->
-  <div class="flex-1">
+  <div class="flex-1 lg:flex-[3] xl:flex-1 min-w-0">
 
     <!-- Tabla EN CURSO -->
     <div class="card">
