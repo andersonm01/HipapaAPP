@@ -89,11 +89,32 @@ function initScrollReveal() {
   items.forEach(function(el) { observer.observe(el); });
 }
 
+// Enlaces internos tipo "#nosotros" hacen scroll suave sin tocar la URL.
+// Si dejamos que el navegador navegue de forma nativa a un ancla, el
+// #hash queda pegado en la barra de direcciones y el navegador lo guarda
+// en el historial — en el celular eso hace que el autocompletado del
+// dominio termine sugiriendo la página ya scrolleada a esa sección en
+// vez de la portada.
+function initAnchorLinks() {
+  document.querySelectorAll('.landing-body a[href^="#"]').forEach(function(link) {
+    const hash = link.getAttribute('href');
+    if (!hash || hash.length < 2) return;
+
+    link.addEventListener('click', function(e) {
+      const target = document.querySelector(hash);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
 function initLanding() {
   if (!document.querySelector('.landing-body')) return;
   initLandingNavbar();
   initMenuTabs();
   initScrollReveal();
+  initAnchorLinks();
 }
 
 document.addEventListener('turbo:load', initLanding);
