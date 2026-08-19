@@ -253,47 +253,6 @@
   .service-card-icon { font-size: 1.5rem; line-height: 1; }
   .service-card-label { font-size: 0.72rem; font-weight: 700; color: #64748b; }
   .service-card:has(input:checked) .service-card-label { color: #92400e; }
-
-  /* ---- Nuevo Pedido: selector de mesero ---- */
-  .mesero-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.75rem 0.3rem 0.3rem;
-    border-radius: 999px;
-    border: 1.5px solid #e2e8f0;
-    background: #fff;
-    cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #64748b;
-    transition: border-color 0.15s, background 0.15s, color 0.15s;
-  }
-  .mesero-pill:hover { border-color: #cbd5e1; background: #f8fafc; }
-  .mesero-pill:has(input:focus-visible) { outline: 2px solid #f59e0b; outline-offset: 2px; }
-  .mesero-pill:has(input:checked) { border-color: var(--color-brand, #f59e0b); background: #fffbeb; color: #92400e; }
-  .mesero-pill-avatar {
-    width: 1.4rem; height: 1.4rem; border-radius: 999px; flex-shrink: 0;
-    background: #e2e8f0; color: #64748b;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; font-weight: 800;
-    transition: background 0.15s, color 0.15s;
-  }
-  .mesero-pill:has(input:checked) .mesero-pill-avatar { background: var(--color-brand, #f59e0b); color: #fff; }
-
-  /* ---- Nuevo Pedido: resumen en vivo ---- */
-  .new-order-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    border-radius: 0.75rem;
-    border: 1px dashed #d1d5db;
-    background: #f8fafc;
-    padding: 0.65rem 0.9rem;
-  }
-  .new-order-summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; }
-  .new-order-summary-row span { color: #94a3b8; font-weight: 600; }
-  .new-order-summary-row strong { color: #1e293b; font-weight: 700; }
 }
 
 /* =============================================

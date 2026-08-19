@@ -248,38 +248,19 @@
                 <label class="form-label mb-2">Tipo de servicio</label>
                 <div class="grid grid-cols-3 gap-2">
                   <label class="service-card">
-                    <input type="radio" name="tipo_servicio" value="mesa" class="sr-only" data-service-label="En mesa" checked>
+                    <input type="radio" name="tipo_servicio" value="mesa" class="sr-only" checked>
                     <span class="service-card-icon">🍽️</span>
                     <span class="service-card-label">En mesa</span>
                   </label>
                   <label class="service-card">
-                    <input type="radio" name="tipo_servicio" value="llevar" class="sr-only" data-service-label="Para llevar">
+                    <input type="radio" name="tipo_servicio" value="llevar" class="sr-only">
                     <span class="service-card-icon">🥡</span>
                     <span class="service-card-label">Llevar</span>
                   </label>
                   <label class="service-card">
-                    <input type="radio" name="tipo_servicio" value="domicilio" class="sr-only" data-service-label="Domicilio">
+                    <input type="radio" name="tipo_servicio" value="domicilio" class="sr-only">
                     <span class="service-card-icon">🛵</span>
                     <span class="service-card-label">Domicilio</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Mesero -->
-              <div>
-                <label class="form-label mb-2">Mesero <span class="text-slate-400 font-normal">(opcional)</span></label>
-                <div class="flex flex-wrap gap-2">
-                  <label class="mesero-pill">
-                    <input type="radio" name="mesero" value="mesero1" class="sr-only" data-mesero-label="Mesero 1">
-                    <span class="mesero-pill-avatar">M1</span> Mesero 1
-                  </label>
-                  <label class="mesero-pill">
-                    <input type="radio" name="mesero" value="mesero2" class="sr-only" data-mesero-label="Mesero 2">
-                    <span class="mesero-pill-avatar">M2</span> Mesero 2
-                  </label>
-                  <label class="mesero-pill">
-                    <input type="radio" name="mesero" value="mesero3" class="sr-only" data-mesero-label="Mesero 3">
-                    <span class="mesero-pill-avatar">M3</span> Mesero 3
                   </label>
                 </div>
               </div>
@@ -288,22 +269,6 @@
               <div>
                 <label for="comentario" class="form-label">Comentario <span class="text-slate-400 font-normal">(opcional)</span></label>
                 <%= text_area_tag :comentario, nil, class: "form-textarea", rows: 2, placeholder: "Instrucciones especiales..." %>
-              </div>
-
-              <!-- Resumen en vivo -->
-              <div class="new-order-summary">
-                <div class="new-order-summary-row">
-                  <span>Cliente</span>
-                  <strong id="summaryCliente">—</strong>
-                </div>
-                <div class="new-order-summary-row">
-                  <span>Servicio</span>
-                  <strong id="summaryServicio">En mesa</strong>
-                </div>
-                <div class="new-order-summary-row">
-                  <span>Mesero</span>
-                  <strong id="summaryMesero">Sin asignar</strong>
-                </div>
               </div>
 
               <button type="submit" class="btn-primary btn-lg w-full">
