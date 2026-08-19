@@ -19,18 +19,24 @@ else
 end
 
 # ── Configuración del negocio ────────────────────────────────
-setting = BusinessSetting.first_or_initialize
-setting.assign_attributes(
-  nombre:           'Hi Papa',
-  telefono:         '3001234567',
-  descripcion:      'Las mejores papas con todo de la ciudad 🍟',
-  color_primario:   '#f59e0b',
-  color_secundario: '#0f172a',
-  color_acento:     '#fbbf24',
-  whatsapp_negocio: '573001234567'
-)
-setting.save!
-puts "✓ BusinessSetting configurado"
+# Solo se aplican estos valores de ejemplo si todavía no existe la fila
+# (primera vez). Si ya existe, no se toca: antes esto pisaba en cada
+# `db:seed` (ej. en cada deploy) lo que se hubiera configurado desde el
+# admin — nombre, teléfono, descripción, colores, WhatsApp.
+if BusinessSetting.none?
+  BusinessSetting.create!(
+    nombre:           'Hi Papa',
+    telefono:         '3001234567',
+    descripcion:      'Las mejores papas con todo de la ciudad 🍟',
+    color_primario:   '#f59e0b',
+    color_secundario: '#0f172a',
+    color_acento:     '#fbbf24',
+    whatsapp_negocio: '573001234567'
+  )
+  puts "✓ BusinessSetting creado con valores de ejemplo"
+else
+  puts "· BusinessSetting ya existe, no se modifica"
+end
 
 # ── Ingredientes ─────────────────────────────────────────────
 # Precios de compra estimados por unidad/kg/L
