@@ -1,5 +1,5 @@
 // ActionCable setup
-import consumer from "./channels/consumer"
+import consumer from "channels/consumer"
 
 // Make consumer available globally
 window.App = window.App || {};
