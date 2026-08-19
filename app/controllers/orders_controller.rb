@@ -1,36 +1,59 @@
 class OrdersController < ApplicationController
+  # El formulario "Nuevo Pedido" crea la orden y confirma los productos
+  # elegidos en un solo paso (fetch con Accept: json), en vez del flujo
+  # anterior de crear la orden vacía y confirmar productos por separado.
   def create
     Rails.logger.debug "Params recibidos: #{params.inspect}"
     @order = Order.new(order_params)
-    Rails.logger.debug "Order creado: #{@order.inspect}"
-    
-    if @order.save
-      Rails.logger.debug "Order guardado exitosamente"
-      # Transmitir actualización en tiempo real
-      ActionCable.server.broadcast("orders_channel", {
-        type: "order_created",
-        order: {
+
+    ActiveRecord::Base.transaction do
+      @order.save!
+      apply_order_items(@order, params[:order_items]) if params[:order_items].present?
+    end
+
+    Rails.logger.debug "Order guardado exitosamente"
+    ActionCable.server.broadcast("orders_channel", {
+      type: "order_created",
+      order: {
+        id: @order.id,
+        cliente: @order.cliente,
+        total: @order.total,
+        status: @order.status,
+        created_at: @order.created_at.strftime("%d/%m/%Y %H:%M:%S")
+      }
+    })
+
+    respond_to do |format|
+      format.json do
+        render json: {
           id: @order.id,
           cliente: @order.cliente,
-          total: @order.total,
-          status: @order.status,
-          created_at: @order.created_at.strftime("%d/%m/%Y %H:%M:%S")
+          tipo_servicio: @order.tipo_servicio,
+          created_at: @order.created_at.strftime("%d/%m/%y %H:%M")
         }
-      })
-      # Redirigir por JavaScript para que la URL ?order_id= no se pierda (Turbo/navegador)
-      flash[:notice] = 'Pedido creado exitosamente.'
-      render html: <<~HTML.html_safe, layout: false, content_type: 'text/html'
-        <!DOCTYPE html>
-        <html><head><meta charset="utf-8"><title>Redirigiendo...</title></head>
-        <body>
-        <script>window.location.replace("#{mostrador_path(order_id: @order.id)}");</script>
-        <p>Redirigiendo...</p>
-        </body></html>
-      HTML
-    else
-      Rails.logger.debug "Errores: #{@order.errors.full_messages}"
-      flash[:alert] = "Error al crear el pedido: #{@order.errors.full_messages.join(', ')}"
-      redirect_to mostrador_path
+      end
+      format.html do
+        # Redirigir por JavaScript para que la URL ?order_id= no se pierda (Turbo/navegador)
+        flash[:notice] = 'Pedido creado exitosamente.'
+        render html: <<~HTML.html_safe, layout: false, content_type: 'text/html'
+          <!DOCTYPE html>
+          <html><head><meta charset="utf-8"><title>Redirigiendo...</title></head>
+          <body>
+          <script>window.location.replace("#{mostrador_path(order_id: @order.id)}");</script>
+          <p>Redirigiendo...</p>
+          </body></html>
+        HTML
+      end
+    end
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
+    Rails.logger.debug "Errores: #{e.message}"
+    mensaje = @order.errors.any? ? @order.errors.full_messages.join(', ') : e.message
+    respond_to do |format|
+      format.json { render json: { error: mensaje }, status: :unprocessable_entity }
+      format.html do
+        flash[:alert] = "Error al crear el pedido: #{mensaje}"
+        redirect_to mostrador_path
+      end
     end
   end
 
@@ -55,40 +78,8 @@ class OrdersController < ApplicationController
 
     # Recibir array de productos con comentarios
     if params[:order_items].present?
-      params[:order_items].each do |key, item_params|
-        product = Product.find(item_params[:product_id])
-        cantidad = item_params[:cantidad].to_i
-        cantidad = 1 if cantidad < 1
-        comentario = item_params[:comentario].to_s.strip
+      apply_order_items(@order, params[:order_items])
 
-        # Buscar si ya existe el producto en la orden
-        order_item = @order.order_items.find_by(product_id: product.id)
-
-        if order_item
-          # Si existe, actualizar cantidad y comentario
-          new_comentario = if order_item.comentario.present? && comentario.present?
-            "#{order_item.comentario}; #{comentario}"
-          elsif comentario.present?
-            comentario
-          else
-            order_item.comentario
-          end
-
-          order_item.update(
-            cantidad: order_item.cantidad + cantidad,
-            comentario: new_comentario
-          )
-        else
-          # Si no existe, crear nuevo item
-          @order.order_items.create(
-            product: product,
-            cantidad: cantidad,
-            precio_unitario: product.precio,
-            comentario: comentario
-          )
-        end
-      end
-      
       # Si la orden ya estaba entregada, vuelve a aparecer en cocina con nuevos productos
       @order.update(kitchen_status: 'preparing') if @order.kitchen_status == 'delivered'
 
@@ -120,6 +111,9 @@ class OrdersController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.error "Error en confirm_items: #{e.message}"
     redirect_to mostrador_path, alert: 'Error: No se encontró la orden o el producto.'
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "Error en confirm_items: #{e.message}"
+    redirect_to pedido_path(@order.id), alert: "Error al confirmar productos: #{e.message}"
   end
 
   def close_order
@@ -253,6 +247,43 @@ class OrdersController < ApplicationController
   end
 
   private
+
+  # Agrega/mergea productos a una orden a partir de un hash con la forma
+  # { "0" => { product_id:, cantidad:, comentario: }, "1" => {...} }.
+  # Usado tanto al crear un pedido con productos ya elegidos (create) como
+  # al confirmar productos sobre un pedido existente (confirm_items).
+  def apply_order_items(order, items_params)
+    items_params.each do |_key, item_params|
+      product = Product.find(item_params[:product_id])
+      cantidad = item_params[:cantidad].to_i
+      cantidad = 1 if cantidad < 1
+      comentario = item_params[:comentario].to_s.strip
+
+      order_item = order.order_items.find_by(product_id: product.id)
+
+      if order_item
+        new_comentario = if order_item.comentario.present? && comentario.present?
+          "#{order_item.comentario}; #{comentario}"
+        elsif comentario.present?
+          comentario
+        else
+          order_item.comentario
+        end
+
+        order_item.update!(
+          cantidad: order_item.cantidad + cantidad,
+          comentario: new_comentario
+        )
+      else
+        order.order_items.create!(
+          product: product,
+          cantidad: cantidad,
+          precio_unitario: product.precio,
+          comentario: comentario
+        )
+      end
+    end
+  end
 
   def order_params
     params.permit(:cliente, :mesero, :comentario, :tipo_servicio, :customer_id, :user_id, :canal)

@@ -217,12 +217,15 @@ function initHome() {
   const tamanoFuente = 2;
 
   // Imprimir comanda: QZ Tray (producción) con fallback a Rails backend (Windows local).
-  function printComanda(items, onAfterPrint) {
-    const orderId = orderData.orderId || '-';
-    const cliente = (orderData.cliente || '-').toString();
-    const mesero = (orderData.mesero || '-').toString();
-    const tipoServicio = etiquetaTipoServicio(orderData.tipoServicio || 'mesa');
-    const fecha = orderData.createdAt || new Date().toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+  // `meta` es opcional y sobreescribe los datos de `orderData` — se usa al crear
+  // un pedido nuevo (formulario "Nuevo Pedido"), donde todavía no existe un
+  // `@current_order` del que orderData pueda leer el id/cliente/servicio reales.
+  function printComanda(items, meta, onAfterPrint) {
+    meta = meta || {};
+    const orderId = meta.orderId || orderData.orderId || '-';
+    const cliente = (meta.cliente || orderData.cliente || '-').toString();
+    const tipoServicio = etiquetaTipoServicio(meta.tipoServicio || orderData.tipoServicio || 'mesa');
+    const fecha = meta.createdAt || orderData.createdAt || new Date().toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
     var operaciones = [
       { nombre: 'Iniciar', argumentos: [] },
@@ -319,6 +322,22 @@ function initHome() {
     }
   }
 
+  // Adjunta los productos seleccionados como campos hidden order_items[i][...]
+  // a un formulario, para que viajen junto con el resto de sus campos.
+  function appendOrderItemInputs(form, items) {
+    form.querySelectorAll('input[name^="order_items"]').forEach(function(el) { el.remove(); });
+    items.forEach(function(product, index) {
+      [['product_id', product.product_id], ['cantidad', product.cantidad], ['comentario', product.comentario || '']]
+        .forEach(function(pair) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'order_items[' + index + '][' + pair[0] + ']';
+          input.value = pair[1];
+          form.appendChild(input);
+        });
+    });
+  }
+
   // Formulario de confirmación
   const confirmForm = document.getElementById('confirmProductsForm');
   if (confirmForm) {
@@ -331,36 +350,68 @@ function initHome() {
         return;
       }
 
-      // Crear campos hidden para cada producto
-      selectedProducts.forEach(function(product, index) {
-        const productIdInput = document.createElement('input');
-        productIdInput.type = 'hidden';
-        productIdInput.name = 'order_items[' + index + '][product_id]';
-        productIdInput.value = product.product_id;
-        confirmForm.appendChild(productIdInput);
-
-        const cantidadInput = document.createElement('input');
-        cantidadInput.type = 'hidden';
-        cantidadInput.name = 'order_items[' + index + '][cantidad]';
-        cantidadInput.value = product.cantidad;
-        confirmForm.appendChild(cantidadInput);
-
-        const comentarioInput = document.createElement('input');
-        comentarioInput.type = 'hidden';
-        comentarioInput.name = 'order_items[' + index + '][comentario]';
-        comentarioInput.value = product.comentario || '';
-        confirmForm.appendChild(comentarioInput);
-      });
+      appendOrderItemInputs(confirmForm, selectedProducts);
 
       if (hasProducts) {
         // Imprimir comanda y luego enviar formulario
-        printComanda(selectedProducts, function() {
+        printComanda(selectedProducts, null, function() {
           confirmForm.submit();
         });
       } else {
         // Solo cambió el servicio: nada que imprimir, solo guardar.
         confirmForm.submit();
       }
+    });
+  }
+
+  // Formulario "Nuevo Pedido": crea el pedido y confirma los productos ya
+  // elegidos en un solo paso (sin la pantalla intermedia de pedido vacío +
+  // "Confirmar Productos" aparte). Se envía por fetch para poder imprimir
+  // la comanda ya con el id real del pedido antes de navegar a su detalle.
+  const newOrderForm = document.getElementById('newOrderForm');
+  if (newOrderForm) {
+    newOrderForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('newOrderSubmitBtn');
+      if (submitBtn) submitBtn.disabled = true;
+
+      appendOrderItemInputs(newOrderForm, selectedProducts);
+
+      fetch(newOrderForm.action, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: new FormData(newOrderForm)
+      })
+        .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+        .then(function(res) {
+          if (!res.ok) {
+            alert(res.data && res.data.error ? res.data.error : 'No se pudo crear el pedido.');
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+          }
+
+          const order = res.data;
+          function goToOrder() { window.location.href = '/?order_id=' + order.id; }
+
+          if (selectedProducts.length > 0) {
+            printComanda(selectedProducts, {
+              orderId: order.id,
+              cliente: order.cliente,
+              tipoServicio: order.tipo_servicio,
+              createdAt: order.created_at
+            }, goToOrder);
+          } else {
+            goToOrder();
+          }
+        })
+        .catch(function() {
+          alert('No se pudo crear el pedido. Verifica tu conexión.');
+          if (submitBtn) submitBtn.disabled = false;
+        });
     });
   }
 

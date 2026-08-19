@@ -218,69 +218,107 @@
       </div>
 
     <% else %>
-      <!-- ---- Formulario Nuevo Pedido ---- -->
-      <div class="card overflow-hidden">
-        <div class="px-4 py-3.5 bg-gradient-to-br from-navy-900 to-navy-800 text-white rounded-t-xl shrink-0 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl shrink-0">🧾</div>
-          <div class="min-w-0">
-            <h2 class="font-bold leading-tight">Nuevo Pedido</h2>
-            <p class="text-xs text-slate-400">Completa los datos para abrir la mesa</p>
+      <!-- ---- Formulario Nuevo Pedido (cliente + servicio + productos, en un solo paso) ---- -->
+      <%= form_tag orders_path, method: :post, data: { turbo: false }, id: "newOrderForm" do %>
+        <div class="card flex flex-col" style="max-height: calc(100vh - 32px); overflow: hidden;">
+
+          <!-- Header -->
+          <div class="px-4 py-3.5 bg-gradient-to-br from-navy-900 to-navy-800 text-white rounded-t-xl shrink-0 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl shrink-0">🧾</div>
+            <div class="min-w-0">
+              <h2 class="font-bold leading-tight">Nuevo Pedido</h2>
+              <p class="text-xs text-slate-400">Cliente, servicio y productos en un solo paso</p>
+            </div>
           </div>
-        </div>
-        <div class="card-body">
-          <%= form_tag orders_path, method: :post, data: { turbo: false }, id: "newOrderForm" do %>
-            <div class="space-y-5">
-              <!-- Cliente -->
-              <div>
-                <label for="cliente" class="form-label">Cliente</label>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                  </span>
-                  <%= text_field_tag :cliente, nil, class: "form-input", placeholder: "Nombre del cliente", required: true, id: "newOrderCliente", autocomplete: "off" %>
-                </div>
-              </div>
 
-              <!-- Tipo de servicio: selector visual -->
-              <div>
-                <label class="form-label mb-2">Tipo de servicio</label>
-                <div class="grid grid-cols-3 gap-2">
-                  <label class="service-card">
-                    <input type="radio" name="tipo_servicio" value="mesa" class="sr-only" checked>
-                    <span class="service-card-icon">🍽️</span>
-                    <span class="service-card-label">En mesa</span>
-                  </label>
-                  <label class="service-card">
-                    <input type="radio" name="tipo_servicio" value="llevar" class="sr-only">
-                    <span class="service-card-icon">🥡</span>
-                    <span class="service-card-label">Llevar</span>
-                  </label>
-                  <label class="service-card">
-                    <input type="radio" name="tipo_servicio" value="domicilio" class="sr-only">
-                    <span class="service-card-icon">🛵</span>
-                    <span class="service-card-label">Domicilio</span>
-                  </label>
-                </div>
+          <div class="overflow-y-auto flex-1 px-4 py-3 space-y-4">
+            <!-- Cliente -->
+            <div>
+              <label for="cliente" class="form-label">Cliente</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </span>
+                <%= text_field_tag :cliente, nil, class: "form-input", placeholder: "Nombre del cliente", required: true, id: "newOrderCliente", autocomplete: "off" %>
               </div>
+            </div>
 
-              <!-- Comentario -->
-              <div>
-                <label for="comentario" class="form-label">Comentario <span class="text-slate-400 font-normal">(opcional)</span></label>
-                <%= text_area_tag :comentario, nil, class: "form-textarea", rows: 2, placeholder: "Instrucciones especiales..." %>
+            <!-- Tipo de servicio: selector visual -->
+            <div>
+              <label class="form-label mb-2">Tipo de servicio</label>
+              <div class="grid grid-cols-3 gap-2">
+                <label class="service-card">
+                  <input type="radio" name="tipo_servicio" value="mesa" class="sr-only" checked>
+                  <span class="service-card-icon">🍽️</span>
+                  <span class="service-card-label">En mesa</span>
+                </label>
+                <label class="service-card">
+                  <input type="radio" name="tipo_servicio" value="llevar" class="sr-only">
+                  <span class="service-card-icon">🥡</span>
+                  <span class="service-card-label">Llevar</span>
+                </label>
+                <label class="service-card">
+                  <input type="radio" name="tipo_servicio" value="domicilio" class="sr-only">
+                  <span class="service-card-icon">🛵</span>
+                  <span class="service-card-label">Domicilio</span>
+                </label>
               </div>
+            </div>
 
-              <button type="submit" class="btn-primary btn-lg w-full">
+            <!-- Selección temporal -->
+            <div id="selectedProductsContainer" style="display:none;">
+              <p class="section-label" style="margin-bottom:0.5rem;">Seleccionados</p>
+              <div id="selectedProductsList" style="max-height:200px;overflow-y:auto;"></div>
+            </div>
+
+            <!-- Búsqueda + grid de productos -->
+            <div>
+              <label class="form-label mb-2">Productos <span class="text-slate-400 font-normal">(opcional)</span></label>
+              <input type="text" id="productSearch" class="form-input mb-2" placeholder="Buscar producto...">
+              <div id="productsGrid" class="grid grid-cols-3 gap-1.5 max-h-52 overflow-y-auto pr-1">
+                <% if @products.present? %>
+                  <% @products.each do |product| %>
+                    <div class="product-item" data-product-id="<%= product.id %>" data-product-name="<%= product.nombre.downcase %>" data-product-precio="<%= product.precio %>" data-product-category="<%= product.categoria.to_s.downcase %>">
+                      <button type="button" class="product-btn add-product-btn w-full text-left text-xs"
+                              data-product-id="<%= product.id %>"
+                              data-product-name="<%= product.nombre %>"
+                              data-product-precio="<%= product.precio %>">
+                        <%= truncate(product.nombre, length: 22) %>
+                      </button>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <div class="col-span-2 text-center text-slate-400 text-sm py-4">Sin productos disponibles</div>
+                <% end %>
+              </div>
+            </div>
+
+            <!-- Comentario -->
+            <div>
+              <label for="comentario" class="form-label">Comentario <span class="text-slate-400 font-normal">(opcional)</span></label>
+              <%= text_area_tag :comentario, nil, class: "form-textarea", rows: 2, placeholder: "Instrucciones especiales..." %>
+            </div>
+          </div>
+
+          <!-- Footer: total + acción -->
+          <div class="shrink-0 rounded-b-xl overflow-hidden">
+            <div style="display:none;justify-content:space-between;font-size:0.875rem;" id="selectedTotalContainer" class="px-4 py-3 bg-navy-900 text-white">
+              <span class="text-slate-400">Total seleccionado</span>
+              <span class="font-bold" id="selectedTotal">$0.00</span>
+            </div>
+            <div class="p-3 bg-slate-50 border-t border-slate-200">
+              <button type="submit" id="newOrderSubmitBtn" class="btn-primary btn-lg w-full">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 Crear Pedido
               </button>
             </div>
-          <% end %>
+          </div>
         </div>
-      </div>
+      <% end %>
     <% end %>
   </div>
 
