@@ -747,6 +747,25 @@ body.modal-open { overflow: hidden; }
 .kitchen-alert-bar.critical { background: #fee2e2; color: #991b1b; display: block; }
 
 /* =============================================
+   MENÚ PÚBLICO — feedback al agregar al carrito
+   ============================================= */
+@keyframes add-to-cart-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.4) rotate(-8deg); }
+  60%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.add-to-cart-btn.add-bump { animation: add-to-cart-pop 0.4s ease; }
+
+@keyframes cart-badge-bump {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.5); }
+  60%  { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
+#cart-count.badge-bump { animation: cart-badge-bump 0.4s ease; }
+
+/* =============================================
    LANDING — Home page pública (sin login)
    ============================================= */
 html:has(.landing-body) { scroll-behavior: smooth; }

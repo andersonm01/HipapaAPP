@@ -89,6 +89,25 @@
     btn.addEventListener('click', () => {
       const { id, nombre, precio, categoria } = btn.dataset;
       cart.add(parseInt(id), nombre, parseFloat(precio), categoria);
+
+      // Animación de feedback: el botón "salta" y muestra un check
+      btn.classList.remove('add-bump');
+      void btn.offsetWidth; // reflow para poder reiniciar la animación
+      btn.classList.add('add-bump');
+      const original = btn.textContent;
+      btn.textContent = '✓';
+      setTimeout(() => {
+        btn.classList.remove('add-bump');
+        btn.textContent = original;
+      }, 400);
+
+      // El contador del carrito también rebota
+      const badge = document.getElementById('cart-count');
+      if (badge) {
+        badge.classList.remove('badge-bump');
+        void badge.offsetWidth;
+        badge.classList.add('badge-bump');
+      }
     });
   });
 
