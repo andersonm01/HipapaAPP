@@ -69,8 +69,16 @@
 
   // Category tabs
   window.showCategory = (cat, btn) => {
-    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.category-tab').forEach(t => {
+      t.classList.remove('active');
+      t.style.background = '';
+      t.style.color = '';
+      t.style.borderColor = '';
+    });
     btn.classList.add('active');
+    btn.style.background = 'var(--pub-brand, #f59e0b)';
+    btn.style.color = '#000';
+    btn.style.borderColor = 'var(--pub-brand, #f59e0b)';
     document.querySelectorAll('.category-section').forEach(s => {
       s.style.display = (cat === 'all' || s.dataset.category === cat) ? '' : 'none';
     });
