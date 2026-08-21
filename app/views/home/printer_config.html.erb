@@ -336,8 +336,12 @@ async function loadPrinters() {
       if (p === (getSavedPrinter() || '')) opt.selected = true;
       sel.appendChild(opt);
     });
-  } catch {
+  } catch (err) {
     sel.innerHTML = '<option value="">— Error al cargar impresoras —</option>';
+    console.error('QZ Tray printers.find() falló:', err);
+    testMsg.textContent = 'Error al listar impresoras: ' + (err && (err.message || err.toString ? err.toString() : JSON.stringify(err)));
+    testMsg.className = 'mt-2 text-sm text-red-600';
+    testMsg.classList.remove('hidden');
   }
 }
 
