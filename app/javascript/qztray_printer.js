@@ -26,6 +26,10 @@ async function connect() {
       .catch(reject);
   });
 
+  // Debe coincidir con el algoritmo usado en HomeController#printer_qz_sign (SHA512).
+  // Sin esto, QZ Tray verifica con su default (SHA1) y la firma nunca coincide.
+  qz.security.setSignatureAlgorithm('SHA512');
+
   qz.security.setSignaturePromise(function(toSign) {
     return function(resolve, reject) {
       fetch('/printer/qz_sign?toSign=' + encodeURIComponent(toSign))
