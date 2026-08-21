@@ -407,11 +407,17 @@ function initHome() {
     });
   }
 
-  // Id del pedido recién creado por este mismo cliente, mientras imprime la
-  // comanda y navega a su detalle. El broadcast de ActionCable "order_created"
-  // que dispara nuestra propia creación no debe recargar la página a mitad de
-  // ese proceso (ver handler de ordersChannel más abajo) — si no, el reload
-  // corta la impresión antes de que qz.print() llegue a completarse.
+  // Mientras este cliente está creando un pedido (fetch en vuelo + impresión
+  // de comanda + navegación), el broadcast de ActionCable "order_created" no
+  // debe recargar la página a mitad de ese proceso (ver handler de
+  // ordersChannel más abajo) — si no, el reload corta la impresión antes de
+  // que qz.print() llegue a completarse.
+  //
+  // El servidor emite el broadcast ANTES de terminar de responder el fetch
+  // (ver OrdersController#create), así que el mensaje puede llegar antes de
+  // que conozcamos el id del pedido recién creado. Por eso el flag se activa
+  // ANTES de enviar el fetch, no después de recibir la respuesta.
+  let creatingOrder = false;
   let pendingNewOrderId = null;
 
   // Formulario "Nuevo Pedido": crea el pedido y confirma los productos ya
@@ -445,11 +451,16 @@ function initHome() {
       // únicamente la impresión de la comanda ANTES de navegar.
       function fallbackSubmit(motivo) {
         console.error('Nuevo Pedido: fetch falló, se envía el formulario normal.', motivo);
+        creatingOrder = false;
         newOrderForm.submit();
       }
 
       try {
         appendOrderItemInputs(newOrderForm, selectedProducts);
+
+        // Activar el flag ANTES del fetch: el broadcast de "order_created"
+        // puede llegar por ActionCable antes de que tengamos la respuesta.
+        creatingOrder = true;
 
         fetch(newOrderForm.action, {
           method: 'POST',
@@ -462,6 +473,7 @@ function initHome() {
           .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
           .then(function(res) {
             if (!res.ok) {
+              creatingOrder = false;
               alert(res.data && res.data.error ? res.data.error : 'No se pudo crear el pedido.');
               if (submitBtn) submitBtn.disabled = false;
               return;
@@ -575,7 +587,11 @@ function initHome() {
           const isOnRootWithOrderId = (currentPath === '/' || currentPath === '') && orderIdInUrl && data.order && String(data.order.id) === orderIdInUrl;
           // Si este mismo cliente acaba de crear este pedido, todavía puede estar
           // imprimiendo la comanda antes de navegar — no lo interrumpas con un reload.
-          const isOwnPendingOrder = data.order && pendingNewOrderId && String(data.order.id) === String(pendingNewOrderId);
+          // `creatingOrder` cubre la ventana entre el envío del fetch y la respuesta
+          // (el broadcast puede llegar antes que la respuesta HTTP); `pendingNewOrderId`
+          // cubre lo que sigue una vez conocemos el id, hasta que goToOrder navega.
+          const isOwnPendingOrder = creatingOrder ||
+            (data.order && pendingNewOrderId && String(data.order.id) === String(pendingNewOrderId));
           if (!isOnThisPedido && !isOnRootWithOrderId && !isOwnPendingOrder) location.reload();
         } else if (data.type === "order_updated") {
           // Orden actualizada - actualizar si es la orden actual
