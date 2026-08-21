@@ -200,6 +200,13 @@
   .table tbody tr:hover { background: rgba(241,245,249,0.8); }
   .table tbody tr.clickable { cursor: pointer; }
 
+  /* Modificador para tablas angostas (ej. "En Curso" en /mostrador, que
+     comparte fila con el panel de "Nuevo Pedido" y se comprime bastante en
+     pantallas ~1024-1280px) — el padding de .table por sí solo deja muy
+     poco espacio para el contenido y fuerza scroll horizontal. */
+  .table-compact thead th { padding: 0.5rem 0.4rem; white-space: normal; }
+  .table-compact tbody td { padding: 0.5rem 0.4rem; }
+
   /* ---- Page layout ---- */
   .page-header  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
   .page-title   { font-size: 1.25rem; font-weight: 700; color: #1e293b; letter-spacing: -0.01em; }
