@@ -19,14 +19,19 @@ async function connect() {
   if (qz.websocket.isActive()) return;
   if (_connectPromise) return _connectPromise;
 
-  // 🔥 MODO SIMPLE (SIN CERTIFICADOS NI BACKEND)
   qz.security.setCertificatePromise(function(resolve, reject) {
-    resolve();
+    fetch('/printer/qz_cert')
+      .then(res => res.ok ? res.text() : Promise.reject(new Error('No se pudo obtener el certificado QZ')))
+      .then(resolve)
+      .catch(reject);
   });
 
   qz.security.setSignaturePromise(function(toSign) {
     return function(resolve, reject) {
-      resolve();
+      fetch('/printer/qz_sign?toSign=' + encodeURIComponent(toSign))
+        .then(res => res.ok ? res.text() : Promise.reject(new Error('No se pudo firmar la conexión QZ')))
+        .then(resolve)
+        .catch(reject);
     };
   });
 
