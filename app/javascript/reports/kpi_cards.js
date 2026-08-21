@@ -32,15 +32,13 @@ export function renderKpis(kpis) {
   const cards = CONFIG.map(c => {
     const d = kpis[c.key];
     return `
-      <div class="col-6 col-md-3">
-        <div class="rp-card d-flex align-items-center gap-2 p-2 h-100">
-          <div class="kpi-icon" style="background:${c.bg};color:${c.fg};"><i class="bi ${c.icon}"></i></div>
-          <div class="min-w-0">
-            <div class="kpi-lbl">${c.label}</div>
-            <div class="d-flex align-items-baseline gap-1 flex-wrap">
-              <div class="kpi-val">${fmt(d.value, c.decimals, c.money)}</div>
-              ${growthBadge(d.growth, d.prev)}
-            </div>
+      <div class="rp-kpi-card rp-card d-flex align-items-center gap-2 p-2">
+        <div class="kpi-icon" style="background:${c.bg};color:${c.fg};"><i class="bi ${c.icon}"></i></div>
+        <div class="min-w-0">
+          <div class="kpi-lbl">${c.label}</div>
+          <div class="d-flex align-items-baseline gap-1 flex-wrap">
+            <div class="kpi-val">${fmt(d.value, c.decimals, c.money)}</div>
+            ${growthBadge(d.growth, d.prev)}
           </div>
         </div>
       </div>`;
@@ -48,13 +46,11 @@ export function renderKpis(kpis) {
 
   const itemsSold = kpis.items_sold.value;
   const itemsCard = `
-    <div class="col-6 col-md-3">
-      <div class="rp-card d-flex align-items-center gap-2 p-2 h-100">
-        <div class="kpi-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-bag-check"></i></div>
-        <div class="min-w-0">
-          <div class="kpi-lbl">Ítems vendidos</div>
-          <div class="kpi-val">${Number(itemsSold).toLocaleString('es-CO')}</div>
-        </div>
+    <div class="rp-kpi-card rp-card d-flex align-items-center gap-2 p-2">
+      <div class="kpi-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-bag-check"></i></div>
+      <div class="min-w-0">
+        <div class="kpi-lbl">Ítems vendidos</div>
+        <div class="kpi-val">${Number(itemsSold).toLocaleString('es-CO')}</div>
       </div>
     </div>`;
 

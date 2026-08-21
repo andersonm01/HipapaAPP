@@ -3,13 +3,11 @@
 
 export function kpiSkeletonHTML() {
   return Array.from({ length: 4 }).map(() => `
-    <div class="col-6 col-xl-3">
-      <div class="rp-card d-flex align-items-center gap-3 p-3 h-100">
-        <div class="kpi-icon skel"></div>
-        <div class="min-w-0 flex-grow-1">
-          <div class="skel mb-2" style="height:9px;width:70%;"></div>
-          <div class="skel" style="height:22px;width:90%;"></div>
-        </div>
+    <div class="rp-kpi-card rp-card d-flex align-items-center gap-2 p-2">
+      <div class="kpi-icon skel"></div>
+      <div class="min-w-0">
+        <div class="skel mb-1" style="height:7px;width:60px;"></div>
+        <div class="skel" style="height:16px;width:70px;"></div>
       </div>
     </div>`).join('');
 }
