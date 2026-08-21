@@ -32,9 +32,19 @@ module Reports
       when :month      then Time.current.beginning_of_month..Time.current.end_of_month
       when :last_month then 1.month.ago.beginning_of_month..1.month.ago.end_of_month
       when :year       then Time.current.beginning_of_year..Time.current.end_of_year
-      when :custom     then from.to_date.beginning_of_day..to.to_date.end_of_day
+      when :custom     then custom_range(from, to)
       else                  Time.current.beginning_of_day..Time.current.end_of_day
       end
+    end
+
+    # Si todavía no eligieron ambas fechas (o vienen inválidas), no hay rango
+    # personalizado que calcular: se muestra "hoy" hasta que se aplique el filtro.
+    def custom_range(from, to)
+      return Time.current.beginning_of_day..Time.current.end_of_day if from.blank? || to.blank?
+
+      from.to_date.beginning_of_day..to.to_date.end_of_day
+    rescue ArgumentError, TypeError
+      Time.current.beginning_of_day..Time.current.end_of_day
     end
 
     def build_prev_range
