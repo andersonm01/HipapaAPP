@@ -8,7 +8,8 @@
                   box-shadow:0 1px 4px rgba(0,0,0,.06); }
   .rp-card-hd   { padding:.85rem 1.2rem; border-bottom:1px solid #f1f5f9; }
   .rp-card-bd   { padding:1rem 1.2rem; }
-  .rp-kpi-card  { flex:1 1 190px; max-width:260px; }
+  #kpiCards     { flex-wrap:nowrap; overflow-x:auto; }
+  .rp-kpi-card  { flex:1 1 0; min-width:150px; }
   .kpi-icon     { width:34px; height:34px; border-radius:8px; flex-shrink:0;
                   display:flex; align-items:center; justify-content:center; font-size:1rem; }
   .kpi-val      { font-size:1.25rem; font-weight:800; line-height:1.15; color:#0f172a; letter-spacing:-.02em; }
@@ -142,7 +143,7 @@
   </p>
 
   <%# ── KPI CARDS ──────────────────────────────────────────────────────── %>
-  <div class="d-flex flex-wrap gap-2 mb-4" id="kpiCards">
+  <div class="d-flex gap-2 mb-4" id="kpiCards">
     <% 4.times do %>
       <div class="rp-kpi-card rp-card d-flex align-items-center gap-2 p-2">
         <div class="kpi-icon skel"></div>
