@@ -407,6 +407,13 @@ function initHome() {
     });
   }
 
+  // Id del pedido recién creado por este mismo cliente, mientras imprime la
+  // comanda y navega a su detalle. El broadcast de ActionCable "order_created"
+  // que dispara nuestra propia creación no debe recargar la página a mitad de
+  // ese proceso (ver handler de ordersChannel más abajo) — si no, el reload
+  // corta la impresión antes de que qz.print() llegue a completarse.
+  let pendingNewOrderId = null;
+
   // Formulario "Nuevo Pedido": crea el pedido y confirma los productos ya
   // elegidos en un solo paso (sin la pantalla intermedia de pedido vacío +
   // "Confirmar Productos" aparte). Se envía por fetch para poder imprimir
@@ -461,6 +468,7 @@ function initHome() {
             }
 
             const order = res.data;
+            pendingNewOrderId = order.id;
             function goToOrder() { window.location.href = '/pedido/' + order.id; }
 
             if (selectedProducts.length > 0) {
@@ -565,7 +573,10 @@ function initHome() {
           const orderIdInUrl = urlParams.get('order_id');
           const isOnThisPedido = currentPath.startsWith('/pedido/') && data.order && String(data.order.id) === currentPath.replace(/^\/pedido\//, '');
           const isOnRootWithOrderId = (currentPath === '/' || currentPath === '') && orderIdInUrl && data.order && String(data.order.id) === orderIdInUrl;
-          if (!isOnThisPedido && !isOnRootWithOrderId) location.reload();
+          // Si este mismo cliente acaba de crear este pedido, todavía puede estar
+          // imprimiendo la comanda antes de navegar — no lo interrumpas con un reload.
+          const isOwnPendingOrder = data.order && pendingNewOrderId && String(data.order.id) === String(pendingNewOrderId);
+          if (!isOnThisPedido && !isOnRootWithOrderId && !isOwnPendingOrder) location.reload();
         } else if (data.type === "order_updated") {
           // Orden actualizada - actualizar si es la orden actual
           if (orderId && data.order.id === orderId) {
