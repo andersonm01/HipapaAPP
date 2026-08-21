@@ -25,6 +25,14 @@ function noteWithSauces(product) {
 let ordersSubscription = null;
 
 function initHome() {
+  // Guard contra doble inicialización: document.body es reemplazado por
+  // Turbo en cada navegación real (nodo nuevo, el flag se resetea solo),
+  // pero dentro de UNA misma visita initHome() puede llegar a llamarse dos
+  // veces (ver el fallback de readyState más abajo) — sin esto se
+  // duplicarían los listeners de "agregar producto", cantidad, etc.
+  if (document.body.dataset.homeInitialized) return;
+  document.body.dataset.homeInitialized = '1';
+
   // Click en filas de orden
   const orderRows = document.querySelectorAll('.order-row');
   orderRows.forEach(function(row) {
@@ -643,4 +651,16 @@ function initHome() {
   }
 };
 
+// home.js se carga como <script type="module">, que es asíncrono: en la
+// primera visita (con el import cacheado en frío) Turbo puede terminar de
+// renderizar y disparar "turbo:load" ANTES de que este módulo termine de
+// cargar y llegue a registrar el listener de abajo — initHome() nunca corre,
+// y ningún botón de producto queda con su click handler hasta recargar
+// (donde el módulo ya está en caché y alcanza a llegar a tiempo). Si el
+// documento ya terminó de parsear cuando este código corre, turbo:load ya
+// pasó — hay que inicializar ahora mismo. El guard de arriba evita que se
+// ejecute dos veces si además llega a dispararse turbo:load igual.
+if (document.readyState !== 'loading') {
+  initHome();
+}
 document.addEventListener('turbo:load', initHome);
