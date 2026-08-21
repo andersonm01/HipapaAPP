@@ -80,8 +80,11 @@ class HomeController < ApplicationController
     signature = key.sign(OpenSSL::Digest::SHA512.new, to_sign)
     render plain: Base64.strict_encode64(signature)
   rescue StandardError => e
-    Rails.logger.error("QZ Tray sign error: #{e.class}: #{e.message}")
-    render plain: "#{e.class}: #{e.message}", status: :internal_server_error
+    debug = "source=#{ENV['QZTRAY_PRIVATE_KEY'].present? ? 'env' : (Rails.application.credentials.qztray_private_key.present? ? 'credentials' : 'file')} " \
+            "bytesize=#{pem&.bytesize} newlines=#{pem&.count("\n")} " \
+            "head=#{pem&.[](0, 40).inspect} tail=#{pem&.[](-40, 40).inspect}"
+    Rails.logger.error("QZ Tray sign error: #{e.class}: #{e.message} | #{debug}")
+    render plain: "#{e.class}: #{e.message} | #{debug}", status: :internal_server_error
   end
 
   # Impresión directa ESC/POS en Windows (sin plugin, sin páginas extra)
