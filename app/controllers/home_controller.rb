@@ -67,8 +67,8 @@ class HomeController < ApplicationController
     to_sign  = params[:toSign].to_s
     key_path = Rails.root.join('config', 'qztray', 'private_key.pem')
 
-    pem = Rails.application.credentials.qztray_private_key.presence ||
-          ENV['QZTRAY_PRIVATE_KEY'].presence ||
+    pem = ENV['QZTRAY_PRIVATE_KEY'].presence ||
+          Rails.application.credentials.qztray_private_key.presence ||
           (key_path.exist? ? key_path.read : nil)
     return render plain: '', status: :not_found unless pem
 
