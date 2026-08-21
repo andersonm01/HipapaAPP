@@ -8,11 +8,11 @@
                   box-shadow:0 1px 4px rgba(0,0,0,.06); }
   .rp-card-hd   { padding:.85rem 1.2rem; border-bottom:1px solid #f1f5f9; }
   .rp-card-bd   { padding:1rem 1.2rem; }
-  .kpi-icon     { width:44px; height:44px; border-radius:10px; flex-shrink:0;
-                  display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
-  .kpi-val      { font-size:1.8rem; font-weight:800; line-height:1.1; color:#0f172a; letter-spacing:-.03em; }
-  .kpi-lbl      { font-size:.72rem; font-weight:700; text-transform:uppercase;
-                  letter-spacing:.07em; color:#94a3b8; }
+  .kpi-icon     { width:34px; height:34px; border-radius:8px; flex-shrink:0;
+                  display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .kpi-val      { font-size:1.25rem; font-weight:800; line-height:1.15; color:#0f172a; letter-spacing:-.02em; }
+  .kpi-lbl      { font-size:.64rem; font-weight:700; text-transform:uppercase;
+                  letter-spacing:.06em; color:#94a3b8; }
   .sec-lbl      { font-size:.7rem; font-weight:700; text-transform:uppercase;
                   letter-spacing:.07em; color:#94a3b8; }
   .period-nav .pn-btn {
@@ -30,7 +30,7 @@
   .insight-item.info    { border-color:#3b82f6; }
   .insight-item.primary { border-color:#8b5cf6; }
   .table-sm td, .table-sm th { padding:.45rem .75rem; }
-  @media(max-width:575px){ .kpi-val{ font-size:1.4rem; } }
+  @media(max-width:575px){ .kpi-val{ font-size:1.1rem; } }
 
   /* ── Skeletons ────────────────────────────────────────────────────────── */
   .skel { position:relative; overflow:hidden; background:#e2e8f0; border-radius:6px; }
@@ -141,14 +141,14 @@
   </p>
 
   <%# ── KPI CARDS ──────────────────────────────────────────────────────── %>
-  <div class="row g-3 mb-4" id="kpiCards">
+  <div class="row g-2 mb-4" id="kpiCards">
     <% 4.times do %>
-      <div class="col-6 col-xl-3">
-        <div class="rp-card d-flex align-items-center gap-3 p-3 h-100">
+      <div class="col-6 col-md-3">
+        <div class="rp-card d-flex align-items-center gap-2 p-2 h-100">
           <div class="kpi-icon skel"></div>
           <div class="min-w-0 flex-grow-1">
-            <div class="skel mb-2" style="height:9px;width:70%;"></div>
-            <div class="skel" style="height:22px;width:90%;"></div>
+            <div class="skel mb-1" style="height:7px;width:70%;"></div>
+            <div class="skel" style="height:16px;width:85%;"></div>
           </div>
         </div>
       </div>
