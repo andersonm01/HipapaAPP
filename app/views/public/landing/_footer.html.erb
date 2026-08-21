@@ -30,12 +30,12 @@
     <div class="landing-footer-col">
       <p class="landing-footer-heading">Enlaces</p>
       <p class="landing-footer-line"><%= link_to "Ver menú", public_menu_path, class: "landing-footer-link" %></p>
-      <p class="landing-footer-line"><%= link_to "Iniciar sesión", login_path, class: "landing-footer-link" %></p>
     </div>
   </div>
 
   <div class="landing-footer-bottom">
     <p>&copy; <%= Date.current.year %> <%= @business.nombre %>. Todos los derechos reservados.</p>
     <p>Creado por <%= link_to "Portalix", "https://digitalportalix.com", class: "landing-footer-link", target: "_blank", rel: "noopener" %></p>
+    <p><%= link_to "Admin", login_path, class: "landing-footer-admin" %></p>
   </div>
 </footer>
