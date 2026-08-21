@@ -72,19 +72,12 @@ class HomeController < ApplicationController
           (key_path.exist? ? key_path.read : nil)
     return render plain: '', status: :not_found unless pem
 
-    # Algunas plataformas (Railway incluido) guardan variables multilínea
-    # colapsando los saltos de línea reales en la secuencia literal "\n".
-    pem = pem.strip.gsub('\n', "\n") unless pem.include?("\n")
-
-    key       = OpenSSL::PKey::RSA.new(pem)
+    key       = OpenSSL::PKey::RSA.new(normalize_pem(pem))
     signature = key.sign(OpenSSL::Digest::SHA512.new, to_sign)
     render plain: Base64.strict_encode64(signature)
   rescue StandardError => e
-    debug = "source=#{ENV['QZTRAY_PRIVATE_KEY'].present? ? 'env' : (Rails.application.credentials.qztray_private_key.present? ? 'credentials' : 'file')} " \
-            "bytesize=#{pem&.bytesize} newlines=#{pem&.count("\n")} " \
-            "head=#{pem&.[](0, 40).inspect} tail=#{pem&.[](-40, 40).inspect}"
-    Rails.logger.error("QZ Tray sign error: #{e.class}: #{e.message} | #{debug}")
-    render plain: "#{e.class}: #{e.message} | #{debug}", status: :internal_server_error
+    Rails.logger.error("QZ Tray sign error: #{e.class}: #{e.message}")
+    render plain: '', status: :internal_server_error
   end
 
   # Impresión directa ESC/POS en Windows (sin plugin, sin páginas extra)
@@ -108,5 +101,22 @@ class HomeController < ApplicationController
     render json: { ok: false, message: "JSON inválido" }, status: :bad_request
   rescue StandardError => e
     render json: { ok: false, message: e.message }, status: :internal_server_error
+  end
+
+  private
+
+  # Reconstruye un PEM válido sin importar cómo haya quedado pegado en un
+  # panel de variables de entorno: con saltos de línea reales, con la
+  # secuencia literal "\n", o incluso sin las líneas BEGIN/END (solo el
+  # cuerpo base64), que es lo que Railway suele dejar.
+  def normalize_pem(pem)
+    pem = pem.strip
+    return pem if pem.include?("\n") && pem.include?('BEGIN')
+
+    pem = pem.gsub('\n', "\n")
+    return pem if pem.include?("\n") && pem.include?('BEGIN')
+
+    body = pem.gsub(/-----(BEGIN|END)[^-]*-----/, '').gsub(/\s+/, '')
+    "-----BEGIN PRIVATE KEY-----\n#{body.scan(/.{1,64}/).join("\n")}\n-----END PRIVATE KEY-----\n"
   end
 end
