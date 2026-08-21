@@ -72,6 +72,10 @@ class HomeController < ApplicationController
           (key_path.exist? ? key_path.read : nil)
     return render plain: '', status: :not_found unless pem
 
+    # Algunas plataformas (Railway incluido) guardan variables multilínea
+    # colapsando los saltos de línea reales en la secuencia literal "\n".
+    pem = pem.strip.gsub('\n', "\n") unless pem.include?("\n")
+
     key       = OpenSSL::PKey::RSA.new(pem)
     signature = key.sign(OpenSSL::Digest::SHA512.new, to_sign)
     render plain: Base64.strict_encode64(signature)
