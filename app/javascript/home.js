@@ -15,6 +15,15 @@ function noteWithSauces(product) {
   return parts.join(' — ');
 }
 
+// Persiste entre llamadas a initHome() (Turbo dispara "turbo:load" en cada
+// navegación, incluso sin recargar la página entera). Sin esto, cada
+// turbo:load crea una suscripción nueva a OrdersChannel sin cancelar la
+// anterior: las suscripciones "zombie" quedan con su propio `creatingOrder`
+// congelado en false y disparan location.reload() al recibir el broadcast
+// de order_created, cortando la impresión que la suscripción activa sí
+// estaba protegiendo. Ver conversación sobre impresión intermitente.
+let ordersSubscription = null;
+
 function initHome() {
   // Click en filas de orden
   const orderRows = document.querySelectorAll('.order-row');
@@ -383,7 +392,11 @@ function initHome() {
 
   // Formulario de confirmación
   const confirmForm = document.getElementById('confirmProductsForm');
-  if (confirmForm) {
+  // Mismo problema de turbo:load que la suscripción de ActionCable: sin este
+  // guard, cada navegación Turbo agrega otro listener 'submit' encima de los
+  // anteriores, duplicando la impresión/el envío del formulario.
+  if (confirmForm && !confirmForm.dataset.hipapaBound) {
+    confirmForm.dataset.hipapaBound = '1';
     confirmForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -425,7 +438,10 @@ function initHome() {
   // "Confirmar Productos" aparte). Se envía por fetch para poder imprimir
   // la comanda ya con el id real del pedido antes de navegar a su detalle.
   const newOrderForm = document.getElementById('newOrderForm');
-  if (newOrderForm) {
+  // Guard contra doble binding en navegaciones Turbo (ver comentario en
+  // confirmForm más arriba).
+  if (newOrderForm && !newOrderForm.dataset.hipapaBound) {
+    newOrderForm.dataset.hipapaBound = '1';
     newOrderForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -566,7 +582,14 @@ function initHome() {
 
   // ActionCable - Suscripción para actualizaciones en tiempo real
   if (typeof App !== 'undefined' && App.cable) {
-    const ordersChannel = App.cable.subscriptions.create("OrdersChannel", {
+    // Cancelar la suscripción de la navegación Turbo anterior antes de crear
+    // la nueva: de lo contrario quedan activas varias a la vez (ver comentario
+    // sobre ordersSubscription arriba).
+    if (ordersSubscription) {
+      App.cable.subscriptions.remove(ordersSubscription);
+      ordersSubscription = null;
+    }
+    ordersSubscription = App.cable.subscriptions.create("OrdersChannel", {
       connected() {
         console.log("Conectado al canal de órdenes");
       },
