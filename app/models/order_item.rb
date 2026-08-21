@@ -8,4 +8,12 @@ class OrderItem < ApplicationRecord
   def subtotal
     cantidad * precio_unitario
   end
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[cantidad precio_unitario product_id order_id created_at]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[order product]
+  end
 end

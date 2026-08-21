@@ -1,5 +1,7 @@
 module Reports
   class MetricsService
+    include Reports::SqlTimeExpressions
+
     DAYS_ES   = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'].freeze
     MONTHS_ES = %w[Enero Febrero Marzo Abril Mayo Junio Julio Agosto Septiembre Octubre Noviembre Diciembre].freeze
 
@@ -229,45 +231,5 @@ module Reports
       ((current.to_f - prev.to_f) / prev.to_f * 100).round(1)
     end
 
-    # Expresiones SQL para convertir created_at (UTC) a hora local,
-    # con sintaxis distinta según el adaptador (SQLite en dev, PostgreSQL en prod).
-    def postgres?
-      ActiveRecord::Base.connection.adapter_name.match?(/postg/i)
-    end
-
-    def local_time_expr
-      # PostgreSQL necesita el identificador IANA (America/Bogota), no el
-      # nombre amigable de ActiveSupport::TimeZone (Bogota).
-      tz_name = ActiveSupport::TimeZone[Rails.application.config.time_zone].tzinfo.name
-      "(created_at AT TIME ZONE 'UTC' AT TIME ZONE '#{tz_name}')"
-    end
-
-    def local_date_expr
-      postgres? ? "DATE#{local_time_expr}" : "DATE(datetime(created_at, 'localtime'))"
-    end
-
-    def local_hour_expr
-      if postgres?
-        "CAST(EXTRACT(HOUR FROM #{local_time_expr}) AS INTEGER)"
-      else
-        "CAST(STRFTIME('%H', datetime(created_at, 'localtime')) AS INTEGER)"
-      end
-    end
-
-    def local_month_expr
-      if postgres?
-        "TO_CHAR(#{local_time_expr}, 'MM')"
-      else
-        "STRFTIME('%m', datetime(created_at, 'localtime'))"
-      end
-    end
-
-    def local_dow_expr
-      if postgres?
-        "CAST(EXTRACT(DOW FROM #{local_time_expr}) AS INTEGER)"
-      else
-        "CAST(STRFTIME('%w', datetime(created_at, 'localtime')) AS INTEGER)"
-      end
-    end
   end
 end

@@ -41,11 +41,22 @@ gem "omniauth-rails_csrf_protection"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
+# Pineado a la versión que viene precompilada con este Ruby (default gem):
+# la última versión (3.5.1) se compila con el MSYS2 del sistema en esta
+# máquina y el .so resultante no carga (LoadError, símbolos incompatibles).
+gem "date", "3.3.3"
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
 # TailwindCSS
 gem "tailwindcss-rails"
+
+# Agrupaciones por día/semana/mes con soporte de timezone para reportes
+gem "groupdate"
+
+# Filtros dinámicos (rango de fechas, vendedor, categoría, producto) en /reportes
+gem "ransack"
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
@@ -79,4 +90,9 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 
+  # Rails 7.0's test runner (Rails::TestUnit::LineFiltering) llama a
+  # Minitest::Test.run con la firma vieja de argumentos; minitest 6.x la
+  # cambió y rompe "bin/rails test" por completo. Se fija a la última 5.x
+  # compatible.
+  gem "minitest", "~> 5.16"
 end

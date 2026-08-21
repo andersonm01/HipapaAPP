@@ -75,6 +75,20 @@ Rails.application.routes.draw do
   get "reportes", to: "reports#index", as: :reportes
   get "cocina",   to: "cocina#index",  as: :cocina
 
+  # API JSON del dashboard de reportes
+  namespace :api do
+    namespace :v1 do
+      resources :reports, only: [] do
+        collection do
+          get :summary
+          get :trend
+          get :orders
+          get :orders_csv
+        end
+      end
+    end
+  end
+
   # Página pública (pedidos online)
   namespace :public do
     get  '/',      to: 'menu#index',    as: :menu

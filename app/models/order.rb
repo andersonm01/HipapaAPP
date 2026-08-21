@@ -58,6 +58,14 @@ class Order < ApplicationRecord
     customer&.nombre || cliente
   end
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[created_at mesero tipo_servicio tipo_pago user_id status canal customer_id]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[order_items customer user]
+  end
+
   private
 
   def assign_numero_orden

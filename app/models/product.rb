@@ -21,4 +21,12 @@ class Product < ApplicationRecord
   def rentable?
     margen_ganancia.nil? || margen_ganancia >= 30
   end
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[id nombre categoria activo]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[order_items]
+  end
 end

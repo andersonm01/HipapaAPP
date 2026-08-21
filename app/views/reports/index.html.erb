@@ -17,7 +17,7 @@
                   letter-spacing:.07em; color:#94a3b8; }
   .period-nav .pn-btn {
     border-radius:20px; font-size:.8rem; font-weight:600; padding:.3rem .85rem;
-    border:1px solid #cbd5e1; color:#475569; background:#fff; text-decoration:none;
+    border:1px solid #cbd5e1; color:#475569; background:#fff; cursor:pointer;
     transition:background .1s,color .1s; }
   .period-nav .pn-btn:hover:not(.active) { background:#f8fafc; color:#1e293b; }
   .period-nav .pn-btn.active { background:#1e293b; color:#fff; border-color:#1e293b; }
@@ -31,179 +31,147 @@
   .insight-item.primary { border-color:#8b5cf6; }
   .table-sm td, .table-sm th { padding:.45rem .75rem; }
   @media(max-width:575px){ .kpi-val{ font-size:1.4rem; } }
+
+  /* ── Skeletons ────────────────────────────────────────────────────────── */
+  .skel { position:relative; overflow:hidden; background:#e2e8f0; border-radius:6px; }
+  .skel::after { content:''; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+    animation: rp-shimmer 1.3s infinite; }
+  @keyframes rp-shimmer { 100% { transform:translateX(100%); } }
+
+  /* ── Filters ──────────────────────────────────────────────────────────── */
+  .rp-filters select.form-select-sm { font-size:.8rem; }
+
+  /* ── Heatmap ──────────────────────────────────────────────────────────── */
+  .heatmap-scroll { overflow-x:auto; padding-bottom:.25rem; }
+  .heatmap-grid   { display:grid; grid-template-columns:64px repeat(24, minmax(26px,1fr));
+                    gap:3px; min-width:760px; }
+  .heatmap-cell   { aspect-ratio:1; border-radius:4px; }
+  .heatmap-hourlbl{ font-size:.62rem; color:#94a3b8; text-align:center; }
+  .heatmap-daylbl { font-size:.72rem; color:#475569; font-weight:600; display:flex; align-items:center; }
+
+  /* ── Pagination ───────────────────────────────────────────────────────── */
+  .rp-page-btn { border:1px solid #cbd5e1; background:#fff; color:#475569; border-radius:8px;
+                 font-size:.8rem; padding:.25rem .65rem; }
+  .rp-page-btn:disabled { opacity:.4; }
+  .rp-page-btn.active { background:#1e293b; color:#fff; border-color:#1e293b; }
 </style>
 
 <div class="rp-bg">
 <div class="container-xl px-3">
 
   <%# ── HEADER ──────────────────────────────────────────────────────────── %>
-  <div class="d-flex justify-content-between align-items-start mb-3 pt-2">
+  <div class="d-flex justify-content-between align-items-start mb-3 pt-2 flex-wrap gap-2">
     <div>
       <div class="sec-lbl">Panel de analítica</div>
       <h1 class="fw-bold mb-0" style="font-size:1.55rem;color:#0f172a;">Reportes</h1>
     </div>
-    <button class="btn btn-sm btn-outline-secondary mt-1" onclick="window.print()">
-      <i class="bi bi-printer me-1"></i>Imprimir
-    </button>
+    <div class="d-flex gap-2">
+      <a href="#" class="btn btn-sm btn-outline-secondary rp-csv-link" download>
+        <i class="bi bi-download me-1"></i>Exportar CSV
+      </a>
+      <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i>Imprimir
+      </button>
+    </div>
   </div>
 
-  <%# ── PERIOD SELECTOR ────────────────────────────────────────────────── %>
-  <div class="period-nav d-flex flex-wrap gap-2 mb-2">
-    <% [['today','Hoy'],['yesterday','Ayer'],['week','Esta semana'],
-        ['last_week','Sem. pasada'],['month','Este mes'],
-        ['last_month','Mes pasado'],['year','Este año'],['custom','Personalizado']]
-       .each do |val, lbl| %>
-      <a href="<%= reportes_path(period: val) %>"
-         class="pn-btn <%= @period == val ? 'active' : '' %>"
-         data-period="<%= val %>"><%= lbl %></a>
-    <% end %>
-  </div>
+  <%# ── FILTERS ─────────────────────────────────────────────────────────── %>
+  <div class="rp-card p-3 mb-2 rp-filters">
+    <div class="period-nav d-flex flex-wrap gap-2 mb-3" id="periodNav">
+      <button type="button" class="pn-btn" data-period="today">Hoy</button>
+      <button type="button" class="pn-btn" data-period="last_7_days">Últimos 7 días</button>
+      <button type="button" class="pn-btn active" data-period="month">Este mes</button>
+      <button type="button" class="pn-btn" data-period="quarter">Trimestre</button>
+      <button type="button" class="pn-btn" data-period="year">Año</button>
+      <button type="button" class="pn-btn" data-period="custom">Personalizado</button>
+    </div>
 
-  <%# ── CUSTOM DATE FORM ───────────────────────────────────────────────── %>
-  <div id="customRangeForm" class="mb-3" style="<%= @period == 'custom' ? '' : 'display:none;' %>">
-    <%= form_with url: reportes_path, method: :get, local: true,
-          class: "d-flex flex-wrap align-items-end gap-2 p-3 bg-white rounded-3 border" do |f| %>
-      <%= f.hidden_field :period, value: 'custom' %>
+    <div id="customRangeRow" class="d-flex flex-wrap align-items-end gap-2 mb-3" style="display:none;">
       <div>
         <label class="form-label fw-semibold small mb-1">Desde</label>
-        <%= f.date_field :from, value: @from, class: "form-control form-control-sm" %>
+        <input type="date" id="filterFrom" class="form-control form-control-sm">
       </div>
       <div>
         <label class="form-label fw-semibold small mb-1">Hasta</label>
-        <%= f.date_field :to, value: @to, class: "form-control form-control-sm" %>
+        <input type="date" id="filterTo" class="form-control form-control-sm">
       </div>
-      <%= f.submit 'Aplicar', class: "btn btn-sm btn-primary" %>
-    <% end %>
+      <button type="button" class="btn btn-sm btn-primary" id="customRangeApply">Aplicar</button>
+    </div>
+
+    <div class="row g-2">
+      <div class="col-6 col-md-3">
+        <select id="filterMesero" class="form-select form-select-sm">
+          <option value="">Todos los meseros</option>
+          <% @meseros.each do |m| %><option value="<%= m %>"><%= m %></option><% end %>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <select id="filterCategoria" class="form-select form-select-sm">
+          <option value="">Todas las categorías</option>
+          <% @categorias.each do |c| %><option value="<%= c %>"><%= c %></option><% end %>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <select id="filterProducto" class="form-select form-select-sm">
+          <option value="">Todos los productos</option>
+          <% @productos.each do |nombre, id| %><option value="<%= id %>"><%= nombre %></option><% end %>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <select id="filterTipoServicio" class="form-select form-select-sm">
+          <option value="">Todo servicio</option>
+          <option value="mesa">En Mesa</option>
+          <option value="llevar">Para Llevar</option>
+          <option value="domicilio">Domicilio</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <select id="filterTipoPago" class="form-select form-select-sm">
+          <option value="">Todo medio de pago</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia</option>
+        </select>
+      </div>
+    </div>
   </div>
 
-  <%# ── PERIOD LABEL ────────────────────────────────────────────────────── %>
-  <p class="text-muted mb-3" style="font-size:.82rem;">
+  <p class="text-muted mb-3" id="periodLabel" style="font-size:.82rem;min-height:1.1em;">
     <i class="bi bi-calendar3 me-1"></i>
-    Mostrando datos de: <strong><%= @period_label %></strong>
-    <% if @period == 'today' %> — <%= Time.current.strftime('%d/%m/%Y') %><% end %>
-    <% if @period == 'custom' && @from.present? && @to.present? %>
-      (<%= @from %> → <%= @to %>)
-    <% end %>
   </p>
 
   <%# ── KPI CARDS ──────────────────────────────────────────────────────── %>
-  <% kpis = @metrics[:kpis] %>
-  <div class="row g-3 mb-4">
-
-    <%# Revenue %>
-    <div class="col-6 col-xl-3">
-      <div class="rp-card d-flex align-items-center gap-3 p-3 h-100"
-           style="transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
-           onmouseout="this.style.boxShadow=''">
-        <div class="kpi-icon" style="background:#ede9fe;color:#7c3aed;">
-          <i class="bi bi-cash-stack"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="kpi-lbl">Ventas totales</div>
-          <div class="kpi-val">$<%= number_with_delimiter(sprintf('%.0f', kpis[:revenue][:value])) %></div>
-          <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
-            <% g = kpis[:revenue][:growth] %>
-            <% if g > 0 %>
-              <span class="badge bg-success-subtle text-success border border-success-subtle">▲ <%= g %>%</span>
-            <% elsif g < 0 %>
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">▼ <%= g.abs %>%</span>
-            <% elsif kpis[:revenue][:prev] > 0 %>
-              <span class="badge bg-secondary-subtle text-secondary">→ igual</span>
-            <% end %>
-            <span class="text-muted" style="font-size:.68rem;">vs anterior</span>
+  <div class="row g-3 mb-4" id="kpiCards">
+    <% 4.times do %>
+      <div class="col-6 col-xl-3">
+        <div class="rp-card d-flex align-items-center gap-3 p-3 h-100">
+          <div class="kpi-icon skel"></div>
+          <div class="min-w-0 flex-grow-1">
+            <div class="skel mb-2" style="height:9px;width:70%;"></div>
+            <div class="skel" style="height:22px;width:90%;"></div>
           </div>
         </div>
       </div>
-    </div>
+    <% end %>
+  </div>
 
-    <%# Orders %>
-    <div class="col-6 col-xl-3">
-      <div class="rp-card d-flex align-items-center gap-3 p-3 h-100"
-           style="transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
-           onmouseout="this.style.boxShadow=''">
-        <div class="kpi-icon" style="background:#dbeafe;color:#1d4ed8;">
-          <i class="bi bi-receipt"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="kpi-lbl">Pedidos</div>
-          <div class="kpi-val"><%= kpis[:orders][:value] %></div>
-          <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
-            <% g = kpis[:orders][:growth] %>
-            <% if g > 0 %>
-              <span class="badge bg-success-subtle text-success border border-success-subtle">▲ <%= g %>%</span>
-            <% elsif g < 0 %>
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">▼ <%= g.abs %>%</span>
-            <% elsif kpis[:orders][:prev] > 0 %>
-              <span class="badge bg-secondary-subtle text-secondary">→ igual</span>
-            <% end %>
-            <span class="text-muted" style="font-size:.68rem;">vs anterior</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <%# Avg Ticket %>
-    <div class="col-6 col-xl-3">
-      <div class="rp-card d-flex align-items-center gap-3 p-3 h-100"
-           style="transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
-           onmouseout="this.style.boxShadow=''">
-        <div class="kpi-icon" style="background:#fef3c7;color:#d97706;">
-          <i class="bi bi-ticket-perforated"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="kpi-lbl">Ticket promedio</div>
-          <div class="kpi-val">$<%= sprintf('%.2f', kpis[:avg_ticket][:value]) %></div>
-          <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
-            <% g = kpis[:avg_ticket][:growth] %>
-            <% if g > 0 %>
-              <span class="badge bg-success-subtle text-success border border-success-subtle">▲ <%= g %>%</span>
-            <% elsif g < 0 %>
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">▼ <%= g.abs %>%</span>
-            <% elsif kpis[:avg_ticket][:prev] > 0 %>
-              <span class="badge bg-secondary-subtle text-secondary">→ igual</span>
-            <% end %>
-            <span class="text-muted" style="font-size:.68rem;">vs anterior</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <%# Items Sold %>
-    <div class="col-6 col-xl-3">
-      <div class="rp-card d-flex align-items-center gap-3 p-3 h-100"
-           style="transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
-           onmouseout="this.style.boxShadow=''">
-        <div class="kpi-icon" style="background:#dcfce7;color:#16a34a;">
-          <i class="bi bi-bag-check"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="kpi-lbl">Ítems vendidos</div>
-          <div class="kpi-val"><%= kpis[:items_sold][:value] %></div>
-          <div class="mt-1">
-            <span class="text-muted" style="font-size:.72rem;">unidades totales</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><%# /KPI row %>
-
-  <%# ── CHART ROW 1: Trend + Category ─────────────────────────────────── %>
+  <%# ── TREND + TOP PRODUCTS ───────────────────────────────────────────── %>
   <div class="row g-3 mb-3">
-
     <div class="col-lg-8">
       <div class="rp-card h-100">
-        <div class="rp-card-hd d-flex justify-content-between align-items-center">
+        <div class="rp-card-hd d-flex justify-content-between align-items-center flex-wrap gap-2">
           <div>
             <div class="sec-lbl">Tendencia</div>
             <strong style="color:#1e293b;">Evolución de ventas</strong>
           </div>
-          <span class="badge bg-light text-secondary border" style="font-size:.72rem;">
-            <%= @period_label %>
-          </span>
+          <div class="btn-group btn-group-sm" id="granularityToggle" role="group">
+            <button type="button" class="btn btn-outline-secondary active" data-granularity="day">Día</button>
+            <button type="button" class="btn btn-outline-secondary" data-granularity="week">Semana</button>
+            <button type="button" class="btn btn-outline-secondary" data-granularity="month">Mes</button>
+          </div>
         </div>
         <div class="rp-card-bd">
-          <div style="height:245px;position:relative;">
+          <div style="height:260px;position:relative;">
             <canvas id="trendChart"></canvas>
           </div>
         </div>
@@ -213,489 +181,135 @@
     <div class="col-lg-4">
       <div class="rp-card h-100">
         <div class="rp-card-hd">
-          <div class="sec-lbl">Distribución</div>
-          <strong style="color:#1e293b;">Ventas por categoría</strong>
-        </div>
-        <div class="rp-card-bd d-flex flex-column align-items-center">
-          <div style="height:190px;width:190px;position:relative;">
-            <canvas id="categoryChart"></canvas>
-          </div>
-          <div id="categoryLegend" class="mt-2 w-100" style="font-size:.78rem;"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <%# ── CHART ROW 2: Hour + DOW ─────────────────────────────────────────── %>
-  <div class="row g-3 mb-3">
-
-    <div class="col-md-6">
-      <div class="rp-card">
-        <div class="rp-card-hd">
-          <div class="sec-lbl">Distribución horaria</div>
-          <strong style="color:#1e293b;">Ventas por hora del día</strong>
+          <div class="sec-lbl">Ranking</div>
+          <strong style="color:#1e293b;">Top productos</strong>
         </div>
         <div class="rp-card-bd">
-          <div style="height:215px;position:relative;">
-            <canvas id="hourChart"></canvas>
+          <div style="height:260px;position:relative;">
+            <canvas id="topProductsChart"></canvas>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="col-md-6">
-      <div class="rp-card">
-        <div class="rp-card-hd">
-          <div class="sec-lbl">Patrón semanal · últimas 8 semanas</div>
-          <strong style="color:#1e293b;">Ventas por día de la semana</strong>
-        </div>
-        <div class="rp-card-bd">
-          <div style="height:215px;position:relative;">
-            <canvas id="dowChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
-  <%# ── TABLES ROW ──────────────────────────────────────────────────────── %>
+  <%# ── HEATMAP ─────────────────────────────────────────────────────────── %>
   <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="rp-card">
+        <div class="rp-card-hd">
+          <div class="sec-lbl">Patrones</div>
+          <strong style="color:#1e293b;">Mapa de calor: día de la semana × hora</strong>
+        </div>
+        <div class="rp-card-bd">
+          <div id="heatmapContainer" class="heatmap-scroll">
+            <div class="skel" style="height:210px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <%# Top Products %>
+  <%# ── SELLERS + SMALL CHARTS ─────────────────────────────────────────── %>
+  <div class="row g-3 mb-3">
     <div class="col-lg-7">
       <div class="rp-card h-100">
-        <div class="rp-card-hd">
-          <div class="sec-lbl">Ranking</div>
-          <strong style="color:#1e293b;">Top 10 productos</strong>
-        </div>
-        <div class="p-0">
-          <% top = @metrics[:tables][:top_products]
-             total_rev = @metrics[:kpis][:revenue][:value] %>
-          <% if top.any? %>
-            <div class="table-responsive">
-              <table class="table table-sm table-hover mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th style="width:28px;padding-left:.75rem;">#</th>
-                    <th>Producto</th>
-                    <th class="d-none d-md-table-cell text-muted" style="font-weight:500;">Cat.</th>
-                    <th class="text-end">Cant.</th>
-                    <th class="text-end">Ventas</th>
-                    <th class="text-end d-none d-sm-table-cell" style="min-width:80px;">% del total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% top.each_with_index do |p, i| %>
-                    <tr>
-                      <td style="padding-left:.75rem;">
-                        <% case i
-                           when 0 then %><span>🥇</span><%
-                           when 1 then %><span>🥈</span><%
-                           when 2 then %><span>🥉</span><%
-                           else %><span class="text-muted small fw-bold"><%= i + 1 %></span><% end %>
-                      </td>
-                      <td class="fw-semibold" style="color:#0f172a;"><%= p[:nombre] %></td>
-                      <td class="d-none d-md-table-cell">
-                        <span class="badge bg-light text-secondary border" style="font-size:.7rem;">
-                          <%= p[:categoria] %>
-                        </span>
-                      </td>
-                      <td class="text-end text-muted"><%= p[:cantidad] %></td>
-                      <td class="text-end fw-bold">$<%= sprintf('%.2f', p[:revenue]) %></td>
-                      <td class="text-end d-none d-sm-table-cell">
-                        <% pct = total_rev > 0 ? (p[:revenue] / total_rev * 100).round(1) : 0 %>
-                        <div class="d-flex align-items-center justify-content-end gap-1">
-                          <div class="progress" style="width:42px;height:5px;border-radius:3px;">
-                            <div class="progress-bar" style="width:<%= [pct, 100].min %>%;background:#6366f1;"></div>
-                          </div>
-                          <span class="text-muted" style="font-size:.72rem;"><%= pct %>%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          <% else %>
-            <div class="text-center py-5 text-muted">
-              <i class="bi bi-inbox fs-3 d-block mb-2" style="opacity:.4;"></i>
-              Sin datos para este período
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </div>
-
-    <%# Right col: Mesero + small charts %>
-    <div class="col-lg-5 d-flex flex-column gap-3">
-
-      <%# Por Mesero %>
-      <div class="rp-card flex-grow-1">
         <div class="rp-card-hd">
           <div class="sec-lbl">Performance</div>
           <strong style="color:#1e293b;">Por mesero</strong>
         </div>
         <div class="p-0">
-          <% meseros = @metrics[:tables][:by_mesero] %>
-          <% if meseros.any? %>
-            <div class="table-responsive">
-              <table class="table table-sm table-hover mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Mesero</th>
-                    <th class="text-end">Pedidos</th>
-                    <th class="text-end">Ventas</th>
-                    <th class="text-end d-none d-sm-table-cell">Prom.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% meseros.each do |m| %>
-                    <tr>
-                      <td>
-                        <span class="badge rounded-circle text-white me-1"
-                              style="width:22px;height:22px;font-size:.62rem;background:#6366f1;
-                                     display:inline-flex;align-items:center;justify-content:center;">
-                          <%= m[:mesero].to_s[0].upcase %>
-                        </span>
-                        <span class="fw-semibold"><%= m[:mesero] %></span>
-                      </td>
-                      <td class="text-end text-muted"><%= m[:orders] %></td>
-                      <td class="text-end fw-bold">$<%= sprintf('%.2f', m[:revenue]) %></td>
-                      <td class="text-end text-muted small d-none d-sm-table-cell">
-                        $<%= sprintf('%.2f', m[:avg]) %>
-                      </td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          <% else %>
-            <p class="text-muted text-center py-4 mb-0 small">Sin datos</p>
-          <% end %>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Mesero</th>
+                  <th class="text-end">Pedidos</th>
+                  <th class="text-end">Ventas</th>
+                  <th class="text-end d-none d-sm-table-cell">Prom.</th>
+                </tr>
+              </thead>
+              <tbody id="sellersTableBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
+    </div>
 
-      <%# Servicio + Pago small doughnuts %>
+    <div class="col-lg-5">
       <div class="row g-2">
         <div class="col-6">
-          <div class="rp-card p-3" style="height:155px;">
-            <div class="sec-lbl mb-1">Tipo de servicio</div>
-            <div style="height:110px;position:relative;">
-              <canvas id="servicioChart"></canvas>
-            </div>
+          <div class="rp-card p-3" style="height:175px;">
+            <div class="sec-lbl mb-1">Categoría</div>
+            <div style="height:130px;position:relative;"><canvas id="categoryChart"></canvas></div>
           </div>
         </div>
         <div class="col-6">
-          <div class="rp-card p-3" style="height:155px;">
+          <div class="rp-card p-3" style="height:175px;">
+            <div class="sec-lbl mb-1">Servicio</div>
+            <div style="height:130px;position:relative;"><canvas id="servicioChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-2 mt-0">
+        <div class="col-12">
+          <div class="rp-card p-3" style="height:150px;">
             <div class="sec-lbl mb-1">Método de pago</div>
-            <div style="height:110px;position:relative;">
-              <canvas id="pagoChart"></canvas>
-            </div>
+            <div style="height:105px;position:relative;"><canvas id="pagoChart"></canvas></div>
           </div>
         </div>
       </div>
-
-    </div><%# /right col %>
-
-  </div><%# /tables row %>
-
-  <%# ── AI INSIGHTS ──────────────────────────────────────────────────────── %>
-  <% if @insights.any? %>
-    <div class="rp-card p-4">
-      <div class="d-flex align-items-center gap-2 mb-3">
-        <div class="kpi-icon" style="background:#f0fdf4;color:#16a34a;width:40px;height:40px;font-size:1.15rem;">
-          <i class="bi bi-lightbulb-fill"></i>
-        </div>
-        <div>
-          <div class="sec-lbl mb-0">Análisis automático</div>
-          <strong style="color:#1e293b;">Insights inteligentes</strong>
-        </div>
-        <span class="badge border bg-success-subtle text-success ms-auto" style="font-size:.75rem;">
-          <i class="bi bi-stars me-1"></i><%= @insights.size %> hallazgo<%= @insights.size != 1 ? 's' : '' %>
-        </span>
-      </div>
-      <div class="row g-2">
-        <% @insights.each do |insight| %>
-          <div class="col-md-6">
-            <div class="insight-item <%= insight[:type] %>">
-              <%= raw insight[:text] %>
-            </div>
-          </div>
-        <% end %>
-      </div>
     </div>
-  <% else %>
-    <div class="rp-card p-4 text-center text-muted">
-      <i class="bi bi-graph-up-arrow d-block fs-3 mb-2" style="opacity:.35;"></i>
-      <small>Registra ventas en este período para ver insights automáticos</small>
+  </div>
+
+  <%# ── AI INSIGHTS ────────────────────────────────────────────────────── %>
+  <div class="rp-card p-4 mb-3" id="insightsCard" style="display:none;">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="kpi-icon" style="background:#f0fdf4;color:#16a34a;width:40px;height:40px;font-size:1.15rem;">
+        <i class="bi bi-lightbulb-fill"></i>
+      </div>
+      <div>
+        <div class="sec-lbl mb-0">Análisis automático</div>
+        <strong style="color:#1e293b;">Insights inteligentes</strong>
+      </div>
+      <span class="badge border bg-success-subtle text-success ms-auto" id="insightsCount" style="font-size:.75rem;"></span>
     </div>
-  <% end %>
+    <div class="row g-2" id="insightsList"></div>
+  </div>
+
+  <%# ── DETAIL TABLE ───────────────────────────────────────────────────── %>
+  <div class="rp-card mb-4">
+    <div class="rp-card-hd d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <div class="sec-lbl">Detalle</div>
+        <strong style="color:#1e293b;">Pedidos del período</strong>
+      </div>
+      <a href="#" class="btn btn-sm btn-outline-secondary rp-csv-link" download>
+        <i class="bi bi-download me-1"></i>Exportar CSV
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>N°</th><th>Cliente</th><th>Mesero</th><th>Servicio</th>
+            <th>Pago</th><th class="text-end">Total</th><th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="detailTableBody"></tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 p-3">
+      <small class="text-muted" id="paginationSummary"></small>
+      <div class="d-flex gap-1" id="paginationControls"></div>
+    </div>
+  </div>
 
 </div><%# /container-xl %>
 </div><%# /rp-bg %>
 
-<%# ── CHART DATA (JSON) ─────────────────────────────────────────────────── %>
-<script type="application/json" id="reports-charts">
-  <%= @metrics[:charts].to_json.html_safe %>
-</script>
+<div id="reports-data" data-api-base="/api/v1/reports"></div>
 
-<%# ── CHART INITIALIZATION ─────────────────────────────────────────────── %>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const ch = JSON.parse(document.getElementById('reports-charts').textContent);
-
-  const PALETTE = [
-    '#6366f1','#3b82f6','#10b981','#f59e0b',
-    '#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16','#ec4899'
-  ];
-
-  const fmt = v => '$' + parseFloat(v).toFixed(2);
-
-  const tooltipDefaults = {
-    backgroundColor: '#1e293b',
-    titleColor: '#94a3b8',
-    bodyColor: '#f8fafc',
-    padding: 10,
-    cornerRadius: 8
-  };
-
-  const axisDefaults = {
-    x: {
-      grid: { display: false },
-      ticks: { color: '#94a3b8', font: { size: 11 }, maxTicksLimit: 12 }
-    },
-    y: {
-      grid: { color: '#f1f5f9', drawBorder: false },
-      ticks: { color: '#94a3b8', font: { size: 11 },
-               callback: v => v === 0 ? '0' : '$' + v.toLocaleString() }
-    }
-  };
-
-  // ── 1. Revenue Trend (Line) ──────────────────────────────────────────────
-  (function () {
-    const el = document.getElementById('trendChart');
-    if (!el || !ch.revenue_trend) return;
-    const ctx = el.getContext('2d');
-    const grad = ctx.createLinearGradient(0, 0, 0, 245);
-    grad.addColorStop(0, 'rgba(99,102,241,.22)');
-    grad.addColorStop(1, 'rgba(99,102,241,0)');
-    const manyLabels = ch.revenue_trend.labels.length > 28;
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ch.revenue_trend.labels,
-        datasets: [{
-          label: 'Ventas',
-          data: ch.revenue_trend.values,
-          borderColor: '#6366f1',
-          backgroundColor: grad,
-          borderWidth: 2.5,
-          fill: true,
-          tension: 0.4,
-          pointRadius: manyLabels ? 0 : 3,
-          pointHoverRadius: 7,
-          pointBackgroundColor: '#6366f1',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + fmt(c.raw) } }
-        },
-        scales: axisDefaults
-      }
-    });
-  }());
-
-  // ── 2. Category Doughnut ─────────────────────────────────────────────────
-  (function () {
-    const el = document.getElementById('categoryChart');
-    if (!el || !ch.by_category || !ch.by_category.labels.length) return;
-    new Chart(el, {
-      type: 'doughnut',
-      data: {
-        labels: ch.by_category.labels,
-        datasets: [{
-          data: ch.by_category.values,
-          backgroundColor: PALETTE,
-          borderWidth: 3,
-          borderColor: '#fff',
-          hoverBorderColor: '#fff',
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '68%',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            ...tooltipDefaults,
-            callbacks: { label: c => '  ' + c.label + ': ' + fmt(c.raw) }
-          }
-        }
-      }
-    });
-    // Custom legend
-    const leg = document.getElementById('categoryLegend');
-    if (!leg) return;
-    const total = ch.by_category.values.reduce((a, b) => a + b, 0);
-    leg.innerHTML = ch.by_category.labels.slice(0, 6).map((lbl, i) => {
-      const pct = total > 0 ? ((ch.by_category.values[i] / total) * 100).toFixed(1) : 0;
-      return `<div class="d-flex justify-content-between align-items-center mb-1">
-        <span>
-          <span style="display:inline-block;width:9px;height:9px;border-radius:2px;
-                       background:${PALETTE[i] || '#ccc'};margin-right:6px;vertical-align:middle;"></span>
-          <span style="color:#475569;">${lbl}</span>
-        </span>
-        <strong style="color:#0f172a;">${pct}%</strong>
-      </div>`;
-    }).join('');
-  }());
-
-  // ── 3. Revenue by Hour (Bar) ─────────────────────────────────────────────
-  (function () {
-    const el = document.getElementById('hourChart');
-    if (!el || !ch.revenue_by_hour) return;
-    const maxVal = Math.max(...ch.revenue_by_hour.values);
-    new Chart(el, {
-      type: 'bar',
-      data: {
-        labels: ch.revenue_by_hour.labels,
-        datasets: [{
-          label: 'Ventas',
-          data: ch.revenue_by_hour.values,
-          backgroundColor: ch.revenue_by_hour.values.map(v =>
-            v === maxVal && maxVal > 0 ? '#3b82f6' : 'rgba(59,130,246,.35)'
-          ),
-          borderRadius: 4,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + fmt(c.raw) } }
-        },
-        scales: axisDefaults
-      }
-    });
-  }());
-
-  // ── 4. Revenue by DOW (Bar) ──────────────────────────────────────────────
-  (function () {
-    const el = document.getElementById('dowChart');
-    if (!el || !ch.revenue_by_dow) return;
-    const maxVal = Math.max(...ch.revenue_by_dow.values);
-    new Chart(el, {
-      type: 'bar',
-      data: {
-        labels: ch.revenue_by_dow.labels,
-        datasets: [{
-          label: 'Ventas',
-          data: ch.revenue_by_dow.values,
-          backgroundColor: ch.revenue_by_dow.values.map(v =>
-            v === maxVal && maxVal > 0 ? '#f59e0b' : 'rgba(245,158,11,.35)'
-          ),
-          borderRadius: 5,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + fmt(c.raw) } }
-        },
-        scales: axisDefaults
-      }
-    });
-  }());
-
-  // ── 5. Servicio Doughnut (small) ─────────────────────────────────────────
-  (function () {
-    const el = document.getElementById('servicioChart');
-    if (!el || !ch.by_servicio || !ch.by_servicio.labels.length) return;
-    new Chart(el, {
-      type: 'doughnut',
-      data: {
-        labels: ch.by_servicio.labels,
-        datasets: [{
-          data: ch.by_servicio.values,
-          backgroundColor: ['#6366f1','#f59e0b','#10b981'],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '58%',
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: { font: { size: 9 }, padding: 5, boxWidth: 9, color: '#64748b' }
-          },
-          tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + c.label } }
-        }
-      }
-    });
-  }());
-
-  // ── 6. Pago Doughnut (small) ─────────────────────────────────────────────
-  (function () {
-    const el = document.getElementById('pagoChart');
-    if (!el || !ch.by_pago || !ch.by_pago.labels.length) return;
-    new Chart(el, {
-      type: 'doughnut',
-      data: {
-        labels: ch.by_pago.labels,
-        datasets: [{
-          data: ch.by_pago.values,
-          backgroundColor: ['#10b981','#3b82f6'],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '58%',
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: { font: { size: 9 }, padding: 5, boxWidth: 9, color: '#64748b' }
-          },
-          tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + c.label + ': ' + fmt(c.raw) } }
-        }
-      }
-    });
-  }());
-
-  // ── Period nav: show custom form ─────────────────────────────────────────
-  document.querySelectorAll('[data-period]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      if (this.dataset.period === 'custom') {
-        e.preventDefault();
-        const form = document.getElementById('customRangeForm');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      }
-    });
-  });
-});
+<script type="module">
+  import "reports_dashboard";
 </script>
