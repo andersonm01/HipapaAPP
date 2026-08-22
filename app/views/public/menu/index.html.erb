@@ -7,10 +7,10 @@
 <% if @productos_por_categoria.any? %>
   <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
     <button class="category-tab active shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition"
-            onclick="showCategory('all', this)">Todos</button>
+            data-category="all" onclick="showCategory('all', this)">Todos</button>
     <% @productos_por_categoria.keys.each do |cat| %>
       <button class="category-tab shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition"
-              onclick="showCategory('<%= cat.parameterize %>', this)">
+              data-category="<%= cat.parameterize %>" onclick="showCategory('<%= cat.parameterize %>', this)">
         <%= cat %>
       </button>
     <% end %>
@@ -82,7 +82,15 @@
     document.querySelectorAll('.category-section').forEach(s => {
       s.style.display = (cat === 'all' || s.dataset.category === cat) ? '' : 'none';
     });
+    history.replaceState(null, '', cat === 'all' ? location.pathname : `#${cat}`);
   };
+
+  // Deep-link: si la URL trae #categoria, abrir esa pestaña al cargar
+  const initialCategory = location.hash.replace('#', '');
+  if (initialCategory) {
+    const initialBtn = document.querySelector(`.category-tab[data-category="${initialCategory}"]`);
+    if (initialBtn) window.showCategory(initialCategory, initialBtn);
+  }
 
   // Add to cart
   document.querySelectorAll('.add-to-cart-btn').forEach(btn => {

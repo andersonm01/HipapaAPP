@@ -3,22 +3,58 @@
   <head>
     <% setting = @business %>
     <% site_name = setting&.nombre.presence || 'Nuestro Restaurante' %>
-    <% site_desc = setting&.descripcion.presence || "Comida preparada al momento, con ingredientes frescos y buena atención." %>
+    <% site_desc = setting&.descripcion.presence || "Comida preparada al momento, con ingredientes frescos y buena atención en Medellín." %>
 
-    <title><%= site_name %> — Comida que se disfruta</title>
+    <title><%= site_name %> — Hamburguesas y papas fritas en Medellín</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="<%= setting&.color_secundario || '#0f172a' %>">
     <meta name="description" content="<%= site_desc %>">
     <link rel="canonical" href="<%= root_url %>">
+    <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="<%= site_name %>">
-    <meta property="og:title" content="<%= site_name %>">
+    <meta property="og:title" content="<%= site_name %> — Hamburguesas y papas fritas en Medellín">
     <meta property="og:description" content="<%= site_desc %>">
     <meta property="og:url" content="<%= root_url %>">
+    <meta property="og:locale" content="es_CO">
     <% if setting&.logo&.attached? %>
       <meta property="og:image" content="<%= url_for(setting.logo) %>">
+    <% end %>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= site_name %> — Hamburguesas y papas fritas en Medellín">
+    <meta name="twitter:description" content="<%= site_desc %>">
+    <% if setting&.logo&.attached? %>
+      <meta name="twitter:image" content="<%= url_for(setting.logo) %>">
+    <% end %>
+
+    <!-- Datos estructurados (Schema.org Restaurant) -->
+    <% if setting&.direccion.present? %>
+      <script type="application/ld+json">
+        <%= {
+          "@context" => "https://schema.org",
+          "@type" => "Restaurant",
+          "name" => site_name,
+          "image" => (setting.logo.attached? ? url_for(setting.logo) : nil),
+          "description" => site_desc,
+          "servesCuisine" => "Comida rápida",
+          "priceRange" => "$$",
+          "telephone" => setting.telefono.presence,
+          "address" => {
+            "@type" => "PostalAddress",
+            "streetAddress" => setting.direccion,
+            "addressLocality" => "Medellín",
+            "addressRegion" => "Antioquia",
+            "addressCountry" => "CO"
+          },
+          "url" => root_url,
+          "menu" => public_menu_url,
+          "acceptsReservations" => "False"
+        }.compact.to_json.html_safe %>
+      </script>
     <% end %>
 
     <%= csrf_meta_tags %>

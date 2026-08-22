@@ -6,8 +6,8 @@
 %>
 <section class="landing-hero" id="top"<%= " style=\"#{hero_style}\"".html_safe if hero_style %>>
   <div class="landing-container landing-hero-inner">
-    <p class="landing-hero-kicker" data-reveal>Bienvenido a</p>
-    <h1 class="landing-title" data-reveal>Sabores que se sienten,<br>momentos que se comparten</h1>
+    <p class="landing-hero-kicker" data-reveal>Bienvenido a <%= @business.nombre %></p>
+    <h1 class="landing-title" data-reveal>Hamburguesas y papas fritas<br>en Medellín</h1>
     <p class="landing-subtitle" data-reveal><%= hero_subtitle %></p>
 
     <div class="landing-cta-row" data-reveal>

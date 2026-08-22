@@ -1,1 +1,23 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+User-agent: *
+Disallow: /mostrador
+Disallow: /pedido/
+Disallow: /home
+Disallow: /orders
+Disallow: /admin
+Disallow: /login
+Disallow: /reportes
+Disallow: /cocina
+Disallow: /products
+Disallow: /customers
+Disallow: /ingredients
+Disallow: /cash_registers
+Disallow: /invoices
+Disallow: /business_settings
+Disallow: /api/
+Disallow: /printer/
+Disallow: /qz/
+Disallow: /public/pedido/
+Allow: /
+Allow: /public$
+
+Sitemap: https://hipapa.site/sitemap.xml

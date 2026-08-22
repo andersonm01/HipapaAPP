@@ -47,7 +47,7 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = true
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
@@ -55,6 +55,10 @@ Rails.application.configure do
 
   # Host Authorization - allow Railway domain
   config.hosts << "hipapaapp-production-c846.up.railway.app"
+
+  # Dominio propio (SEO — ver auditoría 2026-08-22)
+  config.hosts << "hipapa.site"
+  config.hosts << "www.hipapa.site"
 
   # Also allow localhost for internal health checks
   config.hosts << "localhost"
