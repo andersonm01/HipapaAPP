@@ -3,15 +3,15 @@ namespace :db do
   task clean_sales: :environment do
     puts "🗑️  Limpiando datos de prueba..."
     
-    # Delete in correct order (foreign keys)
+    # Delete in correct order (foreign keys: Invoices -> Orders)
     OrderItem.delete_all
     puts "✓ Orden Items eliminados"
     
-    Order.delete_all
-    puts "✓ Órdenes eliminadas"
-    
     Invoice.delete_all
     puts "✓ Facturas eliminadas"
+    
+    Order.delete_all
+    puts "✓ Órdenes eliminadas"
     
     CashMovement.delete_all
     puts "✓ Movimientos de caja eliminados"
