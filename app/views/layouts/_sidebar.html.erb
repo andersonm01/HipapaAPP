@@ -31,6 +31,22 @@
     </div>
 
     <nav class="sidebar-nav" aria-label="Navegación principal">
+      <% if current_user&.admin? %>
+        <div class="sidebar-store-toggle">
+          <div class="sidebar-store-toggle-label">
+            <span class="sidebar-store-dot <%= 'is-on' if business_setting&.activo? %>"></span>
+            <span class="sidebar-link-label">Tienda <%= business_setting&.activo? ? 'encendida' : 'apagada' %></span>
+          </div>
+          <%= button_to "", toggle_active_business_settings_path,
+                method: :patch,
+                data: { turbo: false },
+                form_class: "sidebar-store-switch-form",
+                class: "sidebar-store-switch #{'is-on' if business_setting&.activo?}",
+                title: business_setting&.activo? ? "Apagar tienda" : "Encender tienda",
+                aria: { pressed: business_setting&.activo?.to_s, label: "Encender o apagar la tienda online" } %>
+        </div>
+        <div class="sidebar-section-gap"></div>
+      <% end %>
       <% sidebar_sections.each do |section| %>
         <% next if section.key?(:visible) && !section[:visible] %>
 
