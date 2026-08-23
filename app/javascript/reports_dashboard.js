@@ -22,11 +22,25 @@ let currentGranularity = 'day';
 // Turbo reemplaza el <body> completo en cada navegación dentro de la app
 // (nodos nuevos, sin listeners previos), así que re-inicializar en cada
 // turbo:load es seguro y necesario — no hace falta un guard "ya inicializado".
-document.addEventListener('turbo:load', initReportsDashboard);
+document.addEventListener('turbo:load', () => {
+  if (!document.getElementById('kpiCards')) return; // esta página no es /reportes
+  waitForChart(initReportsDashboard);
+});
+
+// Chart.js se carga vía <script src> dentro de la vista de /reportes (no del
+// <head> del layout). En un reload normal el navegador bloquea el parseo y
+// ya está listo para cuando corre este módulo, pero en una navegación Turbo
+// ese script se inserta de forma asíncrona: turbo:load puede disparar antes
+// de que "Chart" exista, rompiendo todos los renders con Chart.js. Por eso
+// esperamos explícitamente a que termine de cargar.
+function waitForChart(cb) {
+  if (window.Chart) { cb(); return; }
+  const script = document.querySelector('script[src*="chart.js"]');
+  if (!script) { cb(); return; }
+  script.addEventListener('load', cb, { once: true });
+}
 
 function initReportsDashboard() {
-  if (!document.getElementById('kpiCards')) return; // esta página no es /reportes
-
   currentGranularity = 'day';
   initGranularityToggle(granularity => {
     currentGranularity = granularity;
