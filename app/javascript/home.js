@@ -382,6 +382,19 @@ function initHome() {
     }
   }
 
+  // Reimprimir comanda: reutiliza printComanda con los items ya guardados
+  // en el pedido (no los recién agregados en selectedProducts).
+  const reprintComandaBtn = document.getElementById('reprintComandaBtn');
+  if (reprintComandaBtn && !reprintComandaBtn.dataset.hipapaBound) {
+    reprintComandaBtn.dataset.hipapaBound = '1';
+    reprintComandaBtn.addEventListener('click', function() {
+      reprintComandaBtn.disabled = true;
+      printComanda(orderData.items || [], null, function() {
+        reprintComandaBtn.disabled = false;
+      });
+    });
+  }
+
   // Adjunta los productos seleccionados como campos hidden order_items[i][...]
   // a un formulario, para que viajen junto con el resto de sus campos.
   function appendOrderItemInputs(form, items) {
