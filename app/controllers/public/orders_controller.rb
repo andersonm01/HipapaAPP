@@ -9,6 +9,15 @@ class Public::OrdersController < ApplicationController
       redirect_to(public_menu_path) and return
     end
 
+    missing = []
+    missing << "nombre"    if params[:nombre].to_s.strip.blank?
+    missing << "WhatsApp"  if params[:whatsapp].to_s.strip.blank?
+    missing << "dirección" if params[:tipo_servicio] == 'domicilio' && params[:direccion].to_s.strip.blank?
+    if missing.any?
+      flash[:alert] = "Completá todos los campos del formulario (falta: #{missing.join(', ')})."
+      redirect_to(public_menu_path) and return
+    end
+
     items_raw = JSON.parse(params[:cart_items] || '[]')
 
     ActiveRecord::Base.transaction do
