@@ -28,6 +28,9 @@ function tone(ctx, freq, startOffset, duration, peakGain) {
   osc.stop(now + duration + 0.05);
 }
 
+// Duración de las 3 notas una vez que arrancan a sonar.
+const TONES_DURATION_MS = 800;
+
 function playTones(ctx) {
   tone(ctx, 880,  0,    0.18, 0.3);  // La5
   tone(ctx, 1175, 0.16, 0.28, 0.3);  // Re6
@@ -59,43 +62,65 @@ export function flushChimeLog() {
   } catch (e) { /* noop */ }
 }
 
-// Duración total aproximada del timbre, en ms — quien llame a
-// playNewWebOrderChime() puede esperar este tiempo antes de recargar la
-// página para no cortar el sonido a mitad.
-export const NEW_WEB_ORDER_CHIME_MS = 850;
-
+// Reproduce el timbre y devuelve una Promise que resuelve recién cuando
+// terminó de sonar (o cuando queda claro que no va a sonar). Quien llama
+// debe esperar esta promise antes de recargar la página — NO usar un
+// setTimeout con un valor fijo: cuando el AudioContext arranca en
+// "suspended" (primer pedido después de cargar la página, antes de que el
+// usuario interactúe), resume() es asíncrono y puede tardar más de lo que
+// tarda el propio timbre en sonar. Un delay fijo corto puede recargar la
+// página ANTES de que resume() siquiera resuelva, matando el timbre por
+// completo sin que suene una sola nota (fue exactamente lo que pasó: el log
+// mostraba ctx.state=suspended → resume() resolvió recién después de que
+// el timeout fijo de recarga ya había disparado location.reload()).
 export function playNewWebOrderChime() {
-  try {
-    const ctx = getContext();
-    if (!ctx) {
-      persistLog('Web Audio no disponible en este navegador (AudioContext undefined).');
-      return;
+  return new Promise((resolve) => {
+    // Tope de seguridad: si algo se cuelga (resume() que nunca resuelve),
+    // no bloqueamos la recarga para siempre.
+    const safety = setTimeout(resolve, 3000);
+    const done = () => { clearTimeout(safety); resolve(); };
+
+    try {
+      const ctx = getContext();
+      if (!ctx) {
+        persistLog('Web Audio no disponible en este navegador (AudioContext undefined).');
+        done();
+        return;
+      }
+
+      persistLog('playNewWebOrderChime() llamado, ctx.state=' + ctx.state);
+
+      const playAndWait = () => {
+        playTones(ctx);
+        setTimeout(done, TONES_DURATION_MS);
+      };
+
+      if (ctx.state === 'suspended') {
+        // Los navegadores solo permiten sacar un AudioContext de "suspended"
+        // como resultado directo de un gesto del usuario. Si nadie
+        // interactuó con la página todavía, este resume() no va a
+        // desbloquear nada y el timbre queda mudo — pero igual esperamos
+        // su resolución antes de dar por terminado.
+        ctx.resume().then(() => {
+          persistLog('resume() resolvió, ctx.state=' + ctx.state);
+          if (ctx.state === 'running') playAndWait();
+          else done();
+        }).catch((e) => { persistLog('resume() falló: ' + e); done(); });
+        return;
+      }
+
+      playAndWait();
+    } catch (e) {
+      persistLog('Excepción al reproducir: ' + e);
+      console.warn('No se pudo reproducir el sonido de pedido nuevo:', e);
+      done();
     }
-
-    persistLog('playNewWebOrderChime() llamado, ctx.state=' + ctx.state);
-
-    if (ctx.state === 'suspended') {
-      // Los navegadores solo permiten sacar un AudioContext de "suspended"
-      // como resultado directo de un gesto del usuario (click, tecla, touch).
-      // Si nadie interactuó con la página todavía, este resume() no va a
-      // desbloquear nada y el timbre queda mudo.
-      ctx.resume().then(() => {
-        persistLog('resume() resolvió, ctx.state=' + ctx.state);
-        if (ctx.state === 'running') playTones(ctx);
-      }).catch((e) => persistLog('resume() falló: ' + e));
-      return;
-    }
-
-    playTones(ctx);
-  } catch (e) {
-    persistLog('Excepción al reproducir: ' + e);
-    console.warn('No se pudo reproducir el sonido de pedido nuevo:', e);
-  }
+  });
 }
 
 // Desbloquea el AudioContext en la primera interacción del usuario con la
-// página (click, tecla o touch) para que playNewWebOrderChime() pueda sonar
-// más tarde sin gesto adicional cuando llegue el evento por ActionCable.
+// página (click, tecla o touch) para que playNewWebOrderChime() no tenga
+// que esperar a resume() cuando llegue el evento real por ActionCable.
 // Además del resume(), reproduce un tono realmente inaudible (ganancia ~0)
 // DENTRO del mismo gesto — en iOS/Safari, resume() solo no siempre alcanza;
 // hace falta arrancar al menos un nodo de audio en el gesto mismo para que

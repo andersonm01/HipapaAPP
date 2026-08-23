@@ -1,6 +1,6 @@
 // Home page JavaScript functionality
 import { SAUCES } from "sauces"
-import { playNewWebOrderChime, unlockAudioOnFirstInteraction, flushChimeLog, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
+import { playNewWebOrderChime, unlockAudioOnFirstInteraction, flushChimeLog } from "notification_sound"
 
 flushChimeLog()
 unlockAudioOnFirstInteraction()
@@ -661,10 +661,11 @@ function initHome() {
         } else if (data.type === "new_web_order") {
           // Pedido nuevo desde el módulo público (pedidos online): sonido de
           // aviso y luego recargar para que aparezca en "En Curso". Se espera
-          // a que termine el timbre porque location.reload() corta cualquier
-          // audio en curso al instante.
-          playNewWebOrderChime();
-          setTimeout(() => location.reload(), NEW_WEB_ORDER_CHIME_MS);
+          // a que la promise resuelva (no un delay fijo) porque, si el audio
+          // arrancó "suspended", resume() es asíncrono y puede tardar más de
+          // lo esperado — un timeout fijo puede recargar antes de que llegue
+          // a sonar una sola nota.
+          playNewWebOrderChime().finally(() => location.reload());
         }
       }
     });
