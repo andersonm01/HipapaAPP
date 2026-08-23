@@ -36,8 +36,8 @@
     </div>
 
     <div class="card-body">
-      <dl class="grid grid-cols-2 gap-x-6 gap-y-4">
-        <div class="col-span-2">
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+        <div class="sm:col-span-2">
           <dt class="form-label">Descripción</dt>
           <dd class="text-slate-700 text-sm"><%= @product.descripcion.present? ? @product.descripcion : "—" %></dd>
         </div>

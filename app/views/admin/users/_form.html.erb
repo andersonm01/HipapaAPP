@@ -26,7 +26,7 @@
       <%= f.email_field :email, class: "form-input #{'border-red-400' if user.errors[:email].any?}", required: true, placeholder: "usuario@ejemplo.com" %>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <%= f.label :password, user.new_record? ? "Contraseña" : "Nueva contraseña", class: "form-label" %>
         <%= f.password_field :password, class: "form-input", autocomplete: "new-password",
@@ -42,7 +42,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <%= f.label :role, "Rol", class: "form-label" %>
         <%= f.select :role, User::ROLES.map { |r| [r.capitalize, r] },

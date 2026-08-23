@@ -171,7 +171,7 @@
 
   /* ---- Cards ---- */
   .card { background: #fff; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.07); overflow: hidden; }
-  .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+  .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
   .card-body   { padding: 1.25rem; }
   .card-footer { padding: 1rem 1.25rem; border-top: 1px solid #e2e8f0; background: #f8fafc; }
 
@@ -207,8 +207,16 @@
   .table-compact thead th { padding: 0.5rem 0.4rem; white-space: normal; }
   .table-compact tbody td { padding: 0.5rem 0.4rem; }
 
+  /* En mobile, "Servicio" y "Estado cocina" se ocultan (ver .hidden.sm\:table-cell
+     en el markup) — sin esta regla, table-layout:fixed dejaría sus % de ancho
+     como espacio vacío al final de la tabla en vez de repartirlo entre las
+     columnas visibles. */
+  @media (max-width: 639.98px) {
+    .pos-orders-table th, .pos-orders-table td { width: auto !important; }
+  }
+
   /* ---- Page layout ---- */
-  .page-header  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .page-header  { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1.5rem; }
   .page-title   { font-size: 1.25rem; font-weight: 700; color: #1e293b; letter-spacing: -0.01em; }
   .section-label { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; }
 
@@ -402,6 +410,65 @@ html.sidebar-collapsed .sidebar-collapse-btn { transform: rotate(180deg); }
 }
 .sidebar-nav::-webkit-scrollbar { width: 5px; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+/* ---- Store on/off switch (admin only) ---- */
+.sidebar-store-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+}
+.sidebar-store-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.sidebar-store-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.sidebar-store-dot.is-on {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.18);
+}
+.sidebar-store-switch-form { flex-shrink: 0; }
+.sidebar-store-switch {
+  position: relative;
+  width: 2.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,0.18);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+.sidebar-store-switch:hover { background: rgba(255,255,255,0.28); }
+.sidebar-store-switch::before {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 1rem; height: 1rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  transition: transform 0.2s ease;
+}
+.sidebar-store-switch.is-on { background: #22c55e; }
+.sidebar-store-switch.is-on:hover { background: #16a34a; }
+.sidebar-store-switch.is-on::before { transform: translateX(1rem); }
+html.sidebar-collapsed .sidebar-store-toggle { justify-content: center; gap: 0.4rem; }
 
 .sidebar-link, .sidebar-group-toggle {
   position: relative;

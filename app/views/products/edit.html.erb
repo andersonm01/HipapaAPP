@@ -30,7 +30,7 @@
             <%= f.text_area :descripcion, class: "form-textarea", rows: 3, placeholder: "Descripción opcional..." %>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <%= f.label :precio, "Precio", class: "form-label" %>
               <div class="input-group">
@@ -64,7 +64,7 @@
           </div>
 
           <!-- Posición -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="form-label">Posición visual</label>
               <%= f.number_field :posicion, class: "form-input", min: 0 %>

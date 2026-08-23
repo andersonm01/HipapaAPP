@@ -21,9 +21,9 @@
           <tr>
             <th>Foto</th>
             <th>Nombre</th>
-            <th>Descripción</th>
+            <th class="hidden lg:table-cell">Descripción</th>
             <th>Precio</th>
-            <th>Categoría</th>
+            <th class="hidden md:table-cell">Categoría</th>
             <th>Estado</th>
             <% if current_user&.admin? || current_user&.supervisor? %>
               <th class="text-right">Acciones</th>
@@ -51,11 +51,11 @@
                   </span>
                 <% end %>
               </td>
-              <td class="text-slate-500 max-w-xs">
+              <td class="text-slate-500 max-w-xs hidden lg:table-cell">
                 <%= truncate(product.descripcion, length: 60) if product.descripcion.present? %>
               </td>
               <td class="font-semibold text-slate-800">$<%= sprintf("%.2f", product.precio) %></td>
-              <td>
+              <td class="hidden md:table-cell">
                 <span class="badge-gray"><%= product.categoria %></span>
               </td>
               <td>
