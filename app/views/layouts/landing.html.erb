@@ -3,9 +3,9 @@
   <head>
     <% setting = @business %>
     <% site_name = setting&.nombre.presence || 'Nuestro Restaurante' %>
-    <% site_desc = setting&.descripcion.presence || "Comida preparada al momento, con ingredientes frescos y buena atención en Medellín." %>
+    <% site_desc = setting&.descripcion.presence || "Papas fritas preparadas al momento, con ingredientes frescos y buena atención en Medellín." %>
 
-    <title><%= site_name %> — Hamburguesas y papas fritas en Medellín</title>
+    <title><%= site_name %> — Papas fritas en Medellín</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="<%= setting&.color_secundario || '#0f172a' %>">
     <meta name="description" content="<%= site_desc %>">
@@ -18,7 +18,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="<%= site_name %>">
-    <meta property="og:title" content="<%= site_name %> — Hamburguesas y papas fritas en Medellín">
+    <meta property="og:title" content="<%= site_name %> — Papas fritas en Medellín">
     <meta property="og:description" content="<%= site_desc %>">
     <meta property="og:url" content="<%= root_url %>">
     <meta property="og:locale" content="es_CO">
@@ -28,7 +28,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<%= site_name %> — Hamburguesas y papas fritas en Medellín">
+    <meta name="twitter:title" content="<%= site_name %> — Papas fritas en Medellín">
     <meta name="twitter:description" content="<%= site_desc %>">
     <% if setting&.logo&.attached? %>
       <meta name="twitter:image" content="<%= url_for(setting.logo) %>">
