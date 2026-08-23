@@ -1,5 +1,6 @@
 // Home page JavaScript functionality
 import { SAUCES } from "sauces"
+import { playNewWebOrderChime, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
 
 function isPapas(item) {
   return (item.category || '').toLowerCase().indexOf('papa') !== -1;
@@ -655,9 +656,12 @@ function initHome() {
           // Orden cerrada - recargar para actualizar las tablas
           location.reload();
         } else if (data.type === "new_web_order") {
-          // Pedido nuevo desde el módulo público (pedidos online): recargar
-          // para que aparezca en "En Curso" sin que haya que refrescar a mano.
-          location.reload();
+          // Pedido nuevo desde el módulo público (pedidos online): sonido de
+          // aviso y luego recargar para que aparezca en "En Curso". Se espera
+          // a que termine el timbre porque location.reload() corta cualquier
+          // audio en curso al instante.
+          playNewWebOrderChime();
+          setTimeout(() => location.reload(), NEW_WEB_ORDER_CHIME_MS);
         }
       }
     });

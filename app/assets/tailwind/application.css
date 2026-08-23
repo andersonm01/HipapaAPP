@@ -763,6 +763,12 @@ body.modal-open { overflow: hidden; }
 }
 .kitchen-card.state-critical:hover { box-shadow: 0 0 0 3px rgba(239,68,68,0.16), 0 10px 24px rgba(15,23,42,.12); }
 
+/* Pedido hecho desde la web: un outline (no box-shadow ni border) para que
+   se mantenga visible incluso cuando el timer de la card entra en
+   state-warning/state-critical, que pisan background/border por JS inline
+   (ver updateTimers() en cocina.js). */
+.kitchen-card-web { outline: 3px solid #2563eb; outline-offset: 2px; }
+
 .kitchen-card-header {
   display: flex;
   align-items: center;

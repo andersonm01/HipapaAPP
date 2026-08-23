@@ -17,7 +17,7 @@
                    else                  'badge-gray'
                    end
 %>
-<div class="kitchen-card"
+<div class="kitchen-card <%= 'kitchen-card-web' if order.canal == 'web' %>"
      data-order-id="<%= order.id %>"
      data-created-at="<%= order.created_at.iso8601 %>">
 
@@ -31,6 +31,9 @@
       <span class="badge <%= servicio_badge %>">
         <%= (order.tipo_servicio || 'mesa').upcase %>
       </span>
+      <% if order.canal == 'web' %>
+        <span class="badge badge-info" title="Pedido hecho desde la página web">🌐 WEB</span>
+      <% end %>
     </div>
     <span class="badge <%= status_badge %>"><%= status_label %></span>
   </div>

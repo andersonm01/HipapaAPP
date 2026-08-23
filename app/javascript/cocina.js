@@ -1,4 +1,5 @@
 // Monitor de Cocina — timers, alertas de color, ActionCable
+import { playNewWebOrderChime, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -102,7 +103,10 @@ function initCocina() {
 
     App.cable.subscriptions.create('OrdersChannel', {
       received: function (data) {
-        if (data.type === 'order_created' || data.type === 'order_updated' || data.type === 'new_web_order') {
+        if (data.type === 'new_web_order') {
+          playNewWebOrderChime();
+          setTimeout(function () { location.reload(); }, NEW_WEB_ORDER_CHIME_MS);
+        } else if (data.type === 'order_created' || data.type === 'order_updated') {
           location.reload();
         }
       }
