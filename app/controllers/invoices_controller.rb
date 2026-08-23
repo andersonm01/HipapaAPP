@@ -20,6 +20,6 @@ class InvoicesController < ApplicationController
   private
 
   def set_invoice
-    @invoice = Invoice.find(params[:id])
+    @invoice = Invoice.includes(:customer, order: { order_items: :product }).find(params[:id])
   end
 end

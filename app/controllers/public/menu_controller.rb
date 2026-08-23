@@ -13,7 +13,7 @@ class Public::MenuController < ApplicationController
     @business = setting
     return unless setting.activo?
 
-    productos = Product.activos.where.not(categoria: 'Domicilio').por_categoria
+    productos = Product.activos.with_attached_foto.where.not(categoria: 'Domicilio').por_categoria
     @productos_por_categoria = productos.group_by(&:categoria)
                                          .sort_by { |categoria, _| CATEGORIA_ORDEN.index(categoria) || CATEGORIA_ORDEN.size }
                                          .to_h

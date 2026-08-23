@@ -9,11 +9,13 @@ class BusinessSetting < ApplicationRecord
   validates :color_acento,     presence: true, format: { with: /\A#[0-9a-fA-F]{6}\z/, message: "debe ser un color hex válido (#rrggbb)" }
 
   def self.current
-    first_or_create!(
-      nombre:           'Hi Papa',
-      color_primario:   '#f59e0b',
-      color_secundario: '#0f172a',
-      color_acento:     '#fbbf24'
-    )
+    Rails.cache.fetch("business_setting/current", expires_in: 10.minutes) do
+      first_or_create!(
+        nombre:           'Hi Papa',
+        color_primario:   '#f59e0b',
+        color_secundario: '#0f172a',
+        color_acento:     '#fbbf24'
+      )
+    end
   end
 end

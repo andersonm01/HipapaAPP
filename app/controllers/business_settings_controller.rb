@@ -8,6 +8,7 @@ class BusinessSettingsController < ApplicationController
   def update
     @setting = BusinessSetting.current
     if @setting.update(setting_params)
+      Rails.cache.delete("business_setting/current")
       redirect_to business_settings_path, notice: "Configuración del negocio actualizada."
     else
       render :show, status: :unprocessable_entity
@@ -17,6 +18,7 @@ class BusinessSettingsController < ApplicationController
   def toggle_active
     @setting = BusinessSetting.current
     @setting.update!(activo: !@setting.activo)
+    Rails.cache.delete("business_setting/current")
     mensaje = @setting.activo? ? "La tienda está encendida: ya se pueden recibir pedidos por la web." : "La tienda está apagada: no se pueden hacer pedidos por la web."
     redirect_to business_settings_path, notice: mensaje
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_21_164555) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_23_174002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -92,6 +92,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_21_164555) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["nombre"], name: "index_customers_on_nombre"
+    t.index ["whatsapp"], name: "index_customers_on_whatsapp"
   end
 
   create_table "ingredients", force: :cascade do |t|

@@ -10,7 +10,7 @@ class Public::LandingController < ApplicationController
 
   def index
     @business = BusinessSetting.current
-    menu_productos = Product.activos.where.not(categoria: 'Domicilio')
+    menu_productos = Product.activos.with_attached_foto.where.not(categoria: 'Domicilio')
     @productos_por_categoria = menu_productos.por_categoria.group_by(&:categoria)
                                               .sort_by { |categoria, _| CATEGORIA_ORDEN.index(categoria) || CATEGORIA_ORDEN.size }
                                               .to_h

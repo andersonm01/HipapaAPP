@@ -4,6 +4,8 @@ class CashRegistersController < ApplicationController
 
   def index
     @cajas = CashRegister.includes(:user).order(created_at: :desc).limit(30)
+    @ventas_por_caja = CashMovement.where(cash_register_id: @cajas.map(&:id), tipo: 'venta')
+                                    .group(:cash_register_id).sum(:monto)
     @caja_abierta = CashRegister.caja_abierta_para(current_user)
   end
 

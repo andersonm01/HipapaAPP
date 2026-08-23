@@ -57,7 +57,7 @@
                 <td class="text-sm"><%= caja.abierta_en.strftime('%d/%m %H:%M') %></td>
                 <td class="text-sm text-gray-500"><%= caja.cerrada_en&.strftime('%d/%m %H:%M') || '—' %></td>
                 <td class="text-sm"><%= caja.user.name %></td>
-                <td class="font-semibold">$<%= number_with_precision(caja.total_ventas, precision: 0, delimiter: ',') %></td>
+                <td class="font-semibold">$<%= number_with_precision(@ventas_por_caja[caja.id] || 0, precision: 0, delimiter: ',') %></td>
                 <td class="font-semibold">$<%= number_with_precision(caja.monto_cierre || caja.balance_calculado, precision: 0, delimiter: ',') %></td>
                 <td><span class="badge <%= caja.abierta? ? 'badge-success' : 'badge-gray' %>"><%= caja.estado %></span></td>
                 <td><%= link_to "Ver", cash_register_path(caja), class: "btn-secondary btn-xs" %></td>
