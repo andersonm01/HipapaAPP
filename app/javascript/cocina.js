@@ -1,6 +1,7 @@
 // Monitor de Cocina — timers, alertas de color, ActionCable
-import { playNewWebOrderChime, unlockAudioOnFirstInteraction, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
+import { playNewWebOrderChime, unlockAudioOnFirstInteraction, flushChimeLog, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
 
+flushChimeLog()
 unlockAudioOnFirstInteraction()
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
