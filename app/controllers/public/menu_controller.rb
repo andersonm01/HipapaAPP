@@ -11,6 +11,8 @@ class Public::MenuController < ApplicationController
   def index
     setting = BusinessSetting.current
     @business = setting
+    return unless setting.activo?
+
     productos = Product.activos.where.not(categoria: 'Domicilio').por_categoria
     @productos_por_categoria = productos.group_by(&:categoria)
                                          .sort_by { |categoria, _| CATEGORIA_ORDEN.index(categoria) || CATEGORIA_ORDEN.size }

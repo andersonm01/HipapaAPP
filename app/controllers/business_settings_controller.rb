@@ -14,6 +14,13 @@ class BusinessSettingsController < ApplicationController
     end
   end
 
+  def toggle_active
+    @setting = BusinessSetting.current
+    @setting.update!(activo: !@setting.activo)
+    mensaje = @setting.activo? ? "La tienda está encendida: ya se pueden recibir pedidos por la web." : "La tienda está apagada: no se pueden hacer pedidos por la web."
+    redirect_to business_settings_path, notice: mensaje
+  end
+
   private
 
   def setting_params

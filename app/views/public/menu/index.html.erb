@@ -1,3 +1,11 @@
+<% unless @business.activo? %>
+  <div class="text-center py-16">
+    <div class="text-5xl mb-3">🚫</div>
+    <p class="font-bold text-gray-700 text-lg">La tienda no está en servicio</p>
+    <p class="text-gray-400 text-sm mt-1">En este momento no estamos recibiendo pedidos por la web. Volvé a intentarlo más tarde.</p>
+  </div>
+<% else %>
+
 <!-- Descripción del negocio -->
 <% if @business.descripcion.present? %>
   <p class="text-center text-gray-500 text-sm mb-4"><%= @business.descripcion %></p>
@@ -61,6 +69,7 @@
     <div class="text-5xl mb-3">🍟</div>
     <p>Próximamente nuestro menú estará disponible</p>
   </div>
+<% end %>
 <% end %>
 
 <%= content_for :js do %>

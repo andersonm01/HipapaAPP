@@ -4,6 +4,11 @@ class Public::OrdersController < ApplicationController
   layout 'public'
 
   def create
+    unless BusinessSetting.current.activo?
+      flash[:alert] = "La tienda no está en servicio en este momento. No es posible tomar pedidos por la web."
+      redirect_to(public_menu_path) and return
+    end
+
     items_raw = JSON.parse(params[:cart_items] || '[]')
 
     ActiveRecord::Base.transaction do

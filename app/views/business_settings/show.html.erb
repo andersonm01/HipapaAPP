@@ -2,6 +2,27 @@
   <h1 class="page-title">Configuración del Negocio</h1>
 </div>
 
+<div class="card max-w-2xl mb-4">
+  <div class="card-body flex items-center justify-between gap-4">
+    <div>
+      <p class="font-semibold text-sm">
+        Estado de la tienda online:
+        <% if @setting.activo? %>
+          <span class="text-green-600">🟢 Encendida — recibiendo pedidos por la web</span>
+        <% else %>
+          <span class="text-red-600">🔴 Apagada — la tienda no está en servicio</span>
+        <% end %>
+      </p>
+      <p class="form-hint">Apagar la tienda impide que los clientes hagan pedidos desde la página pública.</p>
+    </div>
+    <%= button_to (@setting.activo? ? "Apagar tienda" : "Encender tienda"),
+          toggle_active_business_settings_path,
+          method: :patch,
+          class: @setting.activo? ? "btn-secondary" : "btn-primary",
+          data: { turbo: false } %>
+  </div>
+</div>
+
 <div class="card max-w-2xl">
   <div class="card-body">
     <%= form_with model: @setting, url: business_settings_path, method: :patch, local: true, data: { turbo: false } do |f| %>

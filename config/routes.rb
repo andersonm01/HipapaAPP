@@ -69,7 +69,9 @@ Rails.application.routes.draw do
   end
 
   # Configuración del negocio
-  resource :business_settings, only: [:show, :update]
+  resource :business_settings, only: [:show, :update] do
+    patch :toggle_active
+  end
 
   # Módulos de reportes y cocina
   get "reportes", to: "reports#index", as: :reportes
