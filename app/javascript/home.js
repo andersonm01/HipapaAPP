@@ -1,6 +1,8 @@
 // Home page JavaScript functionality
 import { SAUCES } from "sauces"
-import { playNewWebOrderChime, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
+import { playNewWebOrderChime, unlockAudioOnFirstInteraction, NEW_WEB_ORDER_CHIME_MS } from "notification_sound"
+
+unlockAudioOnFirstInteraction()
 
 function isPapas(item) {
   return (item.category || '').toLowerCase().indexOf('papa') !== -1;
