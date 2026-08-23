@@ -3,11 +3,25 @@
 // depender de un asset ni de licencias — un timbre de 3 notas ascendentes.
 
 let sharedCtx = null;
+let sharedLimiter = null;
 
 function getContext() {
   const Ctx = window.AudioContext || window.webkitAudioContext;
   if (!Ctx) return null;
-  if (!sharedCtx) sharedCtx = new Ctx();
+  if (!sharedCtx) {
+    sharedCtx = new Ctx();
+    // Con más ganancia las 3 notas se pisan entre sí (empiezan antes de que
+    // termine de sonar la anterior) y eso puede saturar/distorsionar si van
+    // directo a destination — el compressor actúa de limiter para que suene
+    // más fuerte y percusivo sin recortarse feo.
+    sharedLimiter = sharedCtx.createDynamicsCompressor();
+    sharedLimiter.threshold.value = -18;
+    sharedLimiter.knee.value = 6;
+    sharedLimiter.ratio.value = 12;
+    sharedLimiter.attack.value = 0.002;
+    sharedLimiter.release.value = 0.15;
+    sharedLimiter.connect(sharedCtx.destination);
+  }
   return sharedCtx;
 }
 
@@ -16,25 +30,34 @@ function tone(ctx, freq, startOffset, duration, peakGain) {
   const gain = ctx.createGain();
   const now  = ctx.currentTime + startOffset;
 
-  osc.type = 'sine';
+  osc.type = 'triangle'; // más brillante/penetrante que sine, sin ser tan áspero como square
   osc.frequency.value = freq;
 
   gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(peakGain, now + 0.02);
+  gain.gain.linearRampToValueAtTime(peakGain, now + 0.015);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-  osc.connect(gain).connect(ctx.destination);
+  osc.connect(gain).connect(sharedLimiter);
   osc.start(now);
   osc.stop(now + duration + 0.05);
 }
 
-// Duración de las 3 notas una vez que arrancan a sonar.
-const TONES_DURATION_MS = 800;
+// Duración total una vez que arrancan a sonar las 2 repeticiones del timbre.
+const TONES_DURATION_MS = 1300;
 
+// Timbre de alarma de pedido: 3 notas ascendentes, repetidas dos veces
+// (como un "ding-ding" doble) y bastante más fuerte que la versión inicial
+// — el usuario reportó que la primera versión era "muy suave" para el
+// ambiente de un local con ruido.
 function playTones(ctx) {
-  tone(ctx, 880,  0,    0.18, 0.3);  // La5
-  tone(ctx, 1175, 0.16, 0.28, 0.3);  // Re6
-  tone(ctx, 1568, 0.34, 0.42, 0.25); // Sol6
+  const notes = [
+    [880,  0,    0.16, 0.7],  // La5
+    [1175, 0.14, 0.24, 0.7],  // Re6
+    [1568, 0.30, 0.34, 0.65], // Sol6
+  ];
+  notes.forEach(([freq, start, dur, peak]) => tone(ctx, freq, start, dur, peak));
+  const repeatOffset = 0.55;
+  notes.forEach(([freq, start, dur, peak]) => tone(ctx, freq, start + repeatOffset, dur, peak));
 }
 
 // ── Log persistido (sobrevive a location.reload(), que borra la consola) ──
