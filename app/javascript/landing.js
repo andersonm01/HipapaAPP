@@ -116,11 +116,29 @@ function initAnchorLinks() {
 }
 
 function initLanding() {
-  if (!document.querySelector('.landing-body')) return;
+  const body = document.querySelector('.landing-body');
+  if (!body) return;
+  // Guard por nodo: evita duplicar los listeners de scroll, los observers y
+  // los handlers de los tabs si initLanding() llega a correr dos veces sobre
+  // el mismo DOM. Turbo reemplaza el <body> en cada navegación, así que una
+  // landing nueva sí se inicializa.
+  if (body.dataset.landingInit === '1') return;
+  body.dataset.landingInit = '1';
+
   initLandingNavbar();
   initMenuTabs();
   initScrollReveal();
   initAnchorLinks();
 }
 
+// landing.js se importa desde un <script type="module">, que es asíncrono: en
+// la primera carga con la caché fría (por ejemplo después de un deploy, cuando
+// cambian los digests) Turbo puede renderizar y disparar turbo:load ANTES de
+// que el módulo llegue a registrar el listener de abajo, y la landing quedaba
+// sin tabs de menú ni scroll reveal hasta recargar. Si el documento ya terminó
+// de parsear cuando corre esto, hay que inicializar ahora mismo.
+// Mismo arreglo que en home.js, sidebar.js, cocina.js y reports_dashboard.js.
+if (document.readyState !== 'loading') {
+  initLanding();
+}
 document.addEventListener('turbo:load', initLanding);

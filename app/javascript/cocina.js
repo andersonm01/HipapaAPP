@@ -75,7 +75,15 @@ function updateClock() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 function initCocina() {
-  if (!document.getElementById('cocina-monitor')) return;
+  var monitor = document.getElementById('cocina-monitor');
+  if (!monitor) return;
+  // Guard por nodo: sin esto initCocina() corría dos veces en una carga normal
+  // (turbo:load + DOMContentLoaded), duplicando los setInterval y —peor— las
+  // suscripciones a CocinaChannel y OrdersChannel, con lo que el timbre del
+  // pedido web sonaba doble y los reloads se pisaban entre sí. Turbo reemplaza
+  // el <body> en cada navegación, así que un monitor nuevo sí se inicializa.
+  if (monitor.dataset.cocinaInit === '1') return;
+  monitor.dataset.cocinaInit = '1';
 
   updateTimers();
   updateClock();
@@ -116,5 +124,14 @@ function initCocina() {
   }
 }
 
-document.addEventListener('turbo:load',     initCocina);
-document.addEventListener('DOMContentLoaded', initCocina);
+// cocina.js se importa desde un <script type="module">, que es asíncrono: en la
+// primera carga con la caché fría (por ejemplo después de un deploy, cuando
+// cambian los digests) Turbo puede renderizar y disparar turbo:load ANTES de
+// que el módulo llegue a registrar el listener, y DOMContentLoaded ya habría
+// pasado también — el monitor quedaba sin timers ni ActionCable hasta recargar.
+// Si el documento ya terminó de parsear cuando corre esto, inicializamos ya.
+// Mismo arreglo que en home.js, sidebar.js y reports_dashboard.js.
+if (document.readyState !== 'loading') {
+  initCocina();
+}
+document.addEventListener('turbo:load', initCocina);
