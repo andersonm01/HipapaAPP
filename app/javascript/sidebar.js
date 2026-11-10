@@ -13,6 +13,11 @@ function readOpenGroups() {
 function initSidebar() {
   const sidebar = document.querySelector('[data-sidebar]');
   if (!sidebar) return;
+  // Guard por nodo: Turbo reemplaza el <body> en cada navegación, así que un
+  // sidebar nuevo siempre se inicializa, pero el mismo nodo nunca dos veces
+  // (enganchar los toggles dos veces los dejaría abriendo y cerrando a la vez).
+  if (sidebar.dataset.sidebarInit === '1') return;
+  sidebar.dataset.sidebarInit = '1';
 
   // ---- Collapse toggle (desktop/tablet) ----
   const collapseBtn = document.querySelector('[data-sidebar-collapse-toggle]');
@@ -84,4 +89,15 @@ function initSidebar() {
   });
 }
 
+// sidebar.js se importa desde un <script type="module"> al final del layout,
+// que es asíncrono: en la primera carga con la caché fría Turbo puede terminar
+// de renderizar y disparar "turbo:load" ANTES de que este módulo llegue a
+// registrar el listener de abajo — initSidebar() nunca corre y el menú queda
+// muerto (los grupos no abren) hasta recargar, donde el módulo ya está en
+// caché y alcanza a llegar a tiempo. Si el documento ya terminó de parsear
+// cuando corre este código, turbo:load ya pasó: hay que inicializar ahora.
+// Mismo arreglo que en home.js y reports_dashboard.js.
+if (document.readyState !== 'loading') {
+  initSidebar();
+}
 document.addEventListener('turbo:load', initSidebar);
