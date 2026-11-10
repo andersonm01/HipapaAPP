@@ -12,7 +12,7 @@ import { renderInsights } from 'reports/insights';
 import { renderOrdersTable, renderPagination, renderLoading as tableLoading } from 'reports/detail_table';
 
 const PERIOD_LABELS = {
-  today: 'Hoy', last_7_days: 'Últimos 7 días', month: 'Este mes',
+  today: 'Hoy', yesterday: 'Ayer', last_7_days: 'Últimos 7 días', month: 'Este mes',
   quarter: 'Trimestre', year: 'Este año', custom: 'Período personalizado'
 };
 
@@ -21,11 +21,25 @@ let currentGranularity = 'day';
 
 // Turbo reemplaza el <body> completo en cada navegación dentro de la app
 // (nodos nuevos, sin listeners previos), así que re-inicializar en cada
-// turbo:load es seguro y necesario — no hace falta un guard "ya inicializado".
-document.addEventListener('turbo:load', () => {
-  if (!document.getElementById('kpiCards')) return; // esta página no es /reportes
+// turbo:load es seguro: el guard de bootstrap() es por nodo, no global.
+document.addEventListener('turbo:load', bootstrap);
+
+// La PRIMERA vez que se entra a /reportes por una navegación Turbo este
+// módulo todavía no existe: Turbo inserta el <script type="module"> del final
+// de la vista DESPUÉS de renderizar y dispara turbo:load de inmediato, así que
+// el listener de arriba se registraba cuando el evento ya había pasado y el
+// dashboard quedaba vacío hasta recargar a mano. Por eso también arrancamos al
+// evaluarse el módulo; el guard por nodo evita el doble init cuando los dos
+// caminos se cruzan (en un reload normal el módulo corre antes de turbo:load).
+bootstrap();
+
+function bootstrap() {
+  const root = document.getElementById('kpiCards');
+  if (!root) return;                         // esta página no es /reportes
+  if (root.dataset.rpBooted === '1') return; // ya inicializado para este DOM
+  root.dataset.rpBooted = '1';
   waitForChart(initReportsDashboard);
-});
+}
 
 // Chart.js se carga vía <script src> dentro de la vista de /reportes (no del
 // <head> del layout). En un reload normal el navegador bloquea el parseo y

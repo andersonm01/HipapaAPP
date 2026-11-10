@@ -5,7 +5,7 @@ module Reports
   # nivel de Order (KPIs, tendencia, tabla de detalle, vendedores, heatmap)
   # como a nivel de OrderItem (top productos, ventas por categoría).
   class FilterParams
-    PRESETS = %w[today last_7_days month quarter year custom].freeze
+    PRESETS = %w[today yesterday last_7_days month quarter year custom].freeze
 
     attr_reader :from, :to, :period
 
@@ -65,6 +65,7 @@ module Reports
 
       case @period
       when 'today'       then [Time.current.beginning_of_day, Time.current.end_of_day]
+      when 'yesterday'    then [1.day.ago.beginning_of_day, 1.day.ago.end_of_day]
       when 'last_7_days'  then [6.days.ago.beginning_of_day, Time.current.end_of_day]
       when 'quarter'      then [3.months.ago.beginning_of_day, Time.current.end_of_day]
       when 'year'         then [Time.current.beginning_of_year, Time.current.end_of_year]
