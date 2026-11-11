@@ -1258,12 +1258,20 @@ html:has(.landing-body) body.no-scroll { overflow: hidden; }
 /* =============================================================
    MARQUESINA
    ============================================================= */
-.hp-marquee-wrap { position: relative; z-index: 3; overflow: hidden; }
+/* El contenedor recorta a los lados (si no, la banda inclinada y un poco más
+   ancha que la pantalla le da scroll horizontal al documento) pero necesita
+   alto de sobra: al rotar, las esquinas suben y bajan tanto como
+   ancho × sen(1.4°), y sin ese margen la banda sale cortada arriba y abajo. */
+.hp-marquee-wrap {
+  position: relative; z-index: 3; overflow: hidden;
+  padding: clamp(1.1rem, 1.7vw, 2.8rem) 0;
+  margin: calc(-1.5rem - clamp(1.1rem, 1.7vw, 2.8rem)) 0 2rem;
+}
 .hp-marquee {
   position: relative; z-index: 3; overflow: hidden;
   background: linear-gradient(90deg, var(--hp-gold), var(--hp-yellow) 50%, var(--hp-orange));
   border-top: 2px solid rgba(0, 0, 0, .12); border-bottom: 2px solid rgba(0, 0, 0, .12);
-  padding: .8rem 0; transform: rotate(-1.4deg) scale(1.03); margin: -1.5rem 0 3.5rem;
+  padding: .8rem 0; transform: rotate(-1.4deg) scale(1.03);
   box-shadow: 0 14px 40px -16px rgba(247, 181, 0, .9);
 }
 .hp-marquee-track { display: flex; width: max-content; animation: hp-marquee 28s linear infinite; }
