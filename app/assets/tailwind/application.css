@@ -1024,7 +1024,9 @@ html:has(.landing-body) body.no-scroll { overflow: hidden; }
   background: rgba(255, 255, 255, .08); transition: transform .3s cubic-bezier(.2, .8, .3, 1);
 }
 .landing-navbar-brand:hover .landing-navbar-logo { transform: rotate(-8deg) scale(1.06); }
-.landing-navbar-logo-fallback { display: flex; align-items: center; justify-content: center; font-size: 1.35rem; }
+/* La marca propia (SVG de la caja de papas) va suelta, sin recuadro ni
+   recorte: es un ícono con transparencia, no una foto subida por el negocio. */
+.landing-navbar-logo-mark { background: none; border-radius: 0; object-fit: contain; }
 .landing-navbar-name {
   font-family: var(--hp-font-display); color: #fff; font-weight: 600; font-size: 1.22rem; letter-spacing: -.01em;
 }
@@ -1721,6 +1723,7 @@ html:has(.landing-body) body.no-scroll { overflow: hidden; }
 }
 .landing-footer-brand-row { display: flex; align-items: center; gap: .7rem; margin-bottom: .9rem; }
 .landing-footer-logo { width: 2.8rem; height: 2.8rem; border-radius: .85rem; object-fit: cover; }
+.landing-footer-logo-mark { border-radius: 0; object-fit: contain; }
 .landing-footer-name { font-family: var(--hp-font-display); color: #fff; font-weight: 600; font-size: 1.3rem; margin: 0; }
 .landing-footer-name span { color: var(--hp-gold); }
 .landing-footer-desc { font-size: .88rem; line-height: 1.65; margin: 0; max-width: 28rem; }

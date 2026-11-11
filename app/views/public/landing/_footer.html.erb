@@ -9,7 +9,8 @@
         <% if @business.logo.attached? %>
           <%= image_tag @business.logo, class: "landing-footer-logo", alt: @business.nombre, loading: "lazy" %>
         <% else %>
-          <%= image_tag "hipapa-avatar.webp", class: "landing-footer-logo", alt: "", aria: { hidden: true }, loading: "lazy" %>
+          <%= image_tag "hipapa-logo.svg", class: "landing-footer-logo landing-footer-logo-mark",
+                alt: "", aria: { hidden: true }, loading: "lazy" %>
         <% end %>
         <p class="landing-footer-name">
           <%= nombre_partes[0] %><% if nombre_partes[1] %> <span><%= nombre_partes[1] %></span><% end %>
