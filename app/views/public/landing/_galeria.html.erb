@@ -1,13 +1,20 @@
 <% if @fotos_galeria.size >= 3 %>
-  <section class="landing-container landing-galeria" data-reveal>
-    <h2 class="landing-section-title">Galería</h2>
-    <div class="landing-galeria-grid">
-      <% @fotos_galeria.each do |producto| %>
-        <div class="landing-galeria-item">
-          <%= image_tag producto.foto, class: "landing-galeria-photo", alt: producto.nombre, loading: "lazy" %>
-          <span class="landing-galeria-caption"><%= producto.nombre %></span>
-        </div>
-      <% end %>
+  <section class="hp-section hp-section-white" aria-labelledby="galeria-titulo">
+    <div class="landing-container landing-container-wide">
+      <div class="hp-section-head hp-section-head-center">
+        <span class="hp-eyebrow hp-eyebrow-center hp-eyebrow-dark" data-reveal="fade">Para abrir el apetito</span>
+        <h2 class="hp-section-title" id="galeria-titulo" data-reveal>Así se ven</h2>
+      </div>
+
+      <div class="landing-galeria-grid">
+        <% @fotos_galeria.each_with_index do |producto, index| %>
+          <figure class="landing-galeria-item" data-reveal="zoom" data-reveal-delay="<%= (index % 4) * 80 %>">
+            <%= image_tag producto.foto, class: "landing-galeria-photo",
+                  alt: producto.nombre, loading: "lazy", decoding: "async" %>
+            <figcaption class="landing-galeria-caption"><%= producto.nombre %></figcaption>
+          </figure>
+        <% end %>
+      </div>
     </div>
   </section>
 <% end %>

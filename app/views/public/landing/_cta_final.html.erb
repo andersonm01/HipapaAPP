@@ -1,9 +1,20 @@
-<section class="landing-cta-final" data-reveal>
+<section class="landing-cta-final" aria-labelledby="cta-final-titulo">
+  <%= image_tag "hipapa-mascota-saludo.webp", class: "hp-cta-mascota",
+        alt: "", aria: { hidden: true }, loading: "lazy", decoding: "async" %>
+
   <div class="landing-container landing-cta-final-inner">
-    <h2 class="landing-cta-final-title">Tu próxima experiencia gastronómica comienza aquí</h2>
-    <div class="landing-cta-row">
-      <%= link_to "Ver menú", "#menu", class: "landing-btn landing-btn-primary" %>
-      <%= link_to "Ordenar ahora", public_menu_path, class: "landing-btn landing-btn-ghost" %>
+    <span class="hp-eyebrow" data-reveal="fade">¿Listo?</span>
+    <h2 class="landing-cta-final-title" id="cta-final-titulo" data-reveal>
+      El antojo no se aguanta
+    </h2>
+    <p class="landing-cta-final-text" data-reveal data-reveal-delay="100">
+      Arma tu pedido en un minuto y te avisamos apenas esté listo.
+    </p>
+    <div class="hp-cta-row hp-cta-row-center" data-reveal data-reveal-delay="180">
+      <%= link_to public_menu_path, class: "hp-btn hp-btn-dark hp-btn-lg" do %>
+        Pedir ahora <span class="hp-btn-icon" aria-hidden="true">→</span>
+      <% end %>
+      <%= link_to "Ver el menú", "#menu", class: "hp-btn hp-btn-outline hp-btn-lg" %>
     </div>
   </div>
 </section>

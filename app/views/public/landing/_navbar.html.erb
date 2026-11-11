@@ -1,28 +1,47 @@
+<%
+  nombre_partes = @business.nombre.to_s.strip.split(/\s+/, 2)
+  wa_url = hp_whatsapp_url(@business.whatsapp_negocio, "¡Hola #{@business.nombre}! Quiero hacer un pedido 🍟")
+%>
+<div class="hp-progress" data-scroll-progress aria-hidden="true"></div>
+
 <header class="landing-navbar" data-landing-navbar>
   <nav class="landing-navbar-inner" aria-label="Navegación principal">
-    <%= link_to root_path, class: "landing-navbar-brand" do %>
+    <%= link_to root_path, class: "landing-navbar-brand", "aria-label": "Inicio — #{@business.nombre}" do %>
       <% if @business.logo.attached? %>
-        <%= image_tag @business.logo, class: "landing-navbar-logo" %>
+        <%= image_tag @business.logo, class: "landing-navbar-logo", alt: @business.nombre %>
       <% else %>
-        <span class="landing-navbar-logo landing-navbar-logo-fallback">🍟</span>
+        <%= image_tag "hipapa-avatar.webp", class: "landing-navbar-logo", alt: "", aria: { hidden: true } %>
       <% end %>
-      <span class="landing-navbar-name"><%= @business.nombre %></span>
+      <span class="landing-navbar-name">
+        <%= nombre_partes[0] %><% if nombre_partes[1] %> <span><%= nombre_partes[1] %></span><% end %>
+      </span>
     <% end %>
 
-    <button type="button" class="landing-navbar-toggle" data-landing-nav-toggle aria-label="Abrir menú" aria-expanded="false">
+    <button type="button" class="landing-navbar-toggle" data-landing-nav-toggle
+            aria-label="Abrir menú" aria-expanded="false" aria-controls="landing-nav-panel">
       <span></span><span></span><span></span>
     </button>
 
-    <div class="landing-navbar-links" data-landing-nav-panel>
-      <%= link_to "Inicio",   root_path,   class: "landing-navbar-link" %>
-      <%= link_to "Menú",     "#menu",     class: "landing-navbar-link" %>
-      <%= link_to "Nosotros", "#nosotros", class: "landing-navbar-link" %>
-      <%= link_to "Contacto", "#contacto", class: "landing-navbar-link" %>
+    <div class="landing-navbar-links" id="landing-nav-panel" data-landing-nav-panel>
+      <%= link_to "Inicio",   "#top",      class: "landing-navbar-link", data: { nav_link: "top" } %>
+      <%= link_to "Menú",     "#menu",     class: "landing-navbar-link", data: { nav_link: "menu" } %>
+      <%= link_to "Nosotros", "#nosotros", class: "landing-navbar-link", data: { nav_link: "nosotros" } %>
+      <%= link_to "Contacto", "#contacto", class: "landing-navbar-link", data: { nav_link: "contacto" } %>
 
       <div class="landing-navbar-actions">
-        <%= link_to "Ordenar ahora", public_menu_path, class: "landing-btn landing-btn-primary landing-btn-sm" %>
+        <%= link_to public_menu_path, class: "hp-btn hp-btn-primary hp-btn-sm" do %>
+          Ordenar ahora <span class="hp-btn-icon" aria-hidden="true">→</span>
+        <% end %>
       </div>
     </div>
   </nav>
 </header>
 <div class="landing-navbar-overlay" data-landing-nav-overlay></div>
+
+<% if wa_url %>
+  <a href="<%= wa_url %>" class="hp-wa-fab" data-wa-fab target="_blank" rel="noopener"
+     aria-label="Escribirnos por WhatsApp">
+    <span class="hp-wa-fab-icon" aria-hidden="true">💬</span>
+    <span>Pedir por WhatsApp</span>
+  </a>
+<% end %>

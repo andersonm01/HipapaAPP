@@ -1,0 +1,21 @@
+<%
+  frases = ["El sabor de la casa", "Papas con todo", @business.nombre, "Recién hechas",
+            "Hecho en Medellín", "Para comer con la mano"]
+%>
+<%# El contenedor recorta: la banda va rotada y un poco más ancha que la
+    pantalla, y sin este recorte el documento gana scroll horizontal. %>
+<div class="hp-marquee-wrap" aria-hidden="true">
+<div class="hp-marquee">
+  <%# Dos grupos idénticos: la animación recorre -50% y el bucle queda sin salto. %>
+  <div class="hp-marquee-track">
+    <% 2.times do %>
+      <div class="hp-marquee-group">
+        <% frases.each do |frase| %>
+          <span class="hp-marquee-item"><%= frase %></span>
+          <span class="hp-marquee-sep">🍟</span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+</div>

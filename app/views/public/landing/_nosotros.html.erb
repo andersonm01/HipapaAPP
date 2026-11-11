@@ -1,28 +1,57 @@
 <%
-  historia = @business.historia.presence || @business.descripcion.presence ||
-    "#{@business.nombre} nació con una idea simple: servir comida honesta, preparada al momento, " \
-    "para que cada visita se sienta como la primera. Este texto es provisional — reemplázalo desde " \
-    "Negocio → Configuración → Nuestra historia en el panel de administración."
-  foto_producto = Product.activos.where(categoria: 'Papas').with_attached_foto.to_a.find { |p| p.foto.attached? } unless @business.foto_nosotros.attached?
+  # Solo la historia configurada en el panel. La descripción corta NO sirve de
+  # relleno acá: ya se usa en el hero y dejaría la sección en una sola línea.
+  historia = @business.historia.presence
+  foto_producto = unless @business.foto_nosotros.attached?
+    Product.activos.where(categoria: 'Papas').with_attached_foto.to_a.find { |p| p.foto.attached? }
+  end
 %>
-<section class="landing-nosotros" id="nosotros">
-  <div class="landing-container landing-nosotros-grid">
+<section class="hp-section landing-nosotros" id="nosotros" aria-labelledby="nosotros-titulo">
+  <div class="landing-container landing-container-wide landing-nosotros-grid">
     <div class="landing-nosotros-copy">
-      <span class="landing-eyebrow" data-reveal>Nuestra historia</span>
-      <h2 class="landing-section-title landing-section-title-left" data-reveal>Sobre <%= @business.nombre %></h2>
-      <p class="landing-nosotros-text" data-reveal><%= historia %></p>
+      <span class="hp-eyebrow hp-eyebrow-dark" data-reveal="fade">Nuestra historia</span>
+      <h2 class="hp-section-title" id="nosotros-titulo" data-reveal>
+        Así se come en <%= @business.nombre %>
+      </h2>
+
+      <p class="hp-nosotros-claim" data-reveal data-reveal-delay="80">
+        “El sabor de <em>la casa</em>”
+      </p>
+
+      <p class="landing-nosotros-text" data-reveal data-reveal-delay="150">
+        <% if historia %>
+          <%= historia %>
+        <% else %>
+          Cocinamos como en casa: porciones generosas, papas bien crocantes y ese toque de salsa
+          que no se negocia. Cada pedido se arma en el momento, con lo que tenemos fresco ese día,
+          y sale del mostrador caliente — como debe ser.
+        <% end %>
+      </p>
+
+      <ul class="hp-nosotros-points" data-reveal data-reveal-delay="220">
+        <li class="hp-nosotros-point">Porciones pensadas para compartir… aunque casi nunca se comparten.</li>
+        <li class="hp-nosotros-point">Fritas al momento, nunca recalentadas.</li>
+        <li class="hp-nosotros-point">Atención de barrio: aquí te conocemos por el nombre.</li>
+      </ul>
+
+      <div class="hp-cta-row" style="margin-top: 2rem;" data-reveal data-reveal-delay="280">
+        <%= link_to "Conoce el menú", "#menu", class: "hp-btn hp-btn-dark" %>
+      </div>
     </div>
-    <div class="landing-nosotros-media" data-reveal>
-      <span class="landing-nosotros-quote" aria-hidden="true">“</span>
+
+    <div class="landing-nosotros-media" data-reveal="right" data-reveal-delay="120">
       <% if @business.foto_nosotros.attached? %>
-        <%= image_tag @business.foto_nosotros, class: "landing-nosotros-photo" %>
+        <%= image_tag @business.foto_nosotros, class: "landing-nosotros-photo",
+              alt: "El local de #{@business.nombre}", loading: "lazy", decoding: "async" %>
       <% elsif foto_producto %>
-        <%= image_tag foto_producto.foto, class: "landing-nosotros-photo", alt: foto_producto.nombre %>
-      <% elsif @business.logo.attached? %>
-        <%= image_tag @business.logo, class: "landing-nosotros-photo" %>
+        <%= image_tag foto_producto.foto, class: "landing-nosotros-photo",
+              alt: foto_producto.nombre, loading: "lazy", decoding: "async" %>
       <% else %>
-        <div class="landing-nosotros-photo landing-nosotros-photo-fallback">🍟</div>
+        <%= image_tag "hipapa-mascota-saludo.webp",
+              class: "landing-nosotros-photo landing-nosotros-photo-mascota",
+              alt: "Personaje de #{@business.nombre} saludando", loading: "lazy", decoding: "async" %>
       <% end %>
+      <span class="hp-nosotros-stamp" aria-hidden="true">El sabor<br>de la casa</span>
     </div>
   </div>
 </section>

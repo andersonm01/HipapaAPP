@@ -1,39 +1,71 @@
 <% if @productos_por_categoria.any? %>
-  <section class="landing-container landing-menu-section" id="menu" data-reveal>
-    <h2 class="landing-section-title">Nuestro Menú</h2>
-    <p class="landing-section-subtitle">Explora por categoría</p>
+  <section class="hp-section hp-section-cream landing-menu-section" id="menu" aria-labelledby="menu-titulo">
+    <div class="landing-container landing-container-wide">
+      <div class="hp-section-head hp-section-head-center">
+        <span class="hp-eyebrow hp-eyebrow-center hp-eyebrow-dark" data-reveal="fade">Nuestro menú</span>
+        <h2 class="hp-section-title" id="menu-titulo" data-reveal>Elige tu antojo</h2>
+        <p class="hp-section-lead" data-reveal data-reveal-delay="100">
+          Todo se prepara cuando lo pides. Explora por categoría y arma tu pedido.
+        </p>
+      </div>
 
-    <div class="landing-menu-tabs" data-menu-tabs role="tablist">
-      <% @productos_por_categoria.keys.each_with_index do |categoria, index| %>
-        <button type="button" class="landing-menu-tab<%= ' active' if index.zero? %>" data-menu-tab="<%= categoria.parameterize %>"><%= categoria %></button>
-      <% end %>
-    </div>
-
-    <div class="landing-menu-grid" data-menu-grid>
-      <% @productos_por_categoria.each do |categoria, productos| %>
-        <% productos.each do |producto| %>
-          <div class="landing-menu-item" data-menu-category="<%= categoria.parameterize %>">
-            <% if producto.foto.attached? %>
-              <%= image_tag producto.foto, class: "landing-menu-item-photo", alt: producto.nombre %>
-            <% else %>
-              <div class="landing-menu-item-photo landing-menu-item-photo-fallback">🍟</div>
-            <% end %>
-            <div class="landing-menu-item-body">
-              <div class="landing-menu-item-head">
-                <p class="landing-menu-item-name"><%= producto.nombre %></p>
-                <p class="landing-menu-item-price">$<%= number_with_precision(producto.precio, precision: 0, delimiter: ',') %></p>
-              </div>
-              <% if producto.descripcion.present? %>
-                <p class="landing-menu-item-desc"><%= truncate(producto.descripcion, length: 80) %></p>
-              <% end %>
-            </div>
-          </div>
+      <div class="landing-menu-tabs" data-menu-tabs role="tablist" aria-label="Categorías del menú">
+        <% @productos_por_categoria.each_with_index do |(categoria, productos), index| %>
+          <button type="button" role="tab"
+                  class="landing-menu-tab<%= ' active' if index.zero? %>"
+                  aria-selected="<%= index.zero? %>"
+                  data-menu-tab="<%= categoria.parameterize %>">
+            <%= categoria %>
+          </button>
         <% end %>
-      <% end %>
-    </div>
+      </div>
 
-    <div class="landing-menu-cta">
-      <%= link_to "Ordenar ahora →", public_menu_path, class: "landing-btn landing-btn-primary" %>
+      <div class="landing-menu-grid" data-menu-grid>
+        <% @productos_por_categoria.each do |categoria, productos| %>
+          <% productos.each do |producto| %>
+            <%
+              es_top   = @mas_vendidos_ids.include?(producto.id)
+              es_nuevo = !es_top && @nuevos_ids.include?(producto.id)
+            %>
+            <article class="landing-menu-item" data-menu-category="<%= categoria.parameterize %>">
+              <div class="landing-menu-item-media">
+                <% if es_top || es_nuevo %>
+                  <div class="landing-menu-item-tags">
+                    <% if es_top %><span class="hp-tag hp-tag-top">🔥 Más vendido</span><% end %>
+                    <% if es_nuevo %><span class="hp-tag hp-tag-new">✨ Nuevo</span><% end %>
+                  </div>
+                <% end %>
+
+                <% if producto.foto.attached? %>
+                  <%= image_tag producto.foto, class: "landing-menu-item-photo",
+                        alt: producto.nombre, loading: "lazy", decoding: "async" %>
+                <% else %>
+                  <div class="landing-menu-item-photo-fallback"><span aria-hidden="true">🍟</span></div>
+                <% end %>
+              </div>
+
+              <div class="landing-menu-item-body">
+                <h3 class="landing-menu-item-name"><%= producto.nombre %></h3>
+                <% if producto.descripcion.present? %>
+                  <p class="landing-menu-item-desc"><%= truncate(producto.descripcion, length: 72) %></p>
+                <% end %>
+                <div class="landing-menu-item-foot">
+                  <p class="landing-menu-item-price"><%= hp_precio(producto.precio) %></p>
+                  <%= link_to "Pedir", public_menu_path(anchor: categoria.parameterize),
+                        class: "hp-menu-item-cta",
+                        "aria-label": "Pedir #{producto.nombre}" %>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="landing-menu-cta" data-reveal>
+        <%= link_to public_menu_path, class: "hp-btn hp-btn-primary hp-btn-lg" do %>
+          Ver el menú completo y pedir <span class="hp-btn-icon" aria-hidden="true">→</span>
+        <% end %>
+      </div>
     </div>
   </section>
 <% end %>

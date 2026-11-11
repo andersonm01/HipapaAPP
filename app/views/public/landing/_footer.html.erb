@@ -1,41 +1,73 @@
-<footer class="landing-footer" id="contacto">
-  <div class="landing-container landing-footer-grid">
+<%
+  nombre_partes = @business.nombre.to_s.strip.split(/\s+/, 2)
+  wa_url = hp_whatsapp_url(@business.whatsapp_negocio, "¡Hola #{@business.nombre}! Quiero hacer un pedido 🍟")
+%>
+<footer class="landing-footer">
+  <div class="landing-container landing-container-wide landing-footer-grid">
     <div class="landing-footer-brand">
-      <% if @business.logo.attached? %>
-        <%= image_tag @business.logo, class: "landing-footer-logo" %>
-      <% end %>
-      <p class="landing-footer-name"><%= @business.nombre %></p>
-      <% if @business.descripcion.present? %>
-        <p class="landing-footer-desc"><%= truncate(@business.descripcion, length: 120) %></p>
-      <% end %>
+      <div class="landing-footer-brand-row">
+        <% if @business.logo.attached? %>
+          <%= image_tag @business.logo, class: "landing-footer-logo", alt: @business.nombre, loading: "lazy" %>
+        <% else %>
+          <%= image_tag "hipapa-avatar.webp", class: "landing-footer-logo", alt: "", aria: { hidden: true }, loading: "lazy" %>
+        <% end %>
+        <p class="landing-footer-name">
+          <%= nombre_partes[0] %><% if nombre_partes[1] %> <span><%= nombre_partes[1] %></span><% end %>
+        </p>
+      </div>
+
+      <p class="landing-footer-desc">
+        <%= @business.descripcion.presence || "Papas con todo, preparadas al momento. El sabor de la casa." %>
+      </p>
+
+      <div class="landing-footer-social">
+        <% if wa_url %>
+          <a href="<%= wa_url %>" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">💬</a>
+        <% end %>
+        <% if @business.telefono.present? %>
+          <a href="<%= hp_telefono_link(@business.telefono) %>" aria-label="Llamar" title="Llamar">📞</a>
+        <% end %>
+        <% if @business.direccion.present? %>
+          <a href="<%= hp_maps_url(@business.direccion) %>" target="_blank" rel="noopener"
+             aria-label="Cómo llegar" title="Cómo llegar">📍</a>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="landing-footer-col">
+      <p class="landing-footer-heading">Navega</p>
+      <p class="landing-footer-line"><%= link_to "Menú", "#menu", class: "landing-footer-link" %></p>
+      <p class="landing-footer-line"><%= link_to "Nosotros", "#nosotros", class: "landing-footer-link" %></p>
+      <p class="landing-footer-line"><%= link_to "Contacto", "#contacto", class: "landing-footer-link" %></p>
+      <p class="landing-footer-line"><%= link_to "Pedir ahora", public_menu_path, class: "landing-footer-link" %></p>
     </div>
 
     <% if @business.horario.present? || @business.direccion.present? || @business.telefono.present? %>
       <div class="landing-footer-col">
         <p class="landing-footer-heading">Contacto</p>
         <% if @business.direccion.present? %>
-          <p class="landing-footer-line">📍 <%= @business.direccion %></p>
+          <p class="landing-footer-line">
+            <%= link_to @business.direccion, hp_maps_url(@business.direccion),
+                  class: "landing-footer-link", target: "_blank", rel: "noopener" %>
+          </p>
         <% end %>
         <% if @business.telefono.present? %>
           <p class="landing-footer-line">
-            <%= link_to "📞 #{@business.telefono}", "tel:#{@business.telefono.gsub(/\D/, '')}", class: "landing-footer-link" %>
+            <%= link_to @business.telefono, hp_telefono_link(@business.telefono), class: "landing-footer-link" %>
           </p>
         <% end %>
         <% if @business.horario.present? %>
-          <p class="landing-footer-line">🕒 <%= @business.horario %></p>
+          <p class="landing-footer-line"><%= @business.horario %></p>
         <% end %>
       </div>
     <% end %>
-
-    <div class="landing-footer-col">
-      <p class="landing-footer-heading">Enlaces</p>
-      <p class="landing-footer-line"><%= link_to "Ver menú", public_menu_path, class: "landing-footer-link" %></p>
-      <p class="landing-footer-line"><%= link_to "Admin", login_path, class: "landing-footer-admin" %></p>
-    </div>
   </div>
 
   <div class="landing-footer-bottom">
     <p>&copy; <%= Date.current.year %> <%= @business.nombre %>. Todos los derechos reservados.</p>
-    <p>Creado por <%= link_to "Portalix", "https://digitalportalix.com", class: "landing-footer-link", target: "_blank", rel: "noopener" %></p>
+    <p>
+      Creado por <%= link_to "Portalix", "https://digitalportalix.com", class: "landing-footer-link", target: "_blank", rel: "noopener" %>
+      · <%= link_to "Admin", login_path, class: "landing-footer-admin" %>
+    </p>
   </div>
 </footer>

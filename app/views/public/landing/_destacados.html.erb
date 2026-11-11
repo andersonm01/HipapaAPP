@@ -1,0 +1,53 @@
+<% if @destacados.present? %>
+  <%
+    # Si hay ventas registradas, los destacados son el ranking real; si no,
+    # son simplemente nuestras papas, y el título lo dice así.
+    por_ventas = @mas_vendidos_ids.present?
+  %>
+  <section class="hp-section hp-section-dark" aria-labelledby="destacados-titulo">
+    <span class="hp-watermark" style="top: 8%; left: -2%;" aria-hidden="true">HI PAPA</span>
+
+    <div class="landing-container landing-container-wide">
+      <div class="hp-section-head hp-section-head-center">
+        <span class="hp-eyebrow hp-eyebrow-center" data-reveal="fade">
+          <%= por_ventas ? "Los favoritos" : "Nuestra especialidad" %>
+        </span>
+        <h2 class="hp-section-title hp-section-title-light" id="destacados-titulo" data-reveal>
+          <%= por_ventas ? "Lo que más nos piden" : "Las papas de la casa" %>
+        </h2>
+        <p class="hp-section-lead hp-section-lead-light" data-reveal data-reveal-delay="100">
+          <%= por_ventas ? "El top del mostrador, calculado con los pedidos reales de #{@business.nombre}." :
+                           "Lo que nos tiene en el barrio: papas generosas, crocantes y con todo encima." %>
+        </p>
+      </div>
+
+      <div class="hp-destacados-grid">
+        <% @destacados.each_with_index do |producto, index| %>
+          <%= link_to public_menu_path(anchor: producto.categoria.to_s.parameterize),
+                class: "hp-destacado", data: { reveal: "", reveal_delay: index * 110 } do %>
+            <div class="hp-destacado-media">
+              <% if por_ventas %>
+                <span class="hp-destacado-rank" aria-label="Puesto <%= index + 1 %> en ventas"><%= index + 1 %></span>
+              <% end %>
+              <% if producto.foto.attached? %>
+                <%= image_tag producto.foto, alt: producto.nombre, loading: "lazy", decoding: "async" %>
+              <% else %>
+                <div class="landing-menu-item-photo-fallback"><span aria-hidden="true">🍟</span></div>
+              <% end %>
+            </div>
+            <div class="hp-destacado-body">
+              <h3 class="hp-destacado-name"><%= producto.nombre %></h3>
+              <% if producto.descripcion.present? %>
+                <p class="hp-destacado-desc"><%= truncate(producto.descripcion, length: 95) %></p>
+              <% end %>
+              <div class="hp-destacado-foot">
+                <span class="hp-destacado-price"><%= hp_precio(producto.precio) %></span>
+                <span class="hp-btn hp-btn-gold hp-btn-sm">Pedirlo <span class="hp-btn-icon" aria-hidden="true">→</span></span>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

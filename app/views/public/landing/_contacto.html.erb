@@ -1,0 +1,85 @@
+<%
+  wa_url = hp_whatsapp_url(@business.whatsapp_negocio, "¡Hola #{@business.nombre}! Quiero hacer un pedido 🍟")
+  hay_datos = @business.direccion.present? || @business.telefono.present? ||
+              @business.horario.present? || wa_url.present?
+%>
+<% if hay_datos %>
+  <section class="hp-section hp-section-dark landing-contacto" id="contacto" aria-labelledby="contacto-titulo">
+    <div class="landing-container landing-container-wide">
+      <div class="hp-section-head">
+        <span class="hp-eyebrow" data-reveal="fade">Visítanos</span>
+        <h2 class="hp-section-title hp-section-title-light" id="contacto-titulo" data-reveal>
+          Dónde encontrarnos
+        </h2>
+        <p class="hp-section-lead hp-section-lead-light" data-reveal data-reveal-delay="100">
+          Pasa por el local, llámanos o escríbenos por WhatsApp. Te atendemos con gusto.
+        </p>
+      </div>
+
+      <div class="hp-contacto-grid">
+        <div class="hp-contacto-cards">
+          <% if @business.direccion.present? %>
+            <a class="hp-contacto-card" href="<%= hp_maps_url(@business.direccion) %>"
+               target="_blank" rel="noopener" data-reveal="left" data-reveal-delay="0">
+              <span class="hp-contacto-icon" aria-hidden="true">📍</span>
+              <div>
+                <p class="hp-contacto-label">Dirección</p>
+                <p class="hp-contacto-value"><%= @business.direccion %></p>
+                <p class="hp-contacto-hint">Ver en Google Maps →</p>
+              </div>
+            </a>
+          <% end %>
+
+          <% if @business.horario.present? %>
+            <div class="hp-contacto-card" data-reveal="left" data-reveal-delay="80">
+              <span class="hp-contacto-icon" aria-hidden="true">🕒</span>
+              <div>
+                <p class="hp-contacto-label">Horario</p>
+                <p class="hp-contacto-value"><%= @business.horario %></p>
+              </div>
+            </div>
+          <% end %>
+
+          <% if @business.telefono.present? %>
+            <a class="hp-contacto-card" href="<%= hp_telefono_link(@business.telefono) %>"
+               data-reveal="left" data-reveal-delay="160">
+              <span class="hp-contacto-icon" aria-hidden="true">📞</span>
+              <div>
+                <p class="hp-contacto-label">Teléfono</p>
+                <p class="hp-contacto-value"><%= @business.telefono %></p>
+                <p class="hp-contacto-hint">Toca para llamar →</p>
+              </div>
+            </a>
+          <% end %>
+
+          <% if wa_url %>
+            <a class="hp-contacto-card" href="<%= wa_url %>" target="_blank" rel="noopener"
+               data-reveal="left" data-reveal-delay="240">
+              <span class="hp-contacto-icon" aria-hidden="true">💬</span>
+              <div>
+                <p class="hp-contacto-label">WhatsApp</p>
+                <p class="hp-contacto-value">Haz tu pedido por chat</p>
+                <p class="hp-contacto-hint">Te respondemos al toque →</p>
+              </div>
+            </a>
+          <% end %>
+        </div>
+
+        <% if @business.direccion.present? %>
+          <div class="hp-contacto-map" data-reveal="right" data-reveal-delay="120">
+            <iframe src="<%= hp_maps_embed_url(@business.direccion) %>"
+                    title="Mapa con la ubicación de <%= @business.nombre %>"
+                    loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen></iframe>
+            <div class="hp-contacto-map-actions">
+              <%= link_to hp_maps_directions_url(@business.direccion),
+                    class: "hp-btn hp-btn-gold hp-btn-sm", target: "_blank", rel: "noopener" do %>
+                Cómo llegar <span class="hp-btn-icon" aria-hidden="true">→</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

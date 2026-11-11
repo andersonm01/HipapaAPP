@@ -1,18 +1,76 @@
 <%
-  hero_subtitle = @business.descripcion.presence || "Ingredientes frescos, preparación al momento y una atención que se nota. Así se vive #{@business.nombre}."
-  hero_style = if @business.foto_hero.attached?
-    "background-image: linear-gradient(135deg, rgba(15,23,42,.88), rgba(30,41,59,.72) 70%), url('#{url_for(@business.foto_hero)}');"
-  end
+  hero_subtitle = @business.descripcion.presence ||
+    "Papas con todo, preparadas al momento y servidas como en casa."
+  # "Carrera 49 #88-29, Campo Valdés, Medellín" → "Campo Valdés" para el dato rápido.
+  barrio = @business.direccion.to_s.split(',').map(&:strip)[1].presence
 %>
-<section class="landing-hero" id="top"<%= " style=\"#{hero_style}\"".html_safe if hero_style %>>
-  <div class="landing-container landing-hero-inner">
-    <p class="landing-hero-kicker" data-reveal>Bienvenido a <%= @business.nombre %></p>
-    <h1 class="landing-title" data-reveal>Papas fritas<br>en Medellín</h1>
-    <p class="landing-subtitle" data-reveal><%= hero_subtitle %></p>
+<section class="landing-hero" id="top">
+  <% if @business.foto_hero.attached? %>
+    <div class="landing-hero-photo" data-parallax="0.18"
+         style="background-image: url('<%= url_for(@business.foto_hero) %>');" aria-hidden="true"></div>
+  <% end %>
 
-    <div class="landing-cta-row" data-reveal>
-      <%= link_to "Ver menú", "#menu", class: "landing-btn landing-btn-primary" %>
-      <%= link_to "Ordenar ahora", public_menu_path, class: "landing-btn landing-btn-ghost" %>
+  <span class="hp-fry hp-fry-1" aria-hidden="true"></span>
+  <span class="hp-fry hp-fry-2" aria-hidden="true"></span>
+  <span class="hp-fry hp-fry-3" aria-hidden="true"></span>
+  <span class="hp-fry hp-fry-4" aria-hidden="true"></span>
+
+  <div class="landing-container landing-container-wide landing-hero-inner">
+    <div class="landing-hero-copy">
+      <p class="hp-hero-badge" data-reveal="fade">
+        <span class="hp-hero-badge-dot" aria-hidden="true">🍟</span>
+        El sabor de la casa<% if @business.direccion.present? %> · Medellín<% end %>
+      </p>
+
+      <h1 class="landing-title" data-reveal>
+        <span class="hp-title-line">El <span class="hp-highlight">antojo</span></span>
+        <span class="hp-title-line">tiene nombre</span>
+      </h1>
+
+      <p class="landing-subtitle" data-reveal data-reveal-delay="120"><%= hero_subtitle %></p>
+
+      <div class="hp-cta-row" data-reveal data-reveal-delay="200">
+        <%= link_to "#menu", class: "hp-btn hp-btn-primary hp-btn-lg" do %>
+          Ver nuestro menú <span class="hp-btn-icon" aria-hidden="true">→</span>
+        <% end %>
+        <%= link_to "Pedir ahora", public_menu_path, class: "hp-btn hp-btn-ghost hp-btn-lg" %>
+      </div>
+
+      <div class="hp-hero-facts" data-reveal data-reveal-delay="300">
+        <div class="hp-hero-fact">
+          <span class="hp-hero-fact-icon" aria-hidden="true">🔥</span>
+          <span class="hp-hero-fact-text"><strong>Al momento</strong>Nada se fríe antes de tiempo</span>
+        </div>
+        <div class="hp-hero-fact">
+          <span class="hp-hero-fact-icon" aria-hidden="true">🛵</span>
+          <span class="hp-hero-fact-text"><strong>Domicilio</strong>Te lo llevamos caliente</span>
+        </div>
+        <% if @business.horario.present? %>
+          <div class="hp-hero-fact">
+            <span class="hp-hero-fact-icon" aria-hidden="true">🕒</span>
+            <span class="hp-hero-fact-text"><strong>Horario</strong><%= @business.horario %></span>
+          </div>
+        <% elsif barrio %>
+          <div class="hp-hero-fact">
+            <span class="hp-hero-fact-icon" aria-hidden="true">📍</span>
+            <span class="hp-hero-fact-text"><strong><%= barrio %></strong>Pasa por el local</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="landing-hero-art" data-reveal="zoom" data-reveal-delay="150">
+      <span class="hp-mascota-glow" aria-hidden="true"></span>
+      <span class="hp-mascota-ring" aria-hidden="true"></span>
+      <%= image_tag "hipapa-mascota-pulgares.webp",
+            class: "hp-mascota", width: 760, height: 885,
+            alt: "Personaje de #{@business.nombre}: un cono de papas fritas levantando los pulgares",
+            fetchpriority: "high" %>
     </div>
   </div>
+
+  <a href="#menu" class="hp-scroll-cue" aria-label="Ir al menú">
+    <span class="hp-scroll-cue-mouse" aria-hidden="true"></span>
+    Desliza
+  </a>
 </section>

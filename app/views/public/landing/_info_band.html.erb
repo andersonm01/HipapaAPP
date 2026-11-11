@@ -1,9 +1,9 @@
 <% if @business.horario.present? || @business.direccion.present? || @business.telefono.present? %>
-  <div class="landing-container">
-    <section class="landing-info-band" data-reveal>
+  <div class="landing-container landing-container-wide">
+    <section class="landing-info-band" aria-label="Información del local">
       <% if @business.horario.present? %>
-        <div class="landing-info-item">
-          <span class="landing-info-icon">🕒</span>
+        <div class="landing-info-item" data-reveal data-reveal-delay="0">
+          <span class="landing-info-icon" aria-hidden="true">🕒</span>
           <div>
             <p class="landing-info-label">Horario</p>
             <p class="landing-info-value"><%= @business.horario %></p>
@@ -12,22 +12,23 @@
       <% end %>
 
       <% if @business.direccion.present? %>
-        <div class="landing-info-item">
-          <span class="landing-info-icon">📍</span>
+        <div class="landing-info-item" data-reveal data-reveal-delay="90">
+          <span class="landing-info-icon" aria-hidden="true">📍</span>
           <div>
-            <p class="landing-info-label">Dirección</p>
-            <%= link_to @business.direccion, "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(@business.direccion)}",
+            <p class="landing-info-label">Dónde estamos</p>
+            <%= link_to @business.direccion, hp_maps_url(@business.direccion),
                   class: "landing-info-value landing-info-link", target: "_blank", rel: "noopener" %>
           </div>
         </div>
       <% end %>
 
       <% if @business.telefono.present? %>
-        <div class="landing-info-item">
-          <span class="landing-info-icon">📞</span>
+        <div class="landing-info-item" data-reveal data-reveal-delay="180">
+          <span class="landing-info-icon" aria-hidden="true">📞</span>
           <div>
-            <p class="landing-info-label">Teléfono</p>
-            <%= link_to @business.telefono, "tel:#{@business.telefono.gsub(/\D/, '')}", class: "landing-info-value landing-info-link" %>
+            <p class="landing-info-label">Llámanos</p>
+            <%= link_to @business.telefono, hp_telefono_link(@business.telefono),
+                  class: "landing-info-value landing-info-link" %>
           </div>
         </div>
       <% end %>
