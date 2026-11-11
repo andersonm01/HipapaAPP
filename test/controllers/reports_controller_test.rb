@@ -9,6 +9,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     get reportes_url
     assert_response :success
     assert_select "#kpiCards"
-    assert_select "#periodNav .pn-btn", count: 6
+    assert_select "#periodNav .pn-btn", count: 7
+    assert_select "#periodNav .pn-btn[data-period=?]", "yesterday", text: "Ayer"
   end
 end
